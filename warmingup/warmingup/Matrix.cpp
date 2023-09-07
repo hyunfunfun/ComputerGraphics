@@ -21,10 +21,10 @@ void Matrix::m(int arr_1[3][3], int arr_2[3][3]) {
 	}
 };
 //Çà·Ä µ¡¼À
-void Matrix::a(int arr_1[3][3], int arr_2[3][3]) {
+void Matrix::a() {
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
-			result[i][j] = arr_1[i][j] + arr_2[i][j];
+			result[i][j] = arr1[i][j] + arr2[i][j];
 		}
 	}
 	for (int i = 0; i < 3; i++) {

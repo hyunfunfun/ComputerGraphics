@@ -43,7 +43,7 @@ int main() {
 			a.m(a.arr1, a.arr2);
 			break;
 		case 'a':
-			a.a(a.arr1, a.arr2);
+			a.a();
 			break;
 		case 'd':
 			a.d(a.arr1, a.arr2);
