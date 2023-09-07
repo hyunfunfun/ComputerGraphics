@@ -3,6 +3,7 @@
 struct Matrix {
 
 	int result[3][3];
+	int sum;
 	int arr1[3][3];
 	int arr2[3][3];
 	void m(int arr_1[3][3], int arr_2[3][3]);

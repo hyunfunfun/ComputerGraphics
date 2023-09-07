@@ -34,12 +34,23 @@ int main() {
 		}
 		cout << endl;
 	}
-
-	cin >> n;
-	switch (n) {
-	case 'a':
-		a.a(a.arr1,a.arr2);
-		break;
+	n = 'a';
+	while (n!='q') {
+		cout << "입력"<<endl;
+		cin >> n;
+		switch (n) {
+		case 'm':
+			a.m(a.arr1, a.arr2);
+			break;
+		case 'a':
+			a.a(a.arr1, a.arr2);
+			break;
+		case 'q':
+			break;
+		default:
+			cout << "다시입력" << endl;
+			break;
+		}
 	}
 
 	return 0;
