@@ -1,9 +1,6 @@
-#include <iostream>
-#include <stdlib.h>
-#include <time.h>
 #include "Matrix.h"
+#include "Header.h"
 
-using namespace std;
 
 int main() {
 
