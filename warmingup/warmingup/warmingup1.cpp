@@ -45,7 +45,48 @@ int main() {
 		case 'a':
 			a.a(a.arr1, a.arr2);
 			break;
+		case 'd':
+			a.d(a.arr1, a.arr2);
 		case 'q':
+			break;
+		case '1':
+			a.mul(a.arr1, (int)n-48);
+			break;
+		case '2':
+			a.mul(a.arr1, (int)n - 48);
+			break;
+		case '3':
+			a.mul(a.arr1, (int)n - 48);
+			break;
+		case '4':
+			a.mul(a.arr1, (int)n - 48);
+			break;
+		case '5':
+			a.mul(a.arr1, (int)n - 48);
+			break;
+		case '6':
+			a.mul(a.arr1, (int)n - 48);
+			break;
+		case '7':
+			a.mul(a.arr1, (int)n - 48);
+			break;
+		case '8':
+			a.mul(a.arr1, (int)n - 48);
+			break;
+		case '9':
+			a.mul(a.arr1, (int)n - 48);
+			break;
+		case 'r':
+			a.r(a.arr1, a.arr2);
+			break;
+		case 't':
+			a.t(a.arr1, a.arr2);
+			break;
+		case 'h':
+			a.h(a.arr1,a.arr2);
+			break;
+		case 's':
+			a.s();
 			break;
 		default:
 			cout << "다시입력" << endl;
