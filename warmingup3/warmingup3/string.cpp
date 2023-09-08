@@ -48,9 +48,12 @@ void fstring::f()
 		cout << str[i] << endl;
 	}
 }
-void fstring::g()
+void fstring::g(char a, char b)
 {
-
+	for (int i = 0; i < 10; i++) {
+		replace(str[i].begin(), str[i].end(), a, b);
+		cout << str[i] << endl;
+	}
 }
 void fstring::h()
 {

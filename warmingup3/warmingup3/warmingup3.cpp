@@ -2,23 +2,25 @@
 #include "string.h"
 
 int main() {
-	char n='a';
-	int i = 0;
 	fstring fs;
 	ifstream file;
 	file.open("data.txt");
-	fs.count = 0;
 	string str;
 	string str2;
 
+
+	int i = 0;
 	while (!file.eof()) {
 		getline(file, str);
 		fs.str[i] = str;
 		cout << fs.str[i] << endl;
 		i++;
 	}
-	
 
+
+	char n = 'a';
+	fs.count = 0;
+	char a, b;
 	while (n!='q') {
 		cout << "커맨드입력"<<endl;
 		cin >> n;
@@ -40,7 +42,11 @@ int main() {
 			fs.f();
 			break;
 		case 'g':
-			fs.g();
+			cout << "바꿀문자 : ";
+			cin >> a;
+			cout << "새로입력할 문자 : ";
+			cin >> b;
+			fs.g(a,b);
 			break;
 		case 'h':
 			fs.h();

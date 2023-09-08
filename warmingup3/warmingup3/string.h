@@ -9,7 +9,7 @@ struct fstring {
 	void e();
 	void e2();
 	void f();
-	void g();
+	void g(char a, char b);
 	void h();
 	void plus();
 	void minus();
