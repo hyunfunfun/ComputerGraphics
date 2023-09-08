@@ -7,14 +7,13 @@ int main() {
 	fstring fs;
 	ifstream file;
 	file.open("data.txt");
-
+	fs.count = 0;
 	string str;
 	string str2;
 
 	while (!file.eof()) {
 		getline(file, str);
 		fs.str[i] = str;
-		stringstream s(str);
 		cout << fs.str[i] << endl;
 		i++;
 	}
@@ -28,7 +27,14 @@ int main() {
 			fs.d();
 			break;
 		case 'e':
-			fs.e();
+			if (fs.count == 0) {
+				fs.e();
+				fs.count = 1;
+			}
+			else {
+				fs.e2();
+				fs.count = 0;
+			}
 			break;
 		case 'f':
 			fs.f();
