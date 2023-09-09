@@ -57,7 +57,28 @@ void fstring::g(char a, char b)
 }
 void fstring::h()
 {
-
+	for (int i = 0; i < 10; i++) {
+		int len = str[i].length();
+		char* a = new char[len];
+		for (int k = 0; k < len; k++) {
+			a[k] = NULL;
+		}
+		str2[i] = str[i];
+		for (int j = 0; j < len / 2; j++) {
+			if (str2[i][j] == str[i][len - j - 1]) {
+				a[j] = str2[i][j];
+			}
+			else {
+				break;
+			}
+		}
+		if (a[0] == NULL) {
+			cout << str2[i] << " : " << "0" << endl;
+		}
+		else {
+			cout << str2[i] << " : " << a << endl;
+		}
+	}
 }
 void fstring::plus()
 {
