@@ -5,18 +5,31 @@ int main() {
 	List li;
 	char n = 'a';
 	int x, y, z;
+	li.count = 0;
 
 	while (n != 'q') {
 		cout << "커맨드입력";
 		cin >> n;
 		switch (n) {
 		case '+':
-			cout << "x y z 입력";
-			cin >> x >> y >> z;
-			li.plus(x, y, z);
+			if (li.count < 10) {
+				cout << "x y z 입력";
+				cin >> x >> y >> z;
+				li.plus(x, y, z);
+				li.count++;
+			}
+			else {
+				cout << "리스트 초과";
+			}
 			break;
 		case '-':
-			li.minus();
+			if (li.count > 0) {
+				li.count--;
+				li.minus();
+			}
+			else {
+				cout << "리스트 초과";
+			}
 			break;
 		case 'e':
 			cout << "x y z 입력";
