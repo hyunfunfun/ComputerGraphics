@@ -1,5 +1,6 @@
 #include "Header.h"
 #include "List.h"
+#define SWAP(x,y,temp) (temp=x,x=y,y=temp)
 
 void List::plus(int x_, int y_, int z_) {
 	liarr[count].x = x_;
@@ -83,17 +84,16 @@ void List::c() {
 		liarr[i].z = NULL;
 		liarr[i].check = false;
 	}
-	count = 0;
-	ucount = 0;
+	
 }
 void List::m() {
-	int max=0;
+	float max=0;
 	int checki;
 	for (int i = 0; i < 10; i++) {
 		if (liarr[i].check == true) {
-			distance = sqrt((liarr[i].x * 2) + (liarr[i].y * 2) + (liarr[i].z * 2));
-			if (max < distance) {
-				max = distance;
+			liarr[i].distance = sqrt((liarr[i].x * 2) + (liarr[i].y * 2) + (liarr[i].z * 2));
+			if (max < liarr[i].distance) {
+				max = liarr[i].distance;
 				checki = i;
 			}
 		}
@@ -101,13 +101,13 @@ void List::m() {
 	cout << "(" << liarr[checki].x <<" ," << liarr[checki].y << " ," << liarr[checki].z << ")" << endl;
 }
 void List::n() {
-	int max = 100000;
+	float min = 100000;
 	int checki;
 	for (int i = 0; i < 10; i++) {
 		if (liarr[i].check == true) {
-			distance = sqrt((liarr[i].x * 2) + (liarr[i].y * 2) + (liarr[i].z * 2));
-			if (max > distance) {
-				max = distance;
+			liarr[i].distance = sqrt((liarr[i].x * 2) + (liarr[i].y * 2) + (liarr[i].z * 2));
+			if (min > liarr[i].distance) {
+				min = liarr[i].distance;
 				checki = i;
 			}
 		}
@@ -115,8 +115,88 @@ void List::n() {
 	cout << "(" << liarr[checki].x << " ," << liarr[checki].y << " ," << liarr[checki].z << ")" << endl;
 }
 void List::a() {
+	int n=0;
+	for (int i = 0; i < 10; i++) {
+		liarr[i].distance = sqrt((liarr[i].x * 2) + (liarr[i].y * 2) + (liarr[i].z * 2));
+		aliarr[i] = liarr[i];
+		if (liarr[i].check == true) {
+			n++;
+		}
+	}
+	for (int i = n-1; i > 0; i--) {
+		for (int j = 0; j < i; j++) {
+			if (liarr[j].distance < liarr[j + 1].distance) {
+				temp = liarr[j];
+				liarr[j] = liarr[j + 1];
+				liarr[j + 1] = temp;
+			}
+		}
+	}
+	for (int i = 9; i >= 0; i--) {
+		if (liarr[i].check == false) {
+			cout << i << " : " << "-" << " " << "-" << " " << "-" << " " << endl;
+		}
+		else {
+			cout << i << " : " << liarr[i].x << " " << liarr[i].y << " " << liarr[i].z << " " << endl;
+		}
 
+	}
+}
+
+void List::a2() {
+	for (int i = 0; i < 10; i++) {
+		liarr[i] = aliarr[i];
+
+	}
+	for (int i = 9; i >= 0; i--) {
+		if (liarr[i].check == false) {
+			cout << i << " : " << "-" << " " << "-" << " " << "-" << " " << endl;
+		}
+		else {
+			cout << i << " : " << liarr[i].x << " " << liarr[i].y << " " << liarr[i].z << " " << endl;
+		}
+
+	}
 }
 void List::s() {
+	int n = 0;
+	for (int i = 0; i < 10; i++) {
+		liarr[i].distance = sqrt((liarr[i].x * 2) + (liarr[i].y * 2) + (liarr[i].z * 2));
+		sliarr[i] = liarr[i];
+		if (liarr[i].check == true) {
+			n++;
+		}
+	}
+	for (int i = n-1; i > 0; i--) {
+		for (int j = 0; j < i; j++) {
+			if (liarr[j].distance > liarr[j + 1].distance) {
+				temp = liarr[j];
+				liarr[j] = liarr[j + 1];
+				liarr[j + 1] = temp;
+			}
+		}
+	}
+	for (int i = 9; i >= 0; i--) {
+		if (liarr[i].check == false) {
+			cout << i << " : " << "-" << " " << "-" << " " << "-" << " " << endl;
+		}
+		else {
+			cout << i << " : " << liarr[i].x << " " << liarr[i].y << " " << liarr[i].z << " " << endl;
+		}
 
+	}
+}
+void List::s2() {
+	for (int i = 0; i < 10; i++) {
+		liarr[i] = sliarr[i];
+	}
+	for (int i = 9; i >= 0; i--) {
+		if (liarr[i].check == false) {
+			cout << i << " : " << "-" << " " << "-" << " " << "-" << " " << endl;
+		}
+		else {
+			cout << i << " : " << liarr[i].x << " " << liarr[i].y << " " << liarr[i].z << " " << endl;
+		}
+
+	}
 }

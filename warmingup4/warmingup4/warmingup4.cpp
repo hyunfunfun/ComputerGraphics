@@ -7,6 +7,8 @@ int main() {
 	int x, y, z;
 	li.count = 0;
 	li.ucount = 0;
+	int c=0;
+	int c1 = 0;
 
 
 	while (n != 'q') {
@@ -22,14 +24,18 @@ int main() {
 				cout << li.count << "  " << li.ucount << endl;
 			}
 			else {
-				cout << "리스트 초과";
+				if (li.ucount != 0) {
+					li.e(x, y, z);
+				}
+				else {
+					cout << "리스트 초과";
+				}
 			}
 			break;
 		case '-':
 			if (li.count > 0) {
 				li.count--;
 				li.minus();
-				cout << li.count << "  " << li.ucount << endl;
 			}
 			else {
 				cout << "리스트 초과";
@@ -39,7 +45,6 @@ int main() {
 			cout << "x y z 입력";
 			::cin >> x >> y >> z;
 			li.e(x, y, z);
-			cout << li.count << "  " << li.ucount << endl;
 			break;
 		case 'd':
 			if (li.ucount == li.count) {
@@ -49,7 +54,6 @@ int main() {
 			}
 			li.d();
 			li.ucount++;
-			cout << li.count << "  " << li.ucount << endl;
 			break;
 		case 'l':
 			li.l();
@@ -69,10 +73,24 @@ int main() {
 			li.n();
 			break;
 		case 'a':
-			li.a();
+			if (c == 0) {
+				li.a();
+				c++;
+			}
+			else {
+				li.a2();
+				c = 0;
+			}
 			break;
 		case 's':
-			li.s();
+			if (c1 == 0) {
+				li.s();
+				c1++;
+			}
+			else {
+				li.s2();
+				c1 = 0;
+			}
 			break;
 		}
 
