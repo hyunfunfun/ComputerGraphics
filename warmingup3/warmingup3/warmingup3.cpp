@@ -58,7 +58,12 @@ int main() {
 			fs.minus();
 			break;
 		default:
-			cout << "다시입력" << endl;
+			if (n == 'q') {
+				cout << "종료" << endl;
+			}
+			else {
+				cout << "다시입력" << endl;
+			}
 			break;
 		}
 

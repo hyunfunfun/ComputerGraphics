@@ -82,9 +82,54 @@ void fstring::h()
 }
 void fstring::plus()
 {
-
+	for (int i = 0; i < 10; i++) {
+		stringstream s(str[i]);
+		string astr;
+		int num;
+		while (s >> astr) {
+			if (48 <= (int)astr[0] && 57 >= (int)astr[0]) {
+				stringstream ss;
+				stringstream sss;
+				ss << astr;
+				ss >> num;
+				num++;
+				sss << num;
+				sss >> astr;
+			}
+			str2[i].append(astr);
+			str2[i].append(" ");
+		}
+		str2[i].pop_back();
+		str[i] = str2[i];
+		str2[i] = "";
+		cout << str[i] << endl;
+	}
 }
 void fstring::minus()
 {
-
+	for (int i = 0; i < 10; i++) {
+		stringstream s(str[i]);
+		string astr;
+		int num;
+		while (s >> astr) {
+			if (48 <= (int)astr[0] && 57 >= (int)astr[0]) {
+				stringstream ss;
+				stringstream sss;
+				ss << astr;
+				ss >> num;
+				num--;
+				if (num < 0) {
+					num = 0;
+				}
+				sss << num;
+				sss >> astr;
+			}
+			str2[i].append(astr);
+			str2[i].append(" ");
+		}
+		str2[i].pop_back();
+		str[i] = str2[i];
+		str2[i] = "";
+		cout << str[i] << endl;
+	}
 }
