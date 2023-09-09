@@ -6,6 +6,7 @@ int main() {
 	char n = 'a';
 	int x, y, z;
 	li.count = 0;
+	li.ucount = 0;
 
 	while (n != 'q') {
 		cout << "커맨드입력";
@@ -37,7 +38,13 @@ int main() {
 			li.e(x, y, z);
 			break;
 		case 'd':
-			li.d();
+			if (li.ucount >= 0) {
+				li.d();
+				li.ucount++;
+			}
+			else {
+				cout << "리스트 초과";
+			}
 			break;
 		case 'l':
 			li.l();
