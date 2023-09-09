@@ -9,6 +9,7 @@ struct Listarr {
 struct List {
 	int count=0;
 	int ucount=0;
+	float distance = 0.0;
 	Listarr liarr[10];
 	void plus(int x_, int y_, int z_);
 	void minus();

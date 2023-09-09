@@ -54,6 +54,9 @@ void List::e(int x_, int y_, int z_) {
 		}
 
 	}
+	if (count >= 10) {
+		count = 9;
+	}
 }
 void List::d() {
 	liarr[ucount].x = NULL;
@@ -71,16 +74,45 @@ void List::d() {
 	}
 }
 void List::l() {
-
+	cout << count - ucount  << endl;
 }
 void List::c() {
-
+	for (int i = 0; i < 10; i++) {
+		liarr[i].x = NULL;
+		liarr[i].y = NULL;
+		liarr[i].z = NULL;
+		liarr[i].check = false;
+	}
+	count = 0;
+	ucount = 0;
 }
 void List::m() {
-
+	int max=0;
+	int checki;
+	for (int i = 0; i < 10; i++) {
+		if (liarr[i].check == true) {
+			distance = sqrt((liarr[i].x * 2) + (liarr[i].y * 2) + (liarr[i].z * 2));
+			if (max < distance) {
+				max = distance;
+				checki = i;
+			}
+		}
+	}
+	cout << "(" << liarr[checki].x <<" ," << liarr[checki].y << " ," << liarr[checki].z << ")" << endl;
 }
 void List::n() {
-
+	int max = 100000;
+	int checki;
+	for (int i = 0; i < 10; i++) {
+		if (liarr[i].check == true) {
+			distance = sqrt((liarr[i].x * 2) + (liarr[i].y * 2) + (liarr[i].z * 2));
+			if (max > distance) {
+				max = distance;
+				checki = i;
+			}
+		}
+	}
+	cout << "(" << liarr[checki].x << " ," << liarr[checki].y << " ," << liarr[checki].z << ")" << endl;
 }
 void List::a() {
 
