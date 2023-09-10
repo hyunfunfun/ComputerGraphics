@@ -3,13 +3,14 @@
 struct board {
 	char x;
 	int y;
-	bool check = false;
+	char data;
 };
 
 int main() {
-
+	srand(time(NULL));
 	board board[5][5];
 
+	//좌표 넣기
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 5; j++) {
 			switch (i) {
@@ -41,7 +42,31 @@ int main() {
 				break;
 			}
 		}
-		cout << endl;
+	}
+
+	//대문자 넣기
+	int ch = 65;
+	for (int i = 1; i < 5; i++) {
+		for (int j = 1; j < 5; j++) {
+			board[i][j].data = ch;
+			if (j % 2 == 0) {
+				ch++;
+			}
+		}
+	}
+	//대문자 섞기
+	int rn1;
+	int rn2;
+	char temp;
+	for (int i = 1; i < 5; i++) {
+		for (int j = 1; j < 5; j++) {
+			rn1 = rand() % 4 + 1;
+			rn2 = rand() % 4 + 1;
+
+			temp = board[i][j].data;
+			board[i][j].data = board[rn1][rn2].data;
+			board[rn1][rn2].data;
+		}
 	}
 
 	char n;
@@ -50,7 +75,7 @@ int main() {
 	char en;
 
 
-
+	//보드 출력
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 5; j++) {
 			if (i == 0 && j == 0) {
@@ -113,7 +138,7 @@ int main() {
 						cout << board[i][j].y;
 					}
 					else if ((board[i][j].x==x1&&board[i][j].y==y1)|| (board[i][j].x == x2 && board[i][j].y == y2)) {
-						cout <<" " << board[i][j].x<<" ";
+						cout <<" " << board[i][j].data<<" ";
 					}
 					else {
 						cout << " * ";
