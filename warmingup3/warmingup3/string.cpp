@@ -82,12 +82,22 @@ void fstring::h()
 }
 void fstring::plus()
 {
+	bool ch = true;
 	for (int i = 0; i < 10; i++) {
 		stringstream s(str[i]);
 		string astr;
 		int num;
 		while (s >> astr) {
-			if (48 <= (int)astr[0] && 57 >= (int)astr[0]) {
+			for (int i = 0; i < astr.length(); i++) {
+				if (48 <= (int)astr[i] && 57 >= (int)astr[i]) {
+					ch = true;
+				}
+				else {
+					ch = false;
+					break;
+				}
+			}
+			if (ch==true) {
 				stringstream ss;
 				stringstream sss;
 				ss << astr;
@@ -107,20 +117,27 @@ void fstring::plus()
 }
 void fstring::minus()
 {
+	bool ch = true;
 	for (int i = 0; i < 10; i++) {
 		stringstream s(str[i]);
 		string astr;
 		int num;
 		while (s >> astr) {
-			if (48 <= (int)astr[0] && 57 >= (int)astr[0]) {
+			for (int i = 0; i < astr.length(); i++) {
+				if (48 <= (int)astr[i] && 57 >= (int)astr[i]) {
+					ch = true;
+				}
+				else {
+					ch = false;
+					break;
+				}
+			}
+			if (ch == true) {
 				stringstream ss;
 				stringstream sss;
 				ss << astr;
 				ss >> num;
 				num--;
-				if (num < 0) {
-					num = 0;
-				}
 				sss << num;
 				sss >> astr;
 			}
