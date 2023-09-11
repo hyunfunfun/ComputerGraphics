@@ -4,6 +4,7 @@ struct board {
 	char x;
 	int y;
 	char data;
+	bool check=false;
 };
 
 int main() {
@@ -54,6 +55,7 @@ int main() {
 			}
 		}
 	}
+
 	//대문자 섞기
 	int rn1;
 	int rn2;
@@ -65,7 +67,7 @@ int main() {
 
 			temp = board[i][j].data;
 			board[i][j].data = board[rn1][rn2].data;
-			board[rn1][rn2].data;
+			board[rn1][rn2].data=temp;
 		}
 	}
 
@@ -73,6 +75,9 @@ int main() {
 	char x1, x2;
 	int y1, y2;
 	char en;
+
+	int i1=0, j1=0;
+	int i2=0, j2=0;
 
 
 	//보드 출력
@@ -86,6 +91,9 @@ int main() {
 			}
 			else if (j == 0) {
 				cout << board[i][j].y;
+			}
+			else if(board[i][j].check==true) {
+				cout << " " << board[i][j].data << " ";
 			}
 			else {
 				cout << " * ";
@@ -104,6 +112,8 @@ int main() {
 		x2 = _getch();
 		y2 = _getch()-48;
 
+		system("cls");
+		//좌표입력 후 o표시
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 5; j++) {
 				if (i == 0 && j == 0) {
@@ -115,6 +125,9 @@ int main() {
 				else if (j == 0) {
 					cout << board[i][j].y;
 				}
+				else if (board[i][j].check == true) {
+					cout << " " << board[i][j].data << " ";
+				}
 				else if ((board[i][j].x == x1 && board[i][j].y == y1) || (board[i][j].x == x2 && board[i][j].y == y2)) {
 					cout << " o ";
 				}
@@ -124,7 +137,10 @@ int main() {
 			}
 			cout << endl;
 		}
+
 		en = _getch();
+
+		//엔터 눌렀을떄 나온 값 표시
 		if (en == 13) {
 			for (int i = 0; i < 5; i++) {
 				for (int j = 0; j < 5; j++) {
@@ -137,8 +153,18 @@ int main() {
 					else if (j == 0) {
 						cout << board[i][j].y;
 					}
-					else if ((board[i][j].x==x1&&board[i][j].y==y1)|| (board[i][j].x == x2 && board[i][j].y == y2)) {
+					else if (board[i][j].check == true) {
+						cout << " " << board[i][j].data << " ";
+					}
+					else if (board[i][j].x==x1&&board[i][j].y==y1) {
 						cout <<" " << board[i][j].data<<" ";
+						i1 = i;
+						j1 = j;
+					}
+					else if (board[i][j].x == x2 && board[i][j].y == y2) {
+						cout << " " << board[i][j].data << " ";
+						i2 = i;
+						j2 = j;
 					}
 					else {
 						cout << " * ";
@@ -146,6 +172,102 @@ int main() {
 				}
 				cout << endl;
 			}
+		}
+		//다른 키를 눌렀을때 
+		else {
+			for (int i = 0; i < 5; i++) {
+				for (int j = 0; j < 5; j++) {
+					if (i == 0 && j == 0) {
+						cout << " ";
+					}
+					else if (i == 0) {
+						cout << " " << board[i][j].x << " ";
+					}
+					else if (j == 0) {
+						cout << board[i][j].y;
+					}
+					else if (board[i][j].check == true) {
+						cout << board[i][j].data;
+					}
+					else {
+						cout << " * ";
+					}
+				}
+				cout << endl;
+			}
+		}
+
+		//나온 값이 같을때 계속표시
+		if (board[i1][j1].data == board[i2][j2].data) {
+			board[i1][j1].check = true;
+			board[i2][j2].check = true;
+			for (int i = 0; i < 5; i++) {
+				for (int j = 0; j < 5; j++) {
+					if (i == 0 && j == 0) {
+						cout << " ";
+					}
+					else if (i == 0) {
+						cout << " " << board[i][j].x << " ";
+					}
+					else if (j == 0) {
+						cout << board[i][j].y;
+					}
+					else if (board[i][j].check == true) {
+						cout << " " <<board[i][j].data<<" ";
+					}
+					else {
+						cout << " * ";
+					}
+				}
+				cout << endl;
+			}
+		}
+		//나온 값이 다를때 
+		else {
+			Sleep(2000);
+			for (int i = 0; i < 5; i++) {
+				for (int j = 0; j < 5; j++) {
+					if (i == 0 && j == 0) {
+						cout << " ";
+					}
+					else if (i == 0) {
+						cout << " " << board[i][j].x << " ";
+					}
+					else if (j == 0) {
+						cout << board[i][j].y;
+					}
+					else if (board[i][j].check == true) {
+						cout << " "<<board[i][j].data<<" ";
+					}
+					else {
+						cout << " * ";
+					}
+				}
+				cout << endl;
+			}
+		}
+		
+		system("cls");
+
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
+				if (i == 0 && j == 0) {
+					cout << " ";
+				}
+				else if (i == 0) {
+					cout << " " << board[i][j].x << " ";
+				}
+				else if (j == 0) {
+					cout << board[i][j].y;
+				}
+				else if (board[i][j].check == true) {
+					cout << " " << board[i][j].data << " ";
+				}
+				else {
+					cout << " * ";
+				}
+			}
+			cout << endl;
 		}
 	}
 
