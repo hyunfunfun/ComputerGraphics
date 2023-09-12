@@ -43,8 +43,6 @@ void MoveOb::changedata() {
 	}
 }
 void MoveOb::x() {
-	overx1 = -1;
-	overx2 = -1;
 	boardx1++;
 	boardx2++;
 	if (boardx2 >= 30) {
@@ -62,8 +60,6 @@ void MoveOb::x() {
 	changedata();
 }
 void MoveOb::X() {
-	overx1 = -1;
-	overx2 = -1;
 	boardx1--;
 	boardx2--;
 	if (boardx1 <= -1) {
@@ -81,8 +77,6 @@ void MoveOb::X() {
 	changedata();
 }
 void MoveOb::y() {
-	overy1 = -1;
-	overy2 = -1;
 	boardy1++;
 	boardy2++;
 	if (boardy2 >= 30) {
@@ -100,8 +94,6 @@ void MoveOb::y() {
 	changedata();
 }
 void MoveOb::Y() {
-	overy1 = -1;
-	overy2 = -1;
 	boardy1--;
 	boardy2--;
 	if (boardy1 <= -1) {
@@ -119,36 +111,26 @@ void MoveOb::Y() {
 	changedata();
 }
 void MoveOb::s() {
-	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
 		boardx2--;
 		boardy2--;
 		changedata();
-	}
 }
 void MoveOb::S() {
-	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
 		boardx2++;
 		boardy2++;
 		changedata();
-	}
 }
 void MoveOb::i() {
-	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
 		boardx2++;
 		changedata();
-	}
 }
 void MoveOb::j() {
-	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
 		boardx2--;
 		changedata();
-	}
 }
 void MoveOb::k() {
-	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
 		boardy2++;
 		changedata();
-	}
 }
 void MoveOb::l() {
 	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
