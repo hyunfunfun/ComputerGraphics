@@ -10,7 +10,12 @@ void temp(int a, int b) {
 void MoveOb::showboard() {
 	for (int i = 0; i < 30; i++) {
 		for (int j = 0; j < 30; j++) {
-			cout << " " << ob[i][j].data << " ";
+			if (ob[i][j].check == true) {
+				cout << " 0 ";
+			}
+			else {
+				cout << " . ";
+			}
 		}
 		cout << endl;
 	}
@@ -25,14 +30,14 @@ void MoveOb::changedata() {
 	}
 	for (int i = 0; i < 30; i++) {
 		for (int j = 0; j < 30; j++) {
-			if ((overx2>=0) || (overx1<30) (overy1 <= i && overy2 >= i)) {//¼öÁ¤
-				ob[i][j].data = '0';
+			if ((overx2>=j) && (overx1<=j)&& (overy1 <= i && overy2 >= i)) {
+				ob[i][j].check = true;
 			}
 			else if ((boardx1 <= j && boardx2 >= j) && (boardy1 <= i && boardy2 >= i)) {
-				ob[i][j].data = '0';
+				ob[i][j].check = true;
 			}
 			else {
-				ob[i][j].data = '.';
+				ob[i][j].check = false;
 			}
 		}
 	}
@@ -109,24 +114,48 @@ void MoveOb::s() {
 	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
 		boardx2--;
 		boardy2--;
+		changedata();
 	}
-	changedata();
 }
 void MoveOb::S() {
-
+	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
+		boardx2++;
+		boardy2++;
+		changedata();
+	}
 }
 void MoveOb::i() {
-
+	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
+		boardx2++;
+		changedata();
+	}
 }
 void MoveOb::j() {
-
+	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
+		boardx2--;
+		changedata();
+	}
 }
 void MoveOb::k() {
-
+	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
+		boardy2++;
+		changedata();
+	}
 }
 void MoveOb::l() {
-
+	if (overx1 == -1 && overx2 == -1 && overy1 == -1 && overy2 == -1) {
+		boardy2--;
+		changedata();
+	}
 }
 void MoveOb::R() {
-
+	overx1 = -1;
+	overx2 = -1;
+	overy1 = -1;
+	overy2 = -1;
+	for (int i = 0; i < 30; i++) {
+		for (int j = 0; j < 30; j++) {
+			ob[i][j].check = false;
+		}
+	}
 }

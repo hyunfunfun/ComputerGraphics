@@ -3,7 +3,6 @@
 
 struct Ob {
 	bool check=false;
-	char data = '.';
 };
 struct MoveOb {
 	Ob ob[30][30];
