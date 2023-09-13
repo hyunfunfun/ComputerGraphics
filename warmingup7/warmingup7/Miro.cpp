@@ -16,56 +16,34 @@ void Miro::showboard() {
 }
 void Miro::enter() {
 	int x=0, y=0;
-	int check = 0;
-	int ran3 = rand() % 20 + 10;
+	int data = 0;
 	while (1) {
-		if(x<=49||y<=49) {
-			int ran = (rand() % 4);
-			for (int i = 0; i < ran; i++) {
-				if (x >= 49&&y!=49) {
-					for (int i = 1; i < ran; i++) {
-						x--;
-						board[y][x].check = true;
-					}
-				}
-				if (y >= 49&&x!=49) {
-					for (int i = 1; i < ran; i++) {
-						y--;
-						board[y][x].check = true;
-					}
-				}
-				int ran2 = rand() % 2;
-				switch (ran2) {
-				case 0:
-					if (check == 1) {
-						check = 0;
-						break;
-					}
-					else {
-						board[y][x].check = true;
-						x++;
-						check = 1;
-						break;
-					}
-				case 1:
-					if (check == 0) {
-						check = 1;
-						break;
-					}
-					else {
-						board[y][x].check = true;
-						y++;
-						check = 0;
-						break;
-					}
-				}
-			}
-		}
-		else {
-			board[y][x].check = true;
+		if (x > 49 && y > 49) {
 			break;
 		}
+		else {
+			struct node* newnode = new node;
+			newnode->x = x;
+			newnode->y = y;
+			newnode->data = data;
+			newnode->next = NULL;
+			board[x][y].check = true;
+			data++;
+			x++;
+			y++;
+			node* cur;
+			cur = head->next;
+			while (cur->data < data && cur != tail) {
+				cur = cur->next;
+			}
+			node* prev = cur->prev;
+			prev->next = newnode;
+			newnode->prev = prev;
+			cur->prev = newnode;
+			newnode->next = cur;
+		}
 	}
+
 }
 void Miro::r() {
 

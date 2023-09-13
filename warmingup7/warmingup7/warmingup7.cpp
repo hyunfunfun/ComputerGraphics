@@ -1,6 +1,7 @@
 #include "Header.h"
 #include "Miro.h"
 
+
 int main() {
 	srand(time(NULL));
 	Miro miro;
