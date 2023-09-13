@@ -1,20 +1,15 @@
 #pragma once
 #include "Header.h"
-struct node {
-	int x, y;
-	int data;
-	struct node* next;
-	struct node* prev;
-};
-struct node* head=NULL;
-struct node* tail;
 
 struct Board {
 	bool check = false;
+	int no;
 };
 
 struct Miro {
 	Board board[50][50];
+	bool dor = false;
+	int sum = 0;
 	void showboard();
 	void enter();
 	void r();

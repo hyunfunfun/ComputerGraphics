@@ -4,7 +4,10 @@
 void Miro::showboard() {
 	for (int i = 0; i < 50; i++) {
 		for (int j = 0; j < 50; j++) {
-			if (board[i][j].check == true) {
+			if (board[i][j].check == true && dor == true && sum == board[i][j].no) {
+				cout << "* ";
+			}
+			else if (board[i][j].check == true) {
 				cout << "0 ";
 			}
 			else {
@@ -17,40 +20,151 @@ void Miro::showboard() {
 void Miro::enter() {
 	int x=0, y=0;
 	int data = 0;
+	sum = 0;
+	dor = false;
+	int sum = 0;
+	for (int i = 0; i < 50; i++) {
+		for (int j = 0; j < 50; j++) {
+			board[i][j].check = false;
+			board[i][j].no = 0;
+			
+		}
+	}
+	bool chup = false;
+	bool chleft = false;
 	while (1) {
-		if (x > 49 && y > 49) {
+		if (x >= 49 && y >= 49) {
 			break;
 		}
 		else {
-			struct node* newnode = new node;
-			newnode->x = x;
-			newnode->y = y;
-			newnode->data = data;
-			newnode->next = NULL;
-			board[x][y].check = true;
-			data++;
-			x++;
-			y++;
-			node* cur;
-			cur = head->next;
-			while (cur->data < data && cur != tail) {
-				cur = cur->next;
+			if (x == 0 && y == 0) {
+				board[y][x].no = sum;
+				sum++;
+				board[y][x].check = true;
+				x++;
 			}
-			node* prev = cur->prev;
-			prev->next = newnode;
-			newnode->prev = prev;
-			cur->prev = newnode;
-			newnode->next = cur;
+			else if (x == 49) {
+				if (board[y][x-1].check == true) {
+					sum++;
+					board[y][x].no = sum;
+					y++;
+					board[y][x].check = true;
+				}
+				else {
+					x--;
+					sum++;
+					board[y][x].no = sum;
+					board[y][x].check = true;
+				}
+			}
+			else if (y == 49) {
+				if (board[y-1][x].check == true) {
+					x++;
+					sum++;
+					board[y][x].no = sum;
+					board[y][x].check = true;
+				}
+				else {
+					y--;
+					sum++;
+					board[y][x].no = sum;
+					board[y][x].check = true;
+				}
+			}
+
+			else {
+				int ran = rand() % 4;
+				switch (ran) {
+				case 0:
+					if (board[y][x + 1].check == false) {
+						if (x + 1 > 49) {
+							break;
+						}
+						else {
+							x++;
+							board[y][x].check = true;
+							sum++;
+							board[y][x].no = sum;
+							chup = false;
+							break;
+						}
+					}
+					else {
+						break;
+					}
+				case 1:
+					if (board[y][x - 1].check == false) {
+						if (x -1 < 0) {
+							break;
+						}
+						else {
+							if (chup != true) {
+								x--;
+								board[y][x].check = true;
+								sum++;
+								board[y][x].no = sum;
+								chleft = true;
+								break;
+							}
+						}
+					}
+					else {
+						break;
+					}
+				case 2:
+					if (board[y + 1][x].check == false) {
+						if (y + 1 > 49) {
+							break;
+						}
+						else {
+							y++;
+							board[y][x].check = true;
+							sum++;
+							board[y][x].no = sum;
+							chleft = false;
+							break;
+							
+						}
+					}
+					else {
+						break;
+					}
+				case 3:
+					if (board[y - 1][x].check == false) {
+						if (y - 1 < 0) {
+							break;
+						}
+						else {
+							if (chleft != true) {
+								y--;
+								board[y][x].check = true;
+								chup = true;
+								sum++;
+								board[y][x].no = sum;
+								break;
+							}
+							else {
+
+							}
+						}
+					}
+					else {
+						break;
+					}
+				}
+			}
+
 		}
 	}
 
 }
 void Miro::r() {
+	dor = true;
 
 }
 void Miro::plus() {
-
+	sum++;
 }
 void Miro::minus() {
-
+	sum--;
 }
