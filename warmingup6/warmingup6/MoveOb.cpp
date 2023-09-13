@@ -57,6 +57,12 @@ void MoveOb::x() {
 			overx2 = -1;
 		}
 	}
+	else {
+		overx1 = -1;
+		overy1 = -1;
+		overx2 = -1;
+		overy2 = -1;
+	}
 	changedata();
 }
 void MoveOb::X() {
@@ -73,6 +79,12 @@ void MoveOb::X() {
 			overx1 = -1;
 			overx2 = -1;
 		}
+	}
+	else {
+		overx1 = -1;
+		overy1 = -1;
+		overx2 = -1;
+		overy2 = -1;
 	}
 	changedata();
 }
@@ -91,6 +103,12 @@ void MoveOb::y() {
 			overy2 = -1;
 		}
 	}
+	else {
+		overx1 = -1;
+		overy1 = -1;
+		overx2 = -1;
+		overy2 = -1;
+	}
 	changedata();
 }
 void MoveOb::Y() {
@@ -107,6 +125,12 @@ void MoveOb::Y() {
 			overy1 = -1;
 			overy2 = -1;
 		}
+	}
+	else {
+		overx1 = -1;
+		overy1 = -1;
+		overx2 = -1;
+		overy2 = -1;
 	}
 	changedata();
 }
