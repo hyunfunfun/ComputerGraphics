@@ -22,6 +22,7 @@ void Miro::enter() {
 	int data = 0;
 	sum = 0;
 	dor = false;
+	int sum = 0;
 	for (int i = 0; i < 50; i++) {
 		for (int j = 0; j < 50; j++) {
 			board[i][j].check = false;
@@ -33,8 +34,6 @@ void Miro::enter() {
 	bool chleft = false;
 	while (1) {
 		if (x >= 49 && y >= 49) {
-			board[y][x].check = true;
-			board[y][x].no = sum;
 			break;
 		}
 		else {
@@ -43,9 +42,6 @@ void Miro::enter() {
 				sum++;
 				board[y][x].check = true;
 				x++;
-				board[y][x].check = true;
-				board[y][x].no = sum;
-				sum++;
 			}
 			else if (x == 49) {
 				if (board[y][x-1].check == true) {
@@ -160,14 +156,13 @@ void Miro::enter() {
 
 		}
 	}
-	sum = 0;
+
 }
 void Miro::r() {
 	dor = true;
-	sum = 0;
+
 }
 void Miro::plus() {
-
 	sum++;
 }
 void Miro::minus() {
