@@ -3,13 +3,13 @@
 
 struct Board {
 	bool check = false;
-	int no;
+	int no=0;
 };
 
 struct Miro {
 	Board board[50][50];
 	bool dor = false;
-	int sum;
+	int sum=0;
 	void showboard();
 	void enter();
 	void r();
