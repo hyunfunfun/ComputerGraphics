@@ -9,7 +9,7 @@ struct Board {
 struct Miro {
 	Board board[50][50];
 	bool dor = false;
-	int sum = 0;
+	int sum;
 	void showboard();
 	void enter();
 	void r();
