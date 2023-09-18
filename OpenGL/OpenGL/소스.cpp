@@ -38,7 +38,7 @@ GLvoid drawRandomScene() {
 }
 
 void TimerFunction(int value) {
-	if (value == 1) {
+	if (value == 0) {
 		drawRandomScene();
 		glutTimerFunc(1000, TimerFunction, value);
 	}
@@ -46,6 +46,7 @@ void TimerFunction(int value) {
 		drawRandomScene();
 	}
 }
+
 
 GLvoid Reshape(int w, int h) {
 	glViewport(0, 0, w, h);
@@ -83,18 +84,28 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		glutKeyboardFunc(Keyboard);
 		break;
 	case 't':
-		
-		glutTimerFunc(1000, TimerFunction, 0);
+		Time(1);
+		//glutTimerFunc(1000, TimerFunction, 0);
 		glutReshapeFunc(Reshape);
 		glutKeyboardFunc(Keyboard);
 		break;
 	case 's':
-		TimerFunction(1);
+		Time(0);
 		glutReshapeFunc(Reshape);
 		glutKeyboardFunc(Keyboard);
+		/*TimerFunction(1);
+		glutReshapeFunc(Reshape);
+		glutKeyboardFunc(Keyboard);*/
 		break;
 	}
 	glutPostRedisplay();
+}
+void Time(int value) {
+	while (value != 0) {
+		drawRandomScene();
+		glutKeyboardFunc(Keyboard);
+		Sleep(1000);
+	}
 }
 
 void main(int argc, char** argv) {
