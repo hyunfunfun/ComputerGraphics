@@ -38,16 +38,13 @@ GLvoid drawRandomScene() {
 }
 
 void TimerFunction(int value) {
-	drawRandomScene();
-	glClear(GL_COLOR_BUFFER_BIT);
-	glutSwapBuffers();
-	glutTimerFunc(1000, TimerFunction, 0);
-}
-
-void TimerEnd(int value) {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glutSwapBuffers();
-	glutTimerFunc(100, TimerFunction, 0);
+	if (value == 1) {
+		drawRandomScene();
+		glutTimerFunc(1000, TimerFunction, value);
+	}
+	else {
+		drawRandomScene();
+	}
 }
 
 GLvoid Reshape(int w, int h) {
@@ -86,12 +83,13 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		glutKeyboardFunc(Keyboard);
 		break;
 	case 't':
+		
 		glutTimerFunc(1000, TimerFunction, 0);
 		glutReshapeFunc(Reshape);
 		glutKeyboardFunc(Keyboard);
 		break;
 	case 's':
-		glutTimerFunc(100, TimerEnd, 0);
+		TimerFunction(1);
 		glutReshapeFunc(Reshape);
 		glutKeyboardFunc(Keyboard);
 		break;
