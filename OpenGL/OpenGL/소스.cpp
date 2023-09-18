@@ -38,6 +38,7 @@ GLvoid drawRandomScene() {
 }
 
 void TimerFunction(int value) {
+<<<<<<< HEAD
 	if (value == 0) {
 		drawRandomScene();
 		glutTimerFunc(1000, TimerFunction, value);
@@ -45,6 +46,18 @@ void TimerFunction(int value) {
 	else {
 		drawRandomScene();
 	}
+=======
+	drawRandomScene();
+	glClear(GL_COLOR_BUFFER_BIT);
+	glutSwapBuffers();
+	glutTimerFunc(1000, TimerFunction, 0);
+}
+
+void TimerEnd(int value) {
+	glClear(GL_COLOR_BUFFER_BIT);
+	glutSwapBuffers();
+	glutTimerFunc(100, TimerFunction, 0);
+>>>>>>> parent of aaeaa7f (OpenGL1-3)
 }
 
 void Time(int value) {
@@ -90,13 +103,21 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		glutKeyboardFunc(Keyboard);
 		break;
 	case 't':
+<<<<<<< HEAD
 		Time(1);
 		//glutTimerFunc(1000, TimerFunction, 0);
+=======
+		glutTimerFunc(1000, TimerFunction, 0);
+>>>>>>> parent of aaeaa7f (OpenGL1-3)
 		glutReshapeFunc(Reshape);
 		glutKeyboardFunc(Keyboard);
 		break;
 	case 's':
+<<<<<<< HEAD
 		Time(0);
+=======
+		glutTimerFunc(100, TimerEnd, 0);
+>>>>>>> parent of aaeaa7f (OpenGL1-3)
 		glutReshapeFunc(Reshape);
 		glutKeyboardFunc(Keyboard);
 		/*TimerFunction(1);
