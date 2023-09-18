@@ -1,7 +1,34 @@
 #include "Header.h"
 
+GLvoid drawScene(GLvoid);
+GLvoid Reshape(int w, int h);
+GLvoid Keyboard(unsigned char key, int x, int y);
 
 
+
+void main(int argc, char** argv) {
+	
+
+	glutInit(&argc, argv); 
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); 
+	glutInitWindowPosition(0,0); 
+	glutInitWindowSize(800,600); 
+	glutCreateWindow("Example1");
+
+	glewExperimental = GL_TRUE;
+	if (glewInit() != GLEW_OK) {
+		std::cerr << "Unable to initialize GLEW" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	else {
+		std::cout << "GLEW Initialized\n";
+	}
+
+	glutDisplayFunc(drawScene);
+	glutReshapeFunc(Reshape);
+	glutKeyboardFunc(Keyboard);
+	glutMainLoop();
+}
 GLvoid drawScene() {
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -28,37 +55,26 @@ GLvoid drawKScene() {
 	glutSwapBuffers();
 }
 GLvoid drawRandomScene() {
-	GLclampf random1 = (rand() % 10 + 1 )/ 10.0;
+	GLclampf random1 = (rand() % 10 + 1) / 10.0;
 	GLclampf random2 = (rand() % 10 + 1) / 10.0;
 	GLclampf random3 = (rand() % 10 + 1) / 10.0;
 	GLclampf random4 = (rand() % 10 + 1) / 10.0;
-	glClearColor(random1,random2,random3,random4);
+	glClearColor(random1, random2, random3, random4);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glutSwapBuffers();
 }
 
 void TimerFunction(int value) {
-<<<<<<< HEAD
-	if (value == 0) {
-		drawRandomScene();
-		glutTimerFunc(1000, TimerFunction, value);
+	if(value==1) {
+		glutTimerFunc(1000, TimerFunction, 1);
 	}
 	else {
 		drawRandomScene();
+		glutKeyboardFunc(Keyboard);
+		glutTimerFunc(1000, TimerFunction, 0);
 	}
-=======
-	drawRandomScene();
-	glClear(GL_COLOR_BUFFER_BIT);
-	glutSwapBuffers();
-	glutTimerFunc(1000, TimerFunction, 0);
 }
 
-void TimerEnd(int value) {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glutSwapBuffers();
-	glutTimerFunc(100, TimerFunction, 0);
->>>>>>> parent of aaeaa7f (OpenGL1-3)
-}
 
 
 GLvoid Reshape(int w, int h) {
@@ -96,59 +112,12 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		glutReshapeFunc(Reshape);
 		glutKeyboardFunc(Keyboard);
 		break;
-	case 't':
-<<<<<<< HEAD
-		Time(1);
-		//glutTimerFunc(1000, TimerFunction, 0);
-=======
-		glutTimerFunc(1000, TimerFunction, 0);
->>>>>>> parent of aaeaa7f (OpenGL1-3)
-		glutReshapeFunc(Reshape);
-		glutKeyboardFunc(Keyboard);
-		break;
 	case 's':
-<<<<<<< HEAD
-		Time(0);
-=======
-		glutTimerFunc(100, TimerEnd, 0);
->>>>>>> parent of aaeaa7f (OpenGL1-3)
-		glutReshapeFunc(Reshape);
-		glutKeyboardFunc(Keyboard);
-		/*TimerFunction(1);
-		glutReshapeFunc(Reshape);
-		glutKeyboardFunc(Keyboard);*/
+		glutTimerFunc(1000, TimerFunction, 1);
+		break;
+	case 't':
+		glutTimerFunc(1000, TimerFunction, 0);
 		break;
 	}
 	glutPostRedisplay();
-}
-void Time(int value) {
-	while (value != 0) {
-		drawRandomScene();
-		glutKeyboardFunc(Keyboard);
-		Sleep(1000);
-	}
-}
-
-void main(int argc, char** argv) {
-	
-
-	glutInit(&argc, argv); 
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); 
-	glutInitWindowPosition(0,0); 
-	glutInitWindowSize(800,600); 
-	glutCreateWindow("Example1");
-
-	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK) {
-		std::cerr << "Unable to initialize GLEW" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	else {
-		std::cout << "GLEW Initialized\n";
-	}
-
-	glutDisplayFunc(drawScene);
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Keyboard);
-	glutMainLoop();
 }
