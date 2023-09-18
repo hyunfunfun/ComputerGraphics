@@ -6,3 +6,5 @@
 #include <gl/freeglut_ext.h>
 #include <random>
 #include <time.h>
+#include <Windows.h>
+#include <conio.h>

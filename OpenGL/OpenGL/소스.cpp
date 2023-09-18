@@ -28,14 +28,26 @@ GLvoid drawKScene() {
 	glutSwapBuffers();
 }
 GLvoid drawRandomScene() {
-	glClearColor((rand() % 10 + 1) / 10.0, (rand() % 10 + 1) / 10.0, (rand() % 10 + 1) / 10.0, (rand() % 10 + 1) / 10.0);
+	GLclampf random1 = (rand() % 10 + 1 )/ 10.0;
+	GLclampf random2 = (rand() % 10 + 1) / 10.0;
+	GLclampf random3 = (rand() % 10 + 1) / 10.0;
+	GLclampf random4 = (rand() % 10 + 1) / 10.0;
+	glClearColor(random1,random2,random3,random4);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glutSwapBuffers();
 }
-GLvoid drawKScene() {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+void TimerFunction(int value) {
+	drawRandomScene();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glutSwapBuffers();
+	glutTimerFunc(1000, TimerFunction, 0);
+}
+
+void TimerEnd(int value) {
+	glClear(GL_COLOR_BUFFER_BIT);
+	glutSwapBuffers();
+	glutTimerFunc(100, TimerFunction, 0);
 }
 
 GLvoid Reshape(int w, int h) {
@@ -73,22 +85,29 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		glutReshapeFunc(Reshape);
 		glutKeyboardFunc(Keyboard);
 		break;
+	case 't':
+		glutTimerFunc(1000, TimerFunction, 0);
+		glutReshapeFunc(Reshape);
+		glutKeyboardFunc(Keyboard);
+		break;
+	case 's':
+		glutTimerFunc(100, TimerEnd, 0);
+		glutReshapeFunc(Reshape);
+		glutKeyboardFunc(Keyboard);
+		break;
 	}
 	glutPostRedisplay();
 }
 
-void main(int argc, char** argv) { //--- 윈도우 출력하고 콜백함수 설정 
-	//--- 윈도우 생성하기
+void main(int argc, char** argv) {
+	
 
-	srand(time(NULL));
+	glutInit(&argc, argv); 
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); 
+	glutInitWindowPosition(0,0); 
+	glutInitWindowSize(800,600); 
+	glutCreateWindow("Example1");
 
-	glutInit(&argc, argv); // glut 초기화
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); // 디스플레이 모드 설정
-	glutInitWindowPosition(0,0); // 윈도우의 위치 지정
-	glutInitWindowSize(800,600); // 윈도우의 크기 지정
-	glutCreateWindow("Example1"); // 윈도우 생성(윈도우 이름)
-
-	// GLEW 초기화하기
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK) {
 		std::cerr << "Unable to initialize GLEW" << std::endl;
