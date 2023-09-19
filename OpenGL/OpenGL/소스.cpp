@@ -65,11 +65,10 @@ GLvoid drawRandomScene() {
 }
 bool timeRunning = true;
 void TimerFunction(int value) {
-	if (timeRunning && value < 10) {
+	if (timeRunning) {
 		drawRandomScene();
 		glutKeyboardFunc(Keyboard);
-		value++;
-		glutTimerFunc(1000, TimerFunction, value);
+		glutTimerFunc(1000, TimerFunction, 0);
 	}
 }
 
