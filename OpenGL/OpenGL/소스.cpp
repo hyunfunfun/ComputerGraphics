@@ -63,18 +63,15 @@ GLvoid drawRandomScene() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glutSwapBuffers();
 }
-
+bool timeRunning = true;
 void TimerFunction(int value) {
-	if(value==1) {
-		glutTimerFunc(1000, TimerFunction, 1);
-	}
-	else {
+	if (timeRunning && value < 10) {
 		drawRandomScene();
 		glutKeyboardFunc(Keyboard);
-		glutTimerFunc(1000, TimerFunction, 0);
+		value++;
+		glutTimerFunc(1000, TimerFunction, value);
 	}
 }
-
 
 
 GLvoid Reshape(int w, int h) {
@@ -84,39 +81,30 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'c':
 		glutDisplayFunc(drawCScene);
-		glutReshapeFunc(Reshape);
-		glutKeyboardFunc(Keyboard);
 		break;
 	case 'm':
 		glutDisplayFunc(drawMScene);
-		glutReshapeFunc(Reshape);
-		glutKeyboardFunc(Keyboard);
 		break;
 	case 'y':
 		glutDisplayFunc(drawYScene);
-		glutReshapeFunc(Reshape);
-		glutKeyboardFunc(Keyboard);
 		break;
 	case 'w':
 		glutDisplayFunc(drawScene);
-		glutReshapeFunc(Reshape);
-		glutKeyboardFunc(Keyboard);
 		break;
 	case 'k':
 		glutDisplayFunc(drawKScene);
-		glutReshapeFunc(Reshape);
-		glutKeyboardFunc(Keyboard);
 		break;
 	case 'a':
 		glutDisplayFunc(drawRandomScene);
-		glutReshapeFunc(Reshape);
-		glutKeyboardFunc(Keyboard);
 		break;
 	case 's':
-		glutTimerFunc(1000, TimerFunction, 1);
+		timeRunning = !timeRunning;
 		break;
 	case 't':
 		glutTimerFunc(1000, TimerFunction, 0);
+		break;
+	case 'q':
+		glutLeaveMainLoop();
 		break;
 	}
 	glutPostRedisplay();
