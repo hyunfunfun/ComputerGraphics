@@ -3,13 +3,14 @@
 GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
 void Mouse(int button, int state, int x, int y);
-void showdisplay();
+void squre1();
 
 void main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(800, 800);
+	
 	glutCreateWindow("Example2");
 
 	glewExperimental = GL_TRUE;
@@ -20,7 +21,8 @@ void main(int argc, char** argv) {
 	else {
 		std::cout << "GLEW Initiallized\n";
 	}
-	glutDisplayFunc(showdisplay);
+
+	glutDisplayFunc(squre1);
 	glutReshapeFunc(Reshape);
 	glutMouseFunc(Mouse);
 	glutMainLoop();
@@ -44,14 +46,19 @@ void Mouse(int button, int state, int x, int y) {
 		drawclickScene();
 	}
 }
-void showdisplay() {
+void squre1() {
 	glClear(GL_COLOR_BUFFER_BIT);
-	glBegin(GL_QUADS);
-	glVertex2f(-1.0f, 1.0f);
-	glVertex2f(0.0f, 1.0f);
-	glVertex2f(0.0f, 0.0f);
-	glVertex2f(-1.0f, 0.0f);
-	glEnd();
-	glutSwapBuffers();
 
+	glColor3f(1.0, 1.0, 0.0);
+	glRectf(-1.0, 1.0, 0.0, 0.0);
+
+	glColor3f(0.5, 1.0, 0.0);
+	glRectf(0.0, 1.0, 1.0, 0.0);
+
+	glColor3f(0.0, 0.0, 1.0);
+	glRectf(0.0, 0.0, 1.0, -1.0);
+
+	glColor3f(1.0, 0.5, 0.0);
+	glRectf(-1.0, 0.0, 0.0, -1.0);
+	glutSwapBuffers();
 }
