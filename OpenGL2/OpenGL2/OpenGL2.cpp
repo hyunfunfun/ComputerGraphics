@@ -2,13 +2,14 @@
 
 GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
-//GLvoid Mouse(int button, int state, int x, int y);
+void Mouse(int button, int state, int x, int y);
+void showdisplay();
 
 void main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowPosition(100, 100);
-	glutInitWindowSize(250, 250);
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(800, 800);
 	glutCreateWindow("Example2");
 
 	glewExperimental = GL_TRUE;
@@ -19,17 +20,38 @@ void main(int argc, char** argv) {
 	else {
 		std::cout << "GLEW Initiallized\n";
 	}
-	glutDisplayFunc(drawScene);
+	glutDisplayFunc(showdisplay);
 	glutReshapeFunc(Reshape);
-	//glutMouseFunc(Mouse);
+	glutMouseFunc(Mouse);
 	glutMainLoop();
 }
 
 GLvoid drawScene() {
-	glClearColor(0.0f, 0.0f, 0.1f, 1.0f);
+	glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glutSwapBuffers();
+}
+GLvoid drawclickScene() {
+	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glutSwapBuffers();
 }
 GLvoid Reshape(int w, int h) {
 	glViewport(0, 0, w, h);
+}
+void Mouse(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		drawclickScene();
+	}
+}
+void showdisplay() {
+	glClear(GL_COLOR_BUFFER_BIT);
+	glBegin(GL_QUADS);
+	glVertex2f(-1.0f, 1.0f);
+	glVertex2f(0.0f, 1.0f);
+	glVertex2f(0.0f, 0.0f);
+	glVertex2f(-1.0f, 0.0f);
+	glEnd();
+	glutSwapBuffers();
+
 }
