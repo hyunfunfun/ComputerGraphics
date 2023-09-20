@@ -6,3 +6,4 @@
 #include <gl/freeglut_ext.h>
 #include <random>
 #include <time.h>
+#include <cmath>
