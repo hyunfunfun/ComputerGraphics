@@ -4,14 +4,16 @@ GLvoid drawScene(GLvoid);
 void Reshape(int w, int h);
 void Movesqure(int x, int y);
 void Mouse(int button, int state, int x, int y);
+void TimeFunction(int value);
 
 bool button_down = false;
 
-float winx = 1000;
-float winy = 1000;
+float winx = 900;
+float winy = 600;
 float rectx = 0.0f;
 float recty = 0.0f;
 float rectsize = 0.1f;
+float squre1[4] = { -(winy / winx)*rectsize, (winx / winy)*rectsize, (winy / winx)*rectsize, -(winx / winy)*rectsize };
 
 
 
@@ -31,8 +33,7 @@ void main(int argc, char **argv) {
 		std::cout << "GLEW Initialized\n";
 	}
 	glutDisplayFunc(drawScene);
-	glutMouseFunc(Mouse);
-	glutMotionFunc(Movesqure);
+	glutTimerFunc(1, TimeFunction, 1);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 }
@@ -41,7 +42,7 @@ GLvoid drawScene() {
 	glClearColor(0.5f, 0.5f, 0.5f, 0.7f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(0.1f, 0.5f, 0.5f);
-	glRectf(rectx-rectsize, recty-rectsize, rectx+rectsize, recty+rectsize);
+	glRectf(squre1[0], squre1[1], squre1[2], squre1[3]);
 	glutSwapBuffers();
 }
 void Reshape(int w, int h) {
@@ -53,9 +54,20 @@ void Mouse(int button, int state, int x, int y) {
 		button_down = true;
 	}
 }
+int prevx=0;
+int prevy=0;
 void Movesqure(int x, int y) {
 	if (button_down == true) {
-		rectx += ((float)x / 100000);
-		recty += ((float)y / 100000);
+		rectx -= ((float)(prevx-x) / 2000);
+		recty += ((float)(prevy-y) / 2000);
+		prevx = x;
+		prevy = y;
 	}
+
 }
+
+void TimeFunction(int value) {
+	glutMouseFunc(Mouse);
+	glutMotionFunc(Movesqure);
+	glutTimerFunc(1, TimeFunction, 1);
+};
