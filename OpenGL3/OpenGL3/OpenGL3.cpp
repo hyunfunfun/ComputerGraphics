@@ -64,11 +64,14 @@ void Mouse(int button, int state, int x, int y) {
 void Movesqure(int x, int y) {
 	float ogx = ((float)x / 500) - 1;
 	float ogy = -(((float)y / 500) - 1);
-	if (button_down == true) {
+	if (button_down == true && ogx > squre1[0] && ogx <squre1[2] && ogy >squre1[1] && ogy < squre1[3]) {
+		
 		squre1[0] += (ogx - prevx);
 		squre1[1] += (ogy - prevy);
 		squre1[2] += (ogx - prevx);
 		squre1[3] += (ogy - prevy);
+		prevx = ogx;
+		prevy = ogy;
 		glutPostRedisplay();
 	}
 
