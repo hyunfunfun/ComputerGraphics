@@ -6,26 +6,19 @@ void Movesqure(int x, int y);
 void Mouse(int button, int state, int x, int y);
 
 bool button_down = false;
-
-float winx = 900;
-float winy = 600;
-float rectx = 0.0f;
-float recty = 0.0f;
+float prevx;
+float prevy;
+float COx = 0.0f;
+float COy = 0.0f;
 float rectsize = 0.1f;
-float squre1[4] = { -(winy / winx)*rectsize, (winx / winy)*rectsize, (winy / winx)*rectsize, -(winx / winy)*rectsize };
+float squre1[4] = { COx-rectsize, COy-rectsize, COx+rectsize, COy+rectsize };
 
-
-
-float winx = 1000;
-float winy = 1000;
-float squresize = 0.1;
-float squre1[7] = {(winx/winx)-1-squresize,(winy / winy - 1) - squresize ,(winx / winx) - 1 + squresize ,(winy / winy) - 1 + squresize ,1.0f, 0.5f, 0.1f };
 
 void main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(winx, winy);
+	glutInitWindowSize(1000, 1000);
 	glutCreateWindow("Example3");
 
 	glewExperimental = GL_TRUE;
@@ -47,7 +40,6 @@ GLvoid drawScene() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(0.1f, 0.5f, 0.5f);
-	glColor3f(squre1[4], squre1[5], squre1[6]);
 	glRectf(squre1[0], squre1[1], squre1[2], squre1[3]);
 	glutSwapBuffers();
 }
@@ -56,18 +48,28 @@ void Reshape(int w, int h) {
 }
 
 void Mouse(int button, int state, int x, int y) {
-	if (button == GLUT_LEFT_BUTTON) {
+	float ogx = ((float)x / 500) - 1;
+	float ogy = -(((float)y / 500) - 1);
+	if (button == GLUT_LEFT_BUTTON && state==GLUT_DOWN&& ogx > squre1[0] && ogx <squre1[2] && ogy >squre1[1] && ogy < squre1[3]) {
+		prevx = ogx;
+		prevy = ogy;
 		button_down = true;
 	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		button_down = false;
+		prevx = ogx;
+		prevy = ogy;
+	}
 }
-int prevx=0;
-int prevy=0;
 void Movesqure(int x, int y) {
+	float ogx = ((float)x / 500) - 1;
+	float ogy = -(((float)y / 500) - 1);
 	if (button_down == true) {
-		rectx -= ((float)(prevx-x) / 2000);
-		recty += ((float)(prevy-y) / 2000);
-		prevx = x;
-		prevy = y;
+		squre1[0] += (ogx - prevx);
+		squre1[1] += (ogy - prevy);
+		squre1[2] += (ogx - prevx);
+		squre1[3] += (ogy - prevy);
+		glutPostRedisplay();
 	}
 
 }
