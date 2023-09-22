@@ -33,6 +33,13 @@ bool squre3size = true;
 bool squre4size = true;
 bool squre5size = true;
 
+float prevsqure1[4];
+float prevsqure2[4];
+float prevsqure3[4];
+float prevsqure4[4];
+float prevsqure5[4];
+
+
 GLvoid drawScene() {
 	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -65,6 +72,11 @@ GLvoid Mouse(int button, int state, int x, int y) {
 			squre1[1] = ogy - squresize;
 			squre1[2] = ogx + squresize;
 			squre1[3] = ogy + squresize;
+			prevsqure1[0] = squre1[0];
+			prevsqure1[1] = squre1[1];
+			prevsqure1[2] = squre1[2];
+			prevsqure1[3] = squre1[3];
+
 			squre1[4] = (rand() % 10 / 10.0);
 			squre1[5] = (rand() % 10 / 10.0);
 			squre1[6] = (rand() % 10 / 10.0);
@@ -74,6 +86,11 @@ GLvoid Mouse(int button, int state, int x, int y) {
 			squre2[1] = ogy - squresize;
 			squre2[2] = ogx + squresize;
 			squre2[3] = ogy + squresize;
+			prevsqure2[0] = squre2[0];
+			prevsqure2[1] = squre2[1];
+			prevsqure2[2] = squre2[2];
+			prevsqure2[3] = squre2[3];
+
 			squre2[4] = (rand() % 10 / 10.0);
 			squre2[5] = (rand() % 10 / 10.0);
 			squre2[6] = (rand() % 10 / 10.0);
@@ -83,6 +100,11 @@ GLvoid Mouse(int button, int state, int x, int y) {
 			squre3[1] = ogy - squresize;
 			squre3[2] = ogx + squresize;
 			squre3[3] = ogy + squresize;
+			prevsqure3[0] = squre3[0];
+			prevsqure3[1] = squre3[1];
+			prevsqure3[2] = squre3[2];
+			prevsqure3[3] = squre3[3];
+
 			squre3[4] = (rand() % 10 / 10.0);
 			squre3[5] = (rand() % 10 / 10.0);
 			squre3[6] = (rand() % 10 / 10.0);
@@ -92,6 +114,10 @@ GLvoid Mouse(int button, int state, int x, int y) {
 			squre4[1] = ogy - squresize;
 			squre4[2] = ogx + squresize;
 			squre4[3] = ogy + squresize;
+			prevsqure4[0] = squre4[0];
+			prevsqure4[1] = squre4[1];
+			prevsqure4[2] = squre4[2];
+			prevsqure4[3] = squre4[3];
 			squre4[4] = (rand() % 10 / 10.0);
 			squre4[5] = (rand() % 10 / 10.0);
 			squre4[6] = (rand() % 10 / 10.0);
@@ -101,6 +127,11 @@ GLvoid Mouse(int button, int state, int x, int y) {
 			squre5[1] = ogy - squresize;
 			squre5[2] = ogx + squresize;
 			squre5[3] = ogy + squresize;
+			prevsqure5[0] = squre5[0];
+			prevsqure5[1] = squre5[1];
+			prevsqure5[2] = squre5[2];
+			prevsqure5[3] = squre5[3];
+
 			squre5[4] = (rand() % 10 / 10.0);
 			squre5[5] = (rand() % 10 / 10.0);
 			squre5[6] = (rand() % 10 / 10.0);
@@ -166,10 +197,35 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		}
 		break;
 	case 's':
+		astop = true;
+		atimer = !atimer;
+		istop = true;
+		itimer = !itimer;
+		cstop = true;
+		ctimer = !ctimer;
+		ostop = true;
+		otimer = !otimer;
 		break;
 	case 'm':
+		for (int i = 0; i < 4; i++) {
+			squre1[i] = prevsqure1[i];
+			squre2[i] = prevsqure2[i];
+			squre3[i] = prevsqure3[i];
+			squre4[i] = prevsqure4[i];
+			squre5[i] = prevsqure5[i];
+			glutPostRedisplay();
+		}
 		break;
 	case 'r':
+		squrecount = 1;
+		for (int i = 0; i < 8; i++) {
+			squre1[i] = NULL;
+			squre2[i] = NULL;
+			squre3[i] = NULL;
+			squre4[i] = NULL;
+			squre5[i] = NULL;
+		}
+		glutPostRedisplay();
 		break;
 	case 'q':
 		glutLeaveMainLoop();
