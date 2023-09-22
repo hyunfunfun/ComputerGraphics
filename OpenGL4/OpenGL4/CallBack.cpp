@@ -156,6 +156,14 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		}
 		break;
 	case 'o':
+		if (ostop == true) {
+			glutTimerFunc(50, oTimer, 1);
+			ostop = false;
+		}
+		else {
+			ostop = true;
+			otimer = !otimer;
+		}
 		break;
 	case 's':
 		break;
@@ -752,5 +760,28 @@ GLvoid cTimer(int value) {
 }
 
 GLvoid oTimer(int value) {
+	if (ctimer == true) {
+		squre1[4] = (rand() % 10 / 10.0);
+		squre1[5] = (rand() % 10 / 10.0);
+		squre1[6] = (rand() % 10 / 10.0);
 
+		squre2[4] = (rand() % 10 / 10.0);
+		squre2[5] = (rand() % 10 / 10.0);
+		squre2[6] = (rand() % 10 / 10.0);
+
+		squre3[4] = (rand() % 10 / 10.0);
+		squre3[5] = (rand() % 10 / 10.0);
+		squre3[6] = (rand() % 10 / 10.0);
+
+		squre4[4] = (rand() % 10 / 10.0);
+		squre4[5] = (rand() % 10 / 10.0);
+		squre4[6] = (rand() % 10 / 10.0);
+
+		squre5[4] = (rand() % 10 / 10.0);
+		squre5[5] = (rand() % 10 / 10.0);
+		squre5[6] = (rand() % 10 / 10.0);
+
+		glutPostRedisplay();
+		glutTimerFunc(50, oTimer, 1);
+	}
 }
