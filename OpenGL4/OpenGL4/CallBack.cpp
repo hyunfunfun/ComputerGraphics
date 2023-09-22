@@ -14,11 +14,18 @@ bool istop = true;
 bool cstop = true;
 bool ostop = true;
 
-float squre1[8] = {0,0,0,0,0,0,0,1.0};
-float squre2[8] = { 0,0,0,0,0,0,0,1.0 };
-float squre3[8] = { 0,0,0,0,0,0,0,1.0 };
-float squre4[8] = { 0,0,0,0,0,0,0,1.0 };
-float squre5[8] = { 0,0,0,0,0,0,0,1.0 };
+float squre1[8];
+float squre2[8];
+float squre3[8];
+float squre4[8];
+float squre5[8];
+
+
+bool squre1c = true;
+bool squre2c = true;
+bool squre3c = true;
+bool squre4c = true;
+bool squre5c = true;
 
 
 GLvoid drawScene() {
@@ -102,8 +109,14 @@ GLvoid Mouse(int button, int state, int x, int y) {
 GLvoid Keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'a':
+		squre1[7] = 1.0;
+		squre2[7] = 1.0;
+		squre3[7] = 1.0;
+		squre4[7] = 1.0;
+		squre5[7] = 1.0;
 		if (astop==true) {
 			glutTimerFunc(3, aTimer, 1);
+			itimer = !itimer;
 			astop = false;
 		}
 		else {
@@ -112,6 +125,21 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		}
 		break;
 	case 'i':
+		squre1[7] = squre1[1];
+		squre2[7] = squre2[1];
+		squre3[7] = squre3[1];
+		squre4[7] = squre4[1];
+		squre5[7] = squre5[1];
+		if (istop == true) {
+			float prev = squre1[1];
+			glutTimerFunc(3, iTimer, prev);
+			atimer = !atimer;
+			istop = false;
+		}
+		else {
+			istop = true;
+			itimer = !itimer;
+		}
 		break;
 	case 'c':
 		break;
@@ -422,7 +450,169 @@ GLvoid aTimer(int value) {
 	}
 
 }
+
 GLvoid iTimer(int value) {
+	float move = 0.001;
+	
+	if (itimer == true) {
+		//squre1 move
+		if (squre1c==true) {
+			if (squre1[1] >= squre1[7] + 0.1) {
+				squre1c = false;
+			}
+			else {
+				if (squre1[2] > 1) {
+					squre1[0] = -1;
+					squre1[2] = squre1[0] + (squresize*2);
+				}
+				squre1[0] += move;
+				squre1[1] += move;
+				squre1[2] += move;
+				squre1[3] += move;
+			}
+		}
+		else if (squre1c==false) {
+			if (squre1[1] <= squre1[7] - 0.1) {
+				squre1c = true;
+			}
+			else {
+				if (squre1[2] > 1) {
+					squre1[0] = -1;
+					squre1[2] = squre1[0]+(squresize*2);
+				}
+				squre1[0] += move;
+				squre1[1] -= move;
+				squre1[2] += move;
+				squre1[3] -= move;
+			}
+		}
+		//squre2 move
+		if (squre2c == true) {
+			if (squre2[1] >= squre2[7] + 0.1) {
+				squre2c = false;
+			}
+			else {
+				if (squre2[2] > 1) {
+					squre2[0] = -1;
+					squre2[2] = squre2[0] + (squresize * 2);
+				}
+				squre2[0] += move;
+				squre2[1] += move;
+				squre2[2] += move;
+				squre2[3] += move;
+			}
+		}
+		else if (squre2c == false) {
+			if (squre2[1] <= squre2[7] - 0.1) {
+				squre2c = true;
+			}
+			else {
+				if (squre2[2] > 1) {
+					squre2[0] = -1;
+					squre2[2] = squre2[0] + (squresize * 2);
+				}
+				squre2[0] += move;
+				squre2[1] -= move;
+				squre2[2] += move;
+				squre2[3] -= move;
+			}
+		}
+		//squre3 move
+		if (squre3c == true) {
+			if (squre3[1] >= squre3[7] + 0.1) {
+				squre3c = false;
+			}
+			else {
+				if (squre3[2] > 1) {
+					squre3[0] = -1;
+					squre3[2] = squre3[0] + (squresize * 2);
+				}
+				squre3[0] += move;
+				squre3[1] += move;
+				squre3[2] += move;
+				squre3[3] += move;
+			}
+		}
+		else if (squre3c == false) {
+			if (squre3[1] <= squre3[7] - 0.1) {
+				squre3c = true;
+			}
+			else {
+				if (squre3[2] > 1) {
+					squre3[0] = -1;
+					squre3[2] = squre3[0] + (squresize * 2);
+				}
+				squre3[0] += move;
+				squre3[1] -= move;
+				squre3[2] += move;
+				squre3[3] -= move;
+			}
+		}
+		//squre4 move
+		if (squre4c == true) {
+			if (squre4[1] >= squre4[7] + 0.1) {
+				squre4c = false;
+			}
+			else {
+				if (squre4[2] > 1) {
+					squre4[0] = -1;
+					squre4[2] = squre4[0] + (squresize * 2);
+				}
+				squre4[0] += move;
+				squre4[1] += move;
+				squre4[2] += move;
+				squre4[3] += move;
+			}
+		}
+		else if (squre4c == false) {
+			if (squre4[1] <= squre4[7] - 0.1) {
+				squre4c = true;
+			}
+			else {
+				if (squre4[2] > 1) {
+					squre4[0] = -1;
+					squre4[2] = squre4[0] + (squresize * 2);
+				}
+				squre4[0] += move;
+				squre4[1] -= move;
+				squre4[2] += move;
+				squre4[3] -= move;
+			}
+		}
+		//squre5 move
+		if (squre5c == true) {
+			if (squre5[1] >= squre5[7] + 0.1) {
+				squre5c = false;
+			}
+			else {
+				if (squre5[2] > 1) {
+					squre5[0] = -1;
+					squre5[2] = squre5[0] + (squresize * 2);
+				}
+				squre5[0] += move;
+				squre5[1] += move;
+				squre5[2] += move;
+				squre5[3] += move;
+			}
+		}
+		else if (squre5c == false) {
+			if (squre5[1] <= squre5[7] - 0.1) {
+				squre5c = true;
+			}
+			else {
+				if (squre5[2] > 1) {
+					squre5[0] = -1;
+					squre5[2] = squre5[0] + (squresize * 2);
+				}
+				squre5[0] += move;
+				squre5[1] -= move;
+				squre5[2] += move;
+				squre5[3] -= move;
+			}
+		}
+		glutPostRedisplay();
+		glutTimerFunc(3, iTimer, 1);
+	}
 
 }
 GLvoid cTimer(int value) {
