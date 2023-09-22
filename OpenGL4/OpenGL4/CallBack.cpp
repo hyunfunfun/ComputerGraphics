@@ -27,6 +27,11 @@ bool squre3c = true;
 bool squre4c = true;
 bool squre5c = true;
 
+bool squre1size = true;
+bool squre2size = true;
+bool squre3size = true;
+bool squre4size = true;
+bool squre5size = true;
 
 GLvoid drawScene() {
 	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
@@ -131,8 +136,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		squre4[7] = squre4[1];
 		squre5[7] = squre5[1];
 		if (istop == true) {
-			float prev = squre1[1];
-			glutTimerFunc(3, iTimer, prev);
+			glutTimerFunc(3, iTimer, 1);
 			atimer = !atimer;
 			istop = false;
 		}
@@ -142,6 +146,14 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		}
 		break;
 	case 'c':
+		if (cstop == true) {
+			glutTimerFunc(3, cTimer, 1);
+			cstop = false;
+		}
+		else {
+			cstop = true;
+			ctimer = !ctimer;
+		}
 		break;
 	case 'o':
 		break;
@@ -462,8 +474,8 @@ GLvoid iTimer(int value) {
 			}
 			else {
 				if (squre1[2] > 1) {
+					squre1[2] = (squre1[2] - squre1[0])-1;
 					squre1[0] = -1;
-					squre1[2] = squre1[0] + (squresize*2);
 				}
 				squre1[0] += move;
 				squre1[1] += move;
@@ -477,8 +489,8 @@ GLvoid iTimer(int value) {
 			}
 			else {
 				if (squre1[2] > 1) {
+					squre1[2] = (squre1[2] - squre1[0]) - 1;
 					squre1[0] = -1;
-					squre1[2] = squre1[0]+(squresize*2);
 				}
 				squre1[0] += move;
 				squre1[1] -= move;
@@ -493,8 +505,8 @@ GLvoid iTimer(int value) {
 			}
 			else {
 				if (squre2[2] > 1) {
+					squre2[2] = (squre2[2] - squre2[0]) - 1;
 					squre2[0] = -1;
-					squre2[2] = squre2[0] + (squresize * 2);
 				}
 				squre2[0] += move;
 				squre2[1] += move;
@@ -508,8 +520,8 @@ GLvoid iTimer(int value) {
 			}
 			else {
 				if (squre2[2] > 1) {
+					squre2[2] = (squre2[2] - squre2[0]) - 1;
 					squre2[0] = -1;
-					squre2[2] = squre2[0] + (squresize * 2);
 				}
 				squre2[0] += move;
 				squre2[1] -= move;
@@ -524,8 +536,8 @@ GLvoid iTimer(int value) {
 			}
 			else {
 				if (squre3[2] > 1) {
+					squre3[2] = (squre3[2] - squre3[0]) - 1;
 					squre3[0] = -1;
-					squre3[2] = squre3[0] + (squresize * 2);
 				}
 				squre3[0] += move;
 				squre3[1] += move;
@@ -539,8 +551,8 @@ GLvoid iTimer(int value) {
 			}
 			else {
 				if (squre3[2] > 1) {
+					squre3[2] = (squre3[2] - squre3[0]) - 1;
 					squre3[0] = -1;
-					squre3[2] = squre3[0] + (squresize * 2);
 				}
 				squre3[0] += move;
 				squre3[1] -= move;
@@ -555,8 +567,8 @@ GLvoid iTimer(int value) {
 			}
 			else {
 				if (squre4[2] > 1) {
+					squre4[2] = (squre4[2] - squre4[0]) - 1;
 					squre4[0] = -1;
-					squre4[2] = squre4[0] + (squresize * 2);
 				}
 				squre4[0] += move;
 				squre4[1] += move;
@@ -570,8 +582,8 @@ GLvoid iTimer(int value) {
 			}
 			else {
 				if (squre4[2] > 1) {
+					squre4[2] = (squre4[2] - squre4[0]) - 1;
 					squre4[0] = -1;
-					squre4[2] = squre4[0] + (squresize * 2);
 				}
 				squre4[0] += move;
 				squre4[1] -= move;
@@ -586,8 +598,8 @@ GLvoid iTimer(int value) {
 			}
 			else {
 				if (squre5[2] > 1) {
+					squre5[2] = (squre5[2] - squre5[0]) - 1;
 					squre5[0] = -1;
-					squre5[2] = squre5[0] + (squresize * 2);
 				}
 				squre5[0] += move;
 				squre5[1] += move;
@@ -601,8 +613,8 @@ GLvoid iTimer(int value) {
 			}
 			else {
 				if (squre5[2] > 1) {
+					squre5[2] = (squre5[2] - squre5[0]) - 1;
 					squre5[0] = -1;
-					squre5[2] = squre5[0] + (squresize * 2);
 				}
 				squre5[0] += move;
 				squre5[1] -= move;
@@ -615,9 +627,130 @@ GLvoid iTimer(int value) {
 	}
 
 }
-GLvoid cTimer(int value) {
 
+GLvoid cTimer(int value) {
+	float sizeup = 0.0001;
+	if (ctimer == true) {
+		//squre1 size
+		if (squre1size==true) {
+			if (squre1[0] - squre1[2] > 0.3) {
+				squre1size = false;
+			}
+			else {
+				squre1[0] += sizeup;
+				squre1[1] += sizeup;
+				squre1[2] -= sizeup;
+				squre1[3] -= sizeup;
+			}
+		}
+		else if(squre1size==false){
+			if (squre1[0] - squre1[2] < 0.05) {
+				squre1size = true;
+			}
+			else {
+				squre1[0] -= sizeup;
+				squre1[1] -= sizeup;
+				squre1[2] += sizeup;
+				squre1[3] += sizeup;
+			}
+		}
+		//squre2 size
+		if (squre2size == true) {
+			if (squre2[0] - squre2[2] > 0.3) {
+				squre2size = false;
+			}
+			else {
+				squre2[0] += sizeup;
+				squre2[1] += sizeup;
+				squre2[2] -= sizeup;
+				squre2[3] -= sizeup;
+			}
+		}
+		else if (squre2size == false) {
+			if (squre2[0] - squre2[2] < 0.05) {
+				squre2size = true;
+			}
+			else {
+				squre2[0] -= sizeup;
+				squre2[1] -= sizeup;
+				squre2[2] += sizeup;
+				squre2[3] += sizeup;
+			}
+		}
+		//squre3 size
+		if (squre3size == true) {
+			if (squre3[0] - squre3[2] > 0.3) {
+				squre3size = false;
+			}
+			else {
+				squre3[0] += sizeup;
+				squre3[1] += sizeup;
+				squre3[2] -= sizeup;
+				squre3[3] -= sizeup;
+			}
+		}
+		else if (squre3size == false) {
+			if (squre3[0] - squre3[2] < 0.05) {
+				squre3size = true;
+			}
+			else {
+				squre3[0] -= sizeup;
+				squre3[1] -= sizeup;
+				squre3[2] += sizeup;
+				squre3[3] += sizeup;
+			}
+		}
+		//squre4 size
+		if (squre4size == true) {
+			if (squre4[0] - squre4[2] > 0.3) {
+				squre4size = false;
+			}
+			else {
+				squre4[0] += sizeup;
+				squre4[1] += sizeup;
+				squre4[2] -= sizeup;
+				squre4[3] -= sizeup;
+			}
+		}
+		else if (squre4size == false) {
+			if (squre4[0] - squre4[2] < 0.05) {
+				squre4size = true;
+			}
+			else {
+				squre4[0] -= sizeup;
+				squre4[1] -= sizeup;
+				squre4[2] += sizeup;
+				squre4[3] += sizeup;
+			}
+		}
+		//squre5 size
+		if (squre5size == true) {
+			if (squre5[0] - squre5[2] > 0.3) {
+				squre5size = false;
+			}
+			else {
+				squre5[0] += sizeup;
+				squre5[1] += sizeup;
+				squre5[2] -= sizeup;
+				squre5[3] -= sizeup;
+			}
+		}
+		else if (squre5size == false) {
+			if (squre5[0] - squre5[2] < 0.05) {
+				squre5size = true;
+			}
+			else {
+				squre5[0] -= sizeup;
+				squre5[1] -= sizeup;
+				squre5[2] += sizeup;
+				squre5[3] += sizeup;
+			}
+		}
+		glutPostRedisplay();
+		glutTimerFunc(3, cTimer, 1);
+	}
 }
+
 GLvoid oTimer(int value) {
 
 }
