@@ -28,6 +28,16 @@ GLvoid defrect() {
 			squre[i][j] = ((rand() % 10)) / 10.0;
 		}
 	}
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 7; j++) {
+			divsqure1[i][j] = -10;
+			divsqure2[i][j] = -10;
+			divsqure3[i][j] = -10;
+			divsqure4[i][j] = -10;
+			divsqure5[i][j] = -10;
+			divsqure5[i+4][j] = -10;
+		}
+	}
 }
 GLvoid drawScene() {
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -488,6 +498,7 @@ GLvoid Timer3(int value) {
 		glutTimerFunc(10, Timer3, 1);
 	}
 }
+
 //squre3 ¼Ò¸ê
 GLvoid Timer4(int value) {
 	float move = 0.0005;
@@ -528,6 +539,7 @@ GLvoid Timer4(int value) {
 	}
 }
 
+//squre4 ¼Ò¸ê
 GLvoid Timer5(int value) {
 	float move = 0.0005;
 	if (sqr5stop == true) {
@@ -597,5 +609,14 @@ GLvoid Timer5(int value) {
 		}
 		glutPostRedisplay();
 		glutTimerFunc(10, Timer5, 1);
+	}
+}
+
+GLvoid keyboard(unsigned char key, int x, int y) {
+	switch (key) {
+	case 'r':
+		defrect();
+		glutPostRedisplay();
+		break;
 	}
 }

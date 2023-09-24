@@ -22,6 +22,7 @@ void main(int argc, char** argv) {
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
 	glutMouseFunc(Mouse);
+	glutKeyboardFunc(keyboard);
 	glutMainLoop();
 
 }
