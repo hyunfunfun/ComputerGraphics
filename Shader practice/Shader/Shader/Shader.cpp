@@ -1,4 +1,6 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "Header.h"
+
 
 GLint width, height;
 GLuint shaderProgramID;
@@ -7,7 +9,7 @@ GLuint fragmentShader;
 
 void make_vertexShaders();
 void make_fragmentShaders();
-GLuint make_shaerPorgram();
+GLuint make_shaderProgram();
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 
@@ -42,7 +44,7 @@ void main(int argc, char** argv) {
 
 	make_vertexShaders();
 	make_fragmentShaders();
-	shaderID = make_shaerPorgram();
+	shaderProgramID = make_shaderProgram();
 
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
@@ -114,6 +116,9 @@ GLuint make_shaderProgram() {
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+
+	GLint result;
+	GLchar errorLog[512];
 
 	glGetProgramiv(shaderID, GL_LINK_STATUS,& result);
 	if (!result) {
