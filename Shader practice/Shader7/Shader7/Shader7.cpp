@@ -3,15 +3,31 @@
 
 //--- 메인 함수
 //--- 함수 선언 추가하기
-GLfloat triShape[3][3]; //--- 삼각형 위치 값
+GLfloat triShape[3][3];
 GLfloat tricolors[3][3] = { //--- 삼각형 꼭지점 색상
 { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
+bool tri = false;
 
-GLfloat pointShape[3];
+GLfloat pointShape[3] = {-1.0,1.0,0};//점 위치
 GLfloat pointcolors[3] = { 0.0,1.0,0.0 };
+bool point = false;
+
+GLfloat lineShape[2][3];
+GLfloat linecolors[2][3]= {{ 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }};
+bool line = false;
+
+GLfloat recShape[4][3];
+GLfloat reccolors[4][3] = { //--- 삼각형 꼭지점 색상
+{ 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } ,{1.0,1.0,0.0} };
+unsigned int index[] = { 0,1,3,1,2,3 };
+bool rec = false;
+
 GLuint vao, vbo[2];
-GLuint pointvao, pointvbo[2];
 GLuint TriPosVbo, TriColorVbo;
+GLuint pointvao, pointvbo[2];
+GLuint linevao, linevbo[2];
+GLuint recvao, recvbo[2];
+GLuint ebo;
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -55,16 +71,26 @@ GLvoid drawScene()
 	//--- 렌더링 파이프라인에 세이더 불러오기
 	glUseProgram(shaderProgramID);
 	//--- 사용할 VAO 불러오기
-	glBindVertexArray(vao);
-	//--- 삼각형 그리기
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-
-	glBindVertexArray(pointvao);
-	glPointSize(10);
-	glDrawArrays(GL_POINTS, 0, 1);
-
-
-	
+	if (tri == true) {
+		glBindVertexArray(vao);
+		//--- 삼각형 그리기
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+	if (point == true) {
+		glBindVertexArray(pointvao);
+		glPointSize(10);
+		glDrawArrays(GL_POINTS, 0, 1);
+	}
+	if (line == true) {
+		glBindVertexArray(linevao);
+		glLineWidth(10);
+		glDrawArrays(GL_LINES, 0, 2);
+	}
+	if (rec == true) {
+		glBindVertexArray(recvao);
+		//--- 삼각형 그리기
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT,0);
+	}
 
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
@@ -108,7 +134,7 @@ void InitBuffer(int a)
 		glBindBuffer(GL_ARRAY_BUFFER, pointvbo[0]);
 		//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
 		//--- triShape 배열의 사이즈: 9 * float
-		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), pointShape, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat), pointShape, GL_STATIC_DRAW);
 		//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		//--- attribute 인덱스 0번을 사용가능하게 함
@@ -117,7 +143,57 @@ void InitBuffer(int a)
 		glBindBuffer(GL_ARRAY_BUFFER, pointvbo[1]);
 		//--- 변수 colors에서 버텍스 색상을 복사한다.
 		//--- colors 배열의 사이즈: 9 *float 
-		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), pointcolors, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat), pointcolors, GL_STATIC_DRAW);
+		//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//--- attribute 인덱스 1번을 사용 가능하게 함.
+		glEnableVertexAttribArray(1);
+	case 3:
+		glGenVertexArrays(1, &linevao); //--- VAO 를 지정하고 할당하기
+		glBindVertexArray(linevao); //--- VAO를 바인드하기
+		glGenBuffers(2, linevbo); //--- 2개의 VBO를 지정하고 할당하기
+		//--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
+		glBindBuffer(GL_ARRAY_BUFFER, linevbo[0]);
+		//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
+		//--- triShape 배열의 사이즈: 9 * float
+		glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), lineShape, GL_STATIC_DRAW);
+		//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//--- attribute 인덱스 0번을 사용가능하게 함
+		glEnableVertexAttribArray(0);
+		//--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
+		glBindBuffer(GL_ARRAY_BUFFER, linevbo[1]);
+		//--- 변수 colors에서 버텍스 색상을 복사한다.
+		//--- colors 배열의 사이즈: 9 *float 
+		glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), linecolors, GL_STATIC_DRAW);
+		//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//--- attribute 인덱스 1번을 사용 가능하게 함.
+		glEnableVertexAttribArray(1);
+	case 4:
+		glGenVertexArrays(1, &recvao); //--- VAO 를 지정하고 할당하기
+		glGenBuffers(2, recvbo); //--- 2개의 VBO를 지정하고 할당하기
+		//--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
+
+		glBindVertexArray(recvao); //--- VAO를 바인드하기
+		glBindBuffer(GL_ARRAY_BUFFER, recvbo[0]);
+		//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
+		//--- triShape 배열의 사이즈: 9 * float
+		glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), recShape, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*sizeof(index), index, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
+		glEnableVertexAttribArray(0);
+		//--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
+		glBindBuffer(GL_ARRAY_BUFFER, recvbo[1]);
+		//--- 변수 colors에서 버텍스 색상을 복사한다.
+		//--- colors 배열의 사이즈: 9 *float 
+		glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), reccolors, GL_STATIC_DRAW);
+		glGenBuffers(1, &ebo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*sizeof(index), index, GL_STATIC_DRAW);
 		//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		//--- attribute 인덱스 1번을 사용 가능하게 함.
@@ -207,19 +283,43 @@ void keyboard(unsigned char key, int x, int y) {
 	float ogy = -(((float)y / 300) - 1);
 	switch (key) {
 	case 'p':
+		point = true;
 		pointShape[0] = ogx;
 		pointShape[1] = ogy;
 		InitBuffer(2);
 		glutPostRedisplay();
 		break;
 	case 't':
-		triShape[0][0] = ogx - 0.25;
-		triShape[0][1] = ogy - 0.25;
-		triShape[1][0] = ogx + 0.25;
-		triShape[1][1] = ogy - 0.25;
+		tri = true;
+		triShape[0][0] = ogx - 0.1;
+		triShape[0][1] = ogy - 0.1;
+		triShape[1][0] = ogx + 0.1;
+		triShape[1][1] = ogy - 0.1;
 		triShape[2][0] = ogx;
-		triShape[2][1] = ogy + 0.25;
+		triShape[2][1] = ogy + 0.1;
 		InitBuffer(1);
+		glutPostRedisplay();
+		break;
+	case 'l':
+		line = true;
+		lineShape[0][0] = ogx - 0.1;
+		lineShape[0][1] = ogy;
+		lineShape[1][0] = ogx + 0.1;
+		lineShape[1][1] = ogy;
+		InitBuffer(3);
+		glutPostRedisplay();
+		break;
+	case 'r':
+		rec = true;
+		recShape[0][0] = ogx - 0.1;
+		recShape[0][1] = ogy - 0.1;
+		recShape[1][0] = ogx + 0.1;
+		recShape[1][1] = ogy - 0.1;
+		recShape[2][0] = ogx + 0.1;
+		recShape[2][1] = ogy + 0.1;
+		recShape[3][0] = ogx - 0.1;
+		recShape[3][1] = ogy + 0.1;
+		InitBuffer(4);
 		glutPostRedisplay();
 		break;
 	}
