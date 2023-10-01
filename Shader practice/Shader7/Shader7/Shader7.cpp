@@ -4,13 +4,13 @@
 //--- 메인 함수
 //--- 함수 선언 추가하기
 GLfloat triShape[3][3]; //--- 삼각형 위치 값
-GLfloat colors[3][3] = { //--- 삼각형 꼭지점 색상
+GLfloat tricolors[3][3] = { //--- 삼각형 꼭지점 색상
 { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
 
-GLfloat tripos[3];
-GLfloat tricolor[3] =  //--- 삼각형 꼭지점 색상
-{ 1.0, 1.0, 0.0 };
-GLuint vao, vbo[3];
+GLfloat pointShape[3];
+GLfloat pointcolors[3] = { 0.0,1.0,0.0 };
+GLuint vao, vbo[2];
+GLuint pointvao, pointvbo[2];
 GLuint TriPosVbo, TriColorVbo;
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
@@ -23,7 +23,7 @@ void make_fragmentShaders();
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 void keyboard(unsigned char key, int x, int y);
-void InitBuffer();
+void InitBuffer(int a);
 char* filetobuf(const char*);
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
@@ -38,7 +38,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 	glewExperimental = GL_TRUE;
 	glewInit();
 	make_shaderProgram();
-	InitBuffer();
+	//InitBuffer();
 	glutKeyboardFunc(keyboard);
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
@@ -59,31 +59,10 @@ GLvoid drawScene()
 	//--- 삼각형 그리기
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
-
-	glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
-	glEnableVertexAttribArray(ColorLocation);
-
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo); // VBO Bind
-		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-		// PosLocation			- Location 번호
-		// 3					- VerTex Size (x, y, z 속성의 Vec3이니 3) 
-		// GL_FLOAT, GL_FALSE	- 자료형과 Normalize 여부
-		// sizeof(float) * 3	- VerTex 마다의 공백 크기 (한 정점마다 메모리 간격)
-		//			(0과 같음)	- 0 일 경우 자동으로 2번째 인자(3) x 3번째 인자(float)로 설정
-		// 0					- 데이터 시작 offset (0이면 데이터 처음부터 시작)
-	}
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo); // VBO Bind
-		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	}
+	glBindVertexArray(pointvao);
 	glPointSize(10);
 	glDrawArrays(GL_POINTS, 0, 1);
 
-	glDisableVertexAttribArray(PosLocation); // Disable 필수!
-	glDisableVertexAttribArray(ColorLocation);
 
 	
 
@@ -95,29 +74,56 @@ GLvoid Reshape(int w, int h)
 	glViewport(0, 0, w, h);
 }
 
-void InitBuffer()
+void InitBuffer(int a)
 {
-	glGenVertexArrays(1, &vao); //--- VAO 를 지정하고 할당하기
-	glBindVertexArray(vao); //--- VAO를 바인드하기
-	glGenBuffers(2, vbo); //--- 2개의 VBO를 지정하고 할당하기
-	//--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
-	//--- triShape 배열의 사이즈: 9 * float
-	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), triShape, GL_STATIC_DRAW);
-	//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	//--- attribute 인덱스 0번을 사용가능하게 함
-	glEnableVertexAttribArray(0);
-	//--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	//--- 변수 colors에서 버텍스 색상을 복사한다.
-	//--- colors 배열의 사이즈: 9 *float 
-	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), colors, GL_STATIC_DRAW);
-	//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	//--- attribute 인덱스 1번을 사용 가능하게 함.
-	glEnableVertexAttribArray(1);
+	switch (a) {
+	case 1:
+		glGenVertexArrays(1, &vao); //--- VAO 를 지정하고 할당하기
+		glBindVertexArray(vao); //--- VAO를 바인드하기
+		glGenBuffers(2, vbo); //--- 2개의 VBO를 지정하고 할당하기
+		//--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+		//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
+		//--- triShape 배열의 사이즈: 9 * float
+		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), triShape, GL_STATIC_DRAW);
+		//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//--- attribute 인덱스 0번을 사용가능하게 함
+		glEnableVertexAttribArray(0);
+		//--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+		//--- 변수 colors에서 버텍스 색상을 복사한다.
+		//--- colors 배열의 사이즈: 9 *float 
+		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), tricolors, GL_STATIC_DRAW);
+		//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//--- attribute 인덱스 1번을 사용 가능하게 함.
+		glEnableVertexAttribArray(1);
+		break;
+	case 2:
+		glGenVertexArrays(1, &pointvao); //--- VAO 를 지정하고 할당하기
+		glBindVertexArray(pointvao); //--- VAO를 바인드하기
+		glGenBuffers(2, pointvbo); //--- 2개의 VBO를 지정하고 할당하기
+		//--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
+		glBindBuffer(GL_ARRAY_BUFFER, pointvbo[0]);
+		//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
+		//--- triShape 배열의 사이즈: 9 * float
+		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), pointShape, GL_STATIC_DRAW);
+		//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//--- attribute 인덱스 0번을 사용가능하게 함
+		glEnableVertexAttribArray(0);
+		//--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
+		glBindBuffer(GL_ARRAY_BUFFER, pointvbo[1]);
+		//--- 변수 colors에서 버텍스 색상을 복사한다.
+		//--- colors 배열의 사이즈: 9 *float 
+		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), pointcolors, GL_STATIC_DRAW);
+		//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//--- attribute 인덱스 1번을 사용 가능하게 함.
+		glEnableVertexAttribArray(1);
+	}
+	
 }
 
 void make_shaderProgram()
@@ -201,19 +207,10 @@ void keyboard(unsigned char key, int x, int y) {
 	float ogy = -(((float)y / 300) - 1);
 	switch (key) {
 	case 'p':
-	{
-		const GLfloat tripos[3][3] = { //--- 삼각형 위치 값
-		{ogx, ogy, 0.0 }, { 0.25, -0.25, 0.0 }, { 0.5, 0.25, 0.0} };
-		const GLfloat tricolor[3][3] = { //--- 삼각형 꼭지점 색상
-		{ 1.0, 1.0, 0.0 }, { 0.0, 1.0, 1.0 }, { 1.0, 0.0, 1.0 } };
-		glGenBuffers(1, &TriPosVbo);
-		glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(tripos), tripos, GL_STATIC_DRAW);
-		glGenBuffers(1, &TriColorVbo);
-		glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(tricolor), tricolor, GL_STATIC_DRAW);
-	}
-	glutPostRedisplay();
+		pointShape[0] = ogx;
+		pointShape[1] = ogy;
+		InitBuffer(2);
+		glutPostRedisplay();
 		break;
 	case 't':
 		triShape[0][0] = ogx - 0.25;
@@ -222,7 +219,7 @@ void keyboard(unsigned char key, int x, int y) {
 		triShape[1][1] = ogy - 0.25;
 		triShape[2][0] = ogx;
 		triShape[2][1] = ogy + 0.25;
-		InitBuffer();
+		InitBuffer(1);
 		glutPostRedisplay();
 		break;
 	}
