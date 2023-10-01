@@ -10,7 +10,7 @@ GLfloat colors[3][3] = { //--- 삼각형 꼭지점 색상
 GLfloat tripos[3];
 GLfloat tricolor[3] =  //--- 삼각형 꼭지점 색상
 { 1.0, 1.0, 0.0 };
-GLuint vao, vbo[2];
+GLuint vao, vbo[3];
 GLuint TriPosVbo, TriColorVbo;
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
@@ -214,6 +214,16 @@ void keyboard(unsigned char key, int x, int y) {
 		glBufferData(GL_ARRAY_BUFFER, sizeof(tricolor), tricolor, GL_STATIC_DRAW);
 	}
 	glutPostRedisplay();
+		break;
+	case 't':
+		triShape[0][0] = ogx - 0.25;
+		triShape[0][1] = ogy - 0.25;
+		triShape[1][0] = ogx + 0.25;
+		triShape[1][1] = ogy - 0.25;
+		triShape[2][0] = ogx;
+		triShape[2][1] = ogy + 0.25;
+		InitBuffer();
+		glutPostRedisplay();
 		break;
 	}
 }
