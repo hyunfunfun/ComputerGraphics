@@ -152,6 +152,7 @@ void InitBuffer(int a)
 		//--- attribute 인덱스 1번을 사용 가능하게 함.
 		glEnableVertexAttribArray(1);
 		objcount++;
+		break;
 	case 3://선
 		glGenVertexArrays(1, &shape[objcount].vao); //--- VAO 를 지정하고 할당하기
 		glBindVertexArray(shape[objcount].vao); //--- VAO를 바인드하기
@@ -175,6 +176,7 @@ void InitBuffer(int a)
 		//--- attribute 인덱스 1번을 사용 가능하게 함.
 		glEnableVertexAttribArray(1);
 		objcount++;
+		break;
 	case 4://사각형
 		glGenVertexArrays(1, &shape[objcount].vao); //--- VAO 를 지정하고 할당하기
 		glBindVertexArray(shape[objcount].vao); //--- VAO를 바인드하기
@@ -204,6 +206,7 @@ void InitBuffer(int a)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[objcount].ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * sizeof(index), index, GL_STATIC_DRAW);
 		objcount++;
+		break;
 	}
 	
 }
