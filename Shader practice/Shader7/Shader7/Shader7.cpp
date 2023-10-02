@@ -95,78 +95,8 @@ GLvoid Reshape(int w, int h)
 }
 
 void InitBuffer(int a){
-	
-	switch (shape[a].check) {
-	case 1:
-		glGenVertexArrays(1, &shape[a].vao); //--- VAO 를 지정하고 할당하기
-		glBindVertexArray(shape[a].vao); //--- VAO를 바인드하기
-		glGenBuffers(2, shape[a].vbo); //--- 2개의 VBO를 지정하고 할당하기
-		//--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
-		glBindBuffer(GL_ARRAY_BUFFER, shape[a].vbo[0]);
-		//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
-		//--- triShape 배열의 사이즈: 9 * float
-		glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat), shape[a].Shape, GL_STATIC_DRAW);
-		//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		//--- attribute 인덱스 0번을 사용가능하게 함
-		glEnableVertexAttribArray(0);
-		//--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
-		glBindBuffer(GL_ARRAY_BUFFER, shape[a].vbo[1]);
-		//--- 변수 colors에서 버텍스 색상을 복사한다.
-		//--- colors 배열의 사이즈: 9 *float 
-		glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat), shape[a].colors, GL_STATIC_DRAW);
-		//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		//--- attribute 인덱스 1번을 사용 가능하게 함.
-		glEnableVertexAttribArray(1);
-		break;
-	case 2:
-		glGenVertexArrays(1, &shape[a].vao); //--- VAO 를 지정하고 할당하기
-		glBindVertexArray(shape[a].vao); //--- VAO를 바인드하기
-		glGenBuffers(2, shape[a].vbo); //--- 2개의 VBO를 지정하고 할당하기
-		//--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
-		glBindBuffer(GL_ARRAY_BUFFER, shape[a].vbo[0]);
-		//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
-		//--- triShape 배열의 사이즈: 9 * float
-		glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), shape[a].Shape, GL_STATIC_DRAW);
-		//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		//--- attribute 인덱스 0번을 사용가능하게 함
-		glEnableVertexAttribArray(0);
-		//--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
-		glBindBuffer(GL_ARRAY_BUFFER, shape[a].vbo[1]);
-		//--- 변수 colors에서 버텍스 색상을 복사한다.
-		//--- colors 배열의 사이즈: 9 *float 
-		glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), shape[a].colors, GL_STATIC_DRAW);
-		//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		//--- attribute 인덱스 1번을 사용 가능하게 함.
-		glEnableVertexAttribArray(1);
-		break;
-	case 3:
-		glGenVertexArrays(1, &shape[a].vao); //--- VAO 를 지정하고 할당하기
-		glBindVertexArray(shape[a].vao); //--- VAO를 바인드하기
-		glGenBuffers(2, shape[a].vbo); //--- 2개의 VBO를 지정하고 할당하기
-		//--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
-		glBindBuffer(GL_ARRAY_BUFFER, shape[a].vbo[0]);
-		//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
-		//--- triShape 배열의 사이즈: 9 * float
-		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), shape[a].Shape, GL_STATIC_DRAW);
-		//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		//--- attribute 인덱스 0번을 사용가능하게 함
-		glEnableVertexAttribArray(0);
-		//--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
-		glBindBuffer(GL_ARRAY_BUFFER, shape[a].vbo[1]);
-		//--- 변수 colors에서 버텍스 색상을 복사한다.
-		//--- colors 배열의 사이즈: 9 *float 
-		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), shape[a].colors, GL_STATIC_DRAW);
-		//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		//--- attribute 인덱스 1번을 사용 가능하게 함.
-		glEnableVertexAttribArray(1);
-		break;
-	case 4:
+
+	if (shape[a].check == 4) {
 		glGenVertexArrays(1, &shape[a].vao); //--- VAO 를 지정하고 할당하기
 		glBindVertexArray(shape[a].vao); //--- VAO를 바인드하기
 		glGenBuffers(2, shape[a].vbo); //--- 2개의 VBO를 지정하고 할당하기
@@ -194,7 +124,29 @@ void InitBuffer(int a){
 		glGenBuffers(1, &shape[a].ebo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[a].ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * sizeof(index), index, GL_STATIC_DRAW);
-		break;
+	}
+	else {
+		glGenVertexArrays(1, &shape[a].vao); //--- VAO 를 지정하고 할당하기
+		glBindVertexArray(shape[a].vao); //--- VAO를 바인드하기
+		glGenBuffers(2, shape[a].vbo); //--- 2개의 VBO를 지정하고 할당하기
+		//--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
+		glBindBuffer(GL_ARRAY_BUFFER, shape[a].vbo[0]);
+		//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
+		//--- triShape 배열의 사이즈: 9 * float
+		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), shape[a].Shape, GL_STATIC_DRAW);
+		//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//--- attribute 인덱스 0번을 사용가능하게 함
+		glEnableVertexAttribArray(0);
+		//--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
+		glBindBuffer(GL_ARRAY_BUFFER, shape[a].vbo[1]);
+		//--- 변수 colors에서 버텍스 색상을 복사한다.
+		//--- colors 배열의 사이즈: 9 *float 
+		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), shape[a].colors, GL_STATIC_DRAW);
+		//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//--- attribute 인덱스 1번을 사용 가능하게 함.
+		glEnableVertexAttribArray(1);
 	}
 }
 
@@ -371,6 +323,19 @@ void keyboard(unsigned char key, int x, int y) {
 		glutPostRedisplay();
 		break;
 	case 'c':
+		for (int i = 0; i < objcount; i++) {
+			shape[i].Shape[0][0] = NULL;
+			shape[i].Shape[1][0] = NULL;
+			shape[i].Shape[2][0] = NULL;
+			shape[i].Shape[3][0] = NULL;
+			shape[i].Shape[0][1] = NULL;
+			shape[i].Shape[1][1] = NULL;
+			shape[i].Shape[2][1] = NULL;
+			shape[i].Shape[3][1] = NULL;
+			InitBuffer(i);
+		}
+		objcount = 0;
+		glutPostRedisplay();
 		break;
 	}
 }
