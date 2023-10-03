@@ -1,13 +1,12 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Header.h"
 
-bool atimer = false;
-
 struct Shape {
 	GLfloat triShape[3][3];
 	GLfloat colors[3][3];
 	GLuint vao, vbo[2];
 	int status;
+	float dis=0;
 };
 Shape shape[4];
 
@@ -19,7 +18,9 @@ void make_fragmentShaders();
 void make_shaderProgram();
 void InitBuffer(int a);
 void keyboard(unsigned char key, int x, int y);
-void aTimer(int value);
+
+void Bound(int value);
+void ZigZag(int value);
 
 GLint width, height;
 GLuint shaderProgramID;
@@ -28,6 +29,9 @@ GLuint fragmentShader;
 GLchar* vertexSource, * fragmentSource;
 
 int objcount = 0;
+
+bool boundcheck = false;
+bool zigzagcheck = false;
 
 char* filetobuf(const char* file)
 {
@@ -194,7 +198,6 @@ void set() {
 				shape[i].colors[j][1] = 0.0;
 				shape[i].colors[j][2] = 0.0;
 			}
-			shape[i].status = 1;
 			objcount++;
 			InitBuffer(i);
 			break;
@@ -210,7 +213,6 @@ void set() {
 				shape[i].colors[j][1] = 1.0;
 				shape[i].colors[j][2] = 0.0;
 			}
-			shape[i].status = 2;
 			objcount++;
 			InitBuffer(i);
 			break;
@@ -226,7 +228,6 @@ void set() {
 				shape[i].colors[j][1] = 0.0;
 				shape[i].colors[j][2] = 1.0;
 			}
-			shape[i].status = 3;
 			objcount++;
 			InitBuffer(i);
 			break;
@@ -242,7 +243,6 @@ void set() {
 				shape[i].colors[j][1] = 1.0;
 				shape[i].colors[j][2] = 1.0;
 			}
-			shape[i].status = 4;
 			objcount++;
 			InitBuffer(i);
 			break;
@@ -252,21 +252,30 @@ void set() {
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case '1':
-		atimer = true;
-		glutTimerFunc(3, aTimer, 1);
+		for (int i = 0; i < 4; i++) {
+			shape[i].status = i + 1;
+		}
+		boundcheck = true;
+		zigzagcheck = !zigzagcheck;
+		glutTimerFunc(3, Bound, 1);
 		break;
 	case '2':
-		atimer = !atimer;
+		for (int i = 0; i < 4; i++) {
+			shape[i].status = i+1;
+		}
+		zigzagcheck = true;
+		boundcheck = !boundcheck;
+		glutTimerFunc(3, ZigZag, 1);
 		break;
 	}
 }
 //대각선 이동
-GLvoid aTimer(int value) {
+void Bound(int value) {
 	float move0 = 0.001;
 	float move1 = 0.005;
 	float move2 = 0.0005;
 	float move3 = 0.002;
-	if (atimer == true) {
+	if (boundcheck == true) {
 		//tri[0] move
 		if (shape[0].status == 1) {
 			if (shape[0].triShape[1][0]>= 1) {
@@ -533,7 +542,378 @@ GLvoid aTimer(int value) {
 		InitBuffer(3);
 		
 		glutPostRedisplay();
-		glutTimerFunc(3, aTimer, 1);
+		glutTimerFunc(3, Bound, 1);
 	}
 
+}
+
+void ZigZag(int value) {
+	float move0 = 0.001;
+	float move1 = 0.005;
+	float move2 = 0.0005;
+	float move3 = 0.002;
+	if (zigzagcheck == true) {
+		//tri[1] move
+		if (shape[0].status == 1) {
+			if (shape[0].triShape[1][0] >= 1) {
+				if (shape[0].dis < 0.3) {
+					shape[0].triShape[0][1] -= move0;
+					shape[0].triShape[1][1] -= move0;
+					shape[0].triShape[2][1] -= move0;
+					shape[0].dis += move0;
+					if (shape[0].triShape[0][1] <= -1) {
+						shape[0].status = 4;
+					}
+				}
+				else {
+					shape[0].status = 2;
+					shape[0].dis = 0;
+				}
+			}
+			else {
+				shape[0].triShape[0][0] += move0;
+				shape[0].triShape[1][0] += move0;
+				shape[0].triShape[2][0] += move0;
+			}
+		}
+		if (shape[0].status == 2) {
+			if (shape[0].triShape[0][0] <= -1) {
+				if (shape[0].dis < 0.3) {
+					shape[0].triShape[0][1] -= move0;
+					shape[0].triShape[1][1] -= move0;
+					shape[0].triShape[2][1] -= move0;
+					shape[0].dis += move0;
+					if (shape[0].triShape[0][1] <= -1) {
+						shape[0].status = 3;
+					}
+				}
+				else {
+					shape[0].status = 1;
+					shape[0].dis = 0;
+				}
+			}
+			else {
+				shape[0].triShape[0][0] -= move0;
+				shape[0].triShape[1][0] -= move0;
+				shape[0].triShape[2][0] -= move0;
+			}
+		}
+		if (shape[0].status == 3) {
+			if (shape[0].triShape[0][0] <= -1) {
+				if (shape[0].dis < 0.3) {
+					shape[0].triShape[0][1] += move0;
+					shape[0].triShape[1][1] += move0;
+					shape[0].triShape[2][1] += move0;
+					shape[0].dis += move0;
+					if (shape[0].triShape[2][1] >= 1) {
+						shape[0].status = 1;
+					}
+				}
+				else {
+					shape[0].status = 4;
+					shape[0].dis = 0;
+				}
+			}
+			else {
+				shape[0].triShape[0][0] -= move0;
+				shape[0].triShape[1][0] -= move0;
+				shape[0].triShape[2][0] -= move0;
+			}
+		}
+		if (shape[0].status == 4) {
+			if (shape[0].triShape[1][0] >= 1) {
+				if (shape[0].dis < 0.3) {
+					shape[0].triShape[0][1] += move0;
+					shape[0].triShape[1][1] += move0;
+					shape[0].triShape[2][1] += move0;
+					shape[0].dis += move0;
+					if (shape[0].triShape[2][1] >= 1) {
+						shape[0].status = 2;
+					}
+				}
+				else {
+					shape[0].status = 3;
+					shape[0].dis = 0;
+				}
+			}
+			else {
+				shape[0].triShape[0][0] += move0;
+				shape[0].triShape[1][0] += move0;
+				shape[0].triShape[2][0] += move0;
+			}
+		}
+		InitBuffer(0);
+		//tri[1] move
+		if (shape[1].status == 1) {
+			if (shape[1].triShape[1][0] >= 1) {
+				if (shape[1].dis < 0.3) {
+					shape[1].triShape[0][1] -= move1;
+					shape[1].triShape[1][1] -= move1;
+					shape[1].triShape[2][1] -= move1;
+					shape[1].dis += move1;
+					if (shape[1].triShape[0][1] <= -1) {
+						shape[1].status = 4;
+					}
+				}
+				else {
+					shape[1].status = 2;
+					shape[1].dis = 0;
+				}
+			}
+			else {
+				shape[1].triShape[0][0] += move1;
+				shape[1].triShape[1][0] += move1;
+				shape[1].triShape[2][0] += move1;
+			}
+		}
+		if (shape[1].status == 2) {
+			if (shape[1].triShape[0][0] <= -1) {
+				if (shape[1].dis < 0.3) {
+					shape[1].triShape[0][1] -= move1;
+					shape[1].triShape[1][1] -= move1;
+					shape[1].triShape[2][1] -= move1;
+					shape[1].dis += move1;
+					if (shape[1].triShape[0][1] <= -1) {
+						shape[1].status = 3;
+					}
+				}
+				else {
+					shape[1].status = 1;
+					shape[1].dis = 0;
+				}
+			}
+			else {
+				shape[1].triShape[0][0] -= move1;
+				shape[1].triShape[1][0] -= move1;
+				shape[1].triShape[2][0] -= move1;
+			}
+		}
+		if (shape[1].status == 3) {
+			if (shape[1].triShape[0][0] <= -1) {
+				if (shape[1].dis < 0.3) {
+					shape[1].triShape[0][1] += move1;
+					shape[1].triShape[1][1] += move1;
+					shape[1].triShape[2][1] += move1;
+					shape[1].dis += move1;
+					if (shape[1].triShape[2][1] >= 1) {
+						shape[1].status = 1;
+					}
+				}
+				else {
+					shape[1].status = 4;
+					shape[1].dis = 0;
+				}
+			}
+			else {
+				shape[1].triShape[0][0] -= move1;
+				shape[1].triShape[1][0] -= move1;
+				shape[1].triShape[2][0] -= move1;
+			}
+		}
+		if (shape[1].status == 4) {
+			if (shape[1].triShape[1][0] >= 1) {
+				if (shape[1].dis < 0.3) {
+					shape[1].triShape[0][1] += move1;
+					shape[1].triShape[1][1] += move1;
+					shape[1].triShape[2][1] += move1;
+					shape[1].dis += move0;
+					if (shape[1].triShape[2][1] >= 1) {
+						shape[1].status = 2;
+					}
+				}
+				else {
+					shape[1].status = 3;
+					shape[1].dis = 0;
+				}
+			}
+			else {
+				shape[1].triShape[0][0] += move1;
+				shape[1].triShape[1][0] += move1;
+				shape[1].triShape[2][0] += move1;
+			}
+		}
+		InitBuffer(1);
+		//tri[2] move
+		if (shape[2].status == 1) {
+			if (shape[2].triShape[1][0] >= 1) {
+				if (shape[2].dis < 0.3) {
+					shape[2].triShape[0][1] -= move2;
+					shape[2].triShape[1][1] -= move2;
+					shape[2].triShape[2][1] -= move2;
+					shape[2].dis += move2;
+					if (shape[2].triShape[0][1] <= -1) {
+						shape[2].status = 4;
+					}
+				}
+				else {
+					shape[2].status = 2;
+					shape[2].dis = 0;
+				}
+			}
+			else {
+				shape[2].triShape[0][0] += move2;
+				shape[2].triShape[1][0] += move2;
+				shape[2].triShape[2][0] += move2;
+			}
+		}
+		if (shape[2].status == 2) {
+			if (shape[2].triShape[0][0] <= -1) {
+				if (shape[2].dis < 0.3) {
+					shape[2].triShape[0][1] -= move2;
+					shape[2].triShape[1][1] -= move2;
+					shape[2].triShape[2][1] -= move2;
+					shape[2].dis += move2;
+					if (shape[2].triShape[0][1] <= -1) {
+						shape[2].status = 3;
+					}
+				}
+				else {
+					shape[2].status = 1;
+					shape[2].dis = 0;
+				}
+			}
+			else {
+				shape[2].triShape[0][0] -= move2;
+				shape[2].triShape[1][0] -= move2;
+				shape[2].triShape[2][0] -= move2;
+			}
+		}
+		if (shape[2].status == 3) {
+			if (shape[2].triShape[0][0] <= -1) {
+				if (shape[2].dis < 0.3) {
+					shape[2].triShape[0][1] += move2;
+					shape[2].triShape[1][1] += move2;
+					shape[2].triShape[2][1] += move2;
+					shape[2].dis += move2;
+					if (shape[2].triShape[2][1] >= 1) {
+						shape[2].status = 1;
+					}
+				}
+				else {
+					shape[2].status = 4;
+					shape[2].dis = 0;
+				}
+			}
+			else {
+				shape[2].triShape[0][0] -= move2;
+				shape[2].triShape[1][0] -= move2;
+				shape[2].triShape[2][0] -= move2;
+			}
+		}
+		if (shape[2].status == 4) {
+			if (shape[2].triShape[1][0] >= 1) {
+				if (shape[2].dis < 0.3) {
+					shape[2].triShape[0][1] += move2;
+					shape[2].triShape[1][1] += move2;
+					shape[2].triShape[2][1] += move2;
+					shape[2].dis += move2;
+					if (shape[2].triShape[2][1] >= 1) {
+						shape[2].status = 2;
+					}
+				}
+				else {
+					shape[2].status = 3;
+					shape[2].dis = 0;
+				}
+			}
+			else {
+				shape[2].triShape[0][0] += move2;
+				shape[2].triShape[1][0] += move2;
+				shape[2].triShape[2][0] += move2;
+			}
+		}
+		InitBuffer(2);
+		//tri[3] move
+		if (shape[3].status == 1) {
+			if (shape[3].triShape[1][0] >= 1) {
+				if (shape[3].dis < 0.3) {
+					shape[3].triShape[0][1] -= move3;
+					shape[3].triShape[1][1] -= move3;
+					shape[3].triShape[2][1] -= move3;
+					shape[3].dis += move3;
+					if (shape[3].triShape[0][1] <= -1) {
+						shape[3].status = 4;
+					}
+				}
+				else {
+					shape[2].status = 2;
+					shape[2].dis = 0;
+				}
+			}
+			else {
+				shape[3].triShape[0][0] += move3;
+				shape[3].triShape[1][0] += move3;
+				shape[3].triShape[2][0] += move3;
+			}
+		}
+		if (shape[3].status == 2) {
+			if (shape[3].triShape[0][0] <= -1) {
+				if (shape[3].dis < 0.3) {
+					shape[3].triShape[0][1] -= move3;
+					shape[3].triShape[1][1] -= move3;
+					shape[3].triShape[2][1] -= move3;
+					shape[3].dis += move3;
+					if (shape[3].triShape[0][1] <= -1) {
+						shape[3].status = 3;
+					}
+				}
+				else {
+					shape[3].status = 1;
+					shape[3].dis = 0;
+				}
+			}
+			else {
+				shape[3].triShape[0][0] -= move3;
+				shape[3].triShape[1][0] -= move3;
+				shape[3].triShape[2][0] -= move3;
+			}
+		}
+		if (shape[3].status == 3) {
+			if (shape[3].triShape[0][0] <= -1) {
+				if (shape[3].dis < 0.3) {
+					shape[3].triShape[0][1] += move3;
+					shape[3].triShape[1][1] += move3;
+					shape[3].triShape[2][1] += move3;
+					shape[3].dis += move3;
+					if (shape[3].triShape[2][1] >= 1) {
+						shape[3].status = 1;
+					}
+				}
+				else {
+					shape[3].status = 4;
+					shape[3].dis = 0;
+				}
+			}
+			else {
+				shape[3].triShape[0][0] -= move3;
+				shape[3].triShape[1][0] -= move3;
+				shape[3].triShape[2][0] -= move3;
+			}
+		}
+		if (shape[3].status == 4) {
+			if (shape[3].triShape[1][0] >= 1) {
+				if (shape[3].dis < 0.3) {
+					shape[3].triShape[0][1] += move3;
+					shape[3].triShape[1][1] += move3;
+					shape[3].triShape[2][1] += move3;
+					shape[3].dis += move3;
+					if (shape[3].triShape[2][1] >= 1) {
+						shape[3].status = 2;
+					}
+				}
+				else {
+					shape[3].status = 3;
+					shape[3].dis = 0;
+				}
+			}
+			else {
+				shape[3].triShape[0][0] += move3;
+				shape[3].triShape[1][0] += move3;
+				shape[3].triShape[2][0] += move3;
+			}
+		}
+		InitBuffer(3);
+	}
+	glutPostRedisplay();
+	glutTimerFunc(3, ZigZag, 1);
 }
