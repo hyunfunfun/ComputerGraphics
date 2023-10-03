@@ -16,6 +16,7 @@ void make_fragmentShaders();
 void make_shaderProgram();
 void InitBuffer(int a);
 void Mouse(int button, int state, int x, int y);
+void keyboard(unsigned char key, int x, int y);
 
 GLint width, height;
 GLuint shaderProgramID;
@@ -66,6 +67,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
 	glutMouseFunc(Mouse);
+	glutKeyboardFunc(keyboard);
 	glutMainLoop();
 }
 
@@ -282,5 +284,17 @@ void Mouse(int button, int state, int x, int y) {
 			shape[3].triShape[2][1] = ogy + ransize + 0.3;
 			InitBuffer(3);
 		}
+	}
+}
+void keyboard(unsigned char key, int x, int y) {
+	switch (key) {
+	case 'a':
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glutPostRedisplay();
+		break;
+	case 'b':
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glutPostRedisplay();
+		break;
 	}
 }
