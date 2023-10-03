@@ -14,7 +14,8 @@ GLvoid Reshape(int w, int h);
 void make_vertexShaders();
 void make_fragmentShaders();
 void make_shaderProgram();
-void InitBuffer();
+void InitBuffer(int a);
+void Mouse(int button, int state, int x, int y);
 
 GLint width, height;
 GLuint shaderProgramID;
@@ -45,6 +46,7 @@ char* filetobuf(const char* file)
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 {
+	srand(time(NULL));
 	width = 800;
 	height = 600;
 	//--- 윈도우 생성하기
@@ -63,6 +65,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
+	glutMouseFunc(Mouse);
 	glutMainLoop();
 }
 
@@ -88,30 +91,29 @@ GLvoid Reshape(int w, int h) {
 	glViewport(0, 0, w, h);
 }
 
-void InitBuffer()
+void InitBuffer(int a)
 {
-	glGenVertexArrays(1, &shape[objcount].vao); //--- VAO 를 지정하고 할당하기
-	glBindVertexArray(shape[objcount].vao); //--- VAO를 바인드하기
-	glGenBuffers(2, shape[objcount].vbo); //--- 2개의 VBO를 지정하고 할당하기
+	glGenVertexArrays(1, &shape[a].vao); //--- VAO 를 지정하고 할당하기
+	glBindVertexArray(shape[a].vao); //--- VAO를 바인드하기
+	glGenBuffers(2, shape[a].vbo); //--- 2개의 VBO를 지정하고 할당하기
 	//--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
-	glBindBuffer(GL_ARRAY_BUFFER, shape[objcount].vbo[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, shape[a].vbo[0]);
 	//--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
 	//--- triShape 배열의 사이즈: 9 * float
-	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), shape[objcount].triShape, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), shape[a].triShape, GL_STATIC_DRAW);
 	//--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	//--- attribute 인덱스 0번을 사용가능하게 함
 	glEnableVertexAttribArray(0);
 	//--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
-	glBindBuffer(GL_ARRAY_BUFFER, shape[objcount].vbo[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, shape[a].vbo[1]);
 	//--- 변수 colors에서 버텍스 색상을 복사한다.
 	//--- colors 배열의 사이즈: 9 *float
-	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), shape[objcount].colors, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), shape[a].colors, GL_STATIC_DRAW);
 	//--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	//--- attribute 인덱스 1번을 사용 가능하게 함.
 	glEnableVertexAttribArray(1);
-	objcount++;
 }
 
 void make_shaderProgram()
@@ -188,7 +190,8 @@ void set() {
 				shape[i].colors[j][1] = 0.0;
 				shape[i].colors[j][2] = 0.0;
 			}
-			InitBuffer();
+			objcount++;
+			InitBuffer(i);
 			break;
 		case 1:
 			shape[i].triShape[0][0] = loca - 0.1;
@@ -202,7 +205,8 @@ void set() {
 				shape[i].colors[j][1] = 1.0;
 				shape[i].colors[j][2] = 0.0;
 			}
-			InitBuffer();
+			objcount++;
+			InitBuffer(i);
 			break;
 		case 2:
 			shape[i].triShape[0][0] = loca - 0.1;
@@ -216,7 +220,8 @@ void set() {
 				shape[i].colors[j][1] = 0.0;
 				shape[i].colors[j][2] = 1.0;
 			}
-			InitBuffer();
+			objcount++;
+			InitBuffer(i);
 			break;
 		case 3:
 			shape[i].triShape[0][0] = -loca - 0.1;
@@ -230,8 +235,52 @@ void set() {
 				shape[i].colors[j][1] = 1.0;
 				shape[i].colors[j][2] = 1.0;
 			}
-			InitBuffer();
+			objcount++;
+			InitBuffer(i);
 			break;
+		}
+	}
+}
+void Mouse(int button, int state, int x, int y) {
+	float ogx = ((float)x / (width / 2)) - 1;
+	float ogy = -(((float)y / (height / 2)) - 1);
+	float ransize = ((float)((rand() % 3)+1) / 10.0);
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		if (ogx < 0 && ogy>0) {//1사분면
+			shape[0].triShape[0][0] = ogx - ransize;
+			shape[0].triShape[0][1] = ogy - ransize;
+			shape[0].triShape[1][0] = ogx + ransize;
+			shape[0].triShape[1][1] = ogy - ransize;
+			shape[0].triShape[2][0] = ogx;
+			shape[0].triShape[2][1] = ogy + ransize+0.3;
+			InitBuffer(0);
+		}
+		else if (ogx > 0 && ogy>0) {//2사분면
+			shape[1].triShape[0][0] = ogx - ransize;
+			shape[1].triShape[0][1] = ogy - ransize;
+			shape[1].triShape[1][0] = ogx + ransize;
+			shape[1].triShape[1][1] = ogy - ransize;
+			shape[1].triShape[2][0] = ogx;
+			shape[1].triShape[2][1] = ogy + ransize + 0.3;
+			InitBuffer(1);
+		}
+		else if (ogx > 0 && ogy < 0) {//3사분면
+			shape[2].triShape[0][0] = ogx - ransize;
+			shape[2].triShape[0][1] = ogy - ransize;
+			shape[2].triShape[1][0] = ogx + ransize;
+			shape[2].triShape[1][1] = ogy - ransize;
+			shape[2].triShape[2][0] = ogx;
+			shape[2].triShape[2][1] = ogy + ransize + 0.3;
+			InitBuffer(2);
+		}
+		else if (ogx < 0 && ogy < 0) {//4사분면
+			shape[3].triShape[0][0] = ogx - ransize;
+			shape[3].triShape[0][1] = ogy - ransize;
+			shape[3].triShape[1][0] = ogx + ransize;
+			shape[3].triShape[1][1] = ogy - ransize;
+			shape[3].triShape[2][0] = ogx;
+			shape[3].triShape[2][1] = ogy + ransize + 0.3;
+			InitBuffer(3);
 		}
 	}
 }
