@@ -8,6 +8,7 @@ struct Shape {
 	int status;
 	float dis=0;
 	float movesum=0;
+	GLfloat one[3];
 };
 Shape shape[4];
 
@@ -23,6 +24,8 @@ void keyboard(unsigned char key, int x, int y);
 void Bound(int value);
 void ZigZag(int value);
 void RecSpi(int value);
+void CirSpi(int value);
+int rdis=0;
 
 GLint width, height;
 GLuint shaderProgramID;
@@ -35,6 +38,7 @@ int objcount = 0;
 bool boundcheck = false;
 bool zigzagcheck = false;
 bool recspicheck = false;
+bool cirspicheck = false;
 
 char* filetobuf(const char* file)
 {
@@ -258,6 +262,7 @@ void keyboard(unsigned char key, int x, int y) {
 		for (int i = 0; i < 4; i++) {
 			shape[i].status = i + 1;
 			shape[i].dis = 0;
+			shape[i].movesum = 0;
 		}
 		if (boundcheck == false) {
 			boundcheck = true;
@@ -267,12 +272,14 @@ void keyboard(unsigned char key, int x, int y) {
 		}
 		zigzagcheck = !zigzagcheck;
 		recspicheck = !recspicheck;
+		cirspicheck = !cirspicheck;
 		glutTimerFunc(3, Bound, 1);
 		break;
 	case '2':
 		for (int i = 0; i < 4; i++) {
 			shape[i].status = i+1;
 			shape[i].dis = 0;
+			shape[i].movesum = 0;
 		}
 		if (zigzagcheck == false) {
 			zigzagcheck = true;
@@ -282,12 +289,14 @@ void keyboard(unsigned char key, int x, int y) {
 		}
 		boundcheck = !boundcheck;
 		recspicheck = !recspicheck;
+		cirspicheck = !cirspicheck;
 		glutTimerFunc(3, ZigZag, 1);
 		break;
 	case '3':
 		for (int i = 0; i < 4; i++) {
 			shape[i].status = 1;
 			shape[i].dis = 0.8;
+			shape[i].movesum = 0;
 		}
 		if (recspicheck == false) {
 			recspicheck = true;
@@ -297,7 +306,27 @@ void keyboard(unsigned char key, int x, int y) {
 		}
 		boundcheck = !boundcheck;
 		zigzagcheck = !zigzagcheck;
+		cirspicheck = !cirspicheck;
 		glutTimerFunc(3, RecSpi, 1);
+		break;
+	case '4':
+		for (int i = 0; i < 4; i++) {
+			shape[i].status = 1;
+			shape[i].dis = 0.5;
+			shape[i].movesum = 0;
+			shape[i].one[0] = shape[i].triShape[2][0];
+			shape[i].one[1] = shape[i].triShape[2][1] - 0.2;
+		}
+		if (cirspicheck == false) {
+			cirspicheck = true;
+		}
+		else {
+			cirspicheck = false;
+		}
+		boundcheck = !boundcheck;
+		zigzagcheck = !zigzagcheck;
+		recspicheck = !recspicheck;
+		glutTimerFunc(3, CirSpi, 1);
 		break;
 	}
 }
@@ -1235,4 +1264,25 @@ void RecSpi(int value) {
 	}
 	glutPostRedisplay();
 	glutTimerFunc(3, RecSpi, 1);
+}
+
+void CirSpi(int value) {
+
+	if (cirspicheck == true) {
+		rdis += 1;
+		for (int i = 0; i < 4; i++) {
+			shape[i].triShape[0][0] = shape[i].one[0] + cos((shape[i].triShape[0][0] + rdis) / 360 * 2 * 3.14) * shape[i].dis;
+			shape[i].triShape[0][1] = shape[i].one[1] + sin((shape[i].triShape[0][1] + rdis) / 360 * 2 * 3.14) * shape[i].dis;
+			shape[i].triShape[1][0] = shape[i].triShape[0][0] + 0.2;
+			shape[i].triShape[1][1] = shape[i].triShape[0][1];
+			shape[i].triShape[2][0] = shape[i].triShape[0][0] + 0.1;
+			shape[i].triShape[2][1] = shape[i].triShape[0][1] + 0.3;
+			if (shape[i].dis > 0) {
+				shape[i].dis -= 0.0001;
+			}
+			InitBuffer(i);
+		}
+	}
+	glutPostRedisplay();
+	glutTimerFunc(3, CirSpi, 1);
 }
