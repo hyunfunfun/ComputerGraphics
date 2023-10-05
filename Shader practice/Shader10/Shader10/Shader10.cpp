@@ -2,14 +2,14 @@
 #include "Header.h"
 
 struct Shape {
-	GLfloat vertex[360 * 3][3] = { 0 };
-	GLfloat colors[360 * 3][3] = { 0 };
+	GLfloat vertex[360][3] = { 0 };
+	GLfloat colors[360][3] = { 0 };
 	GLuint vao, vbo[2];
 };
 
 Shape shape;
 int count = 1;
-int countsum;
+
 
 GLint width, height;
 GLuint shaderProgramID;
@@ -59,7 +59,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 	glutReshapeFunc(Reshape);
 	glutMouseFunc(Mouse);
 	glutKeyboardFunc(keyboard);
-	glutTimerFunc(1, TimerFunction, 1);
+	glutTimerFunc(10, TimerFunction, 1);
 	glutMainLoop();
 }
 
@@ -150,16 +150,8 @@ void Draw()
 
 	glPointSize(2);
 
-	if (count < 360 * 3)
-	{
-
-			glDrawArrays(GL_POINTS, 0+count, count+ 2);
-
-		count+=10;
-		
-	}
-	else
-		glDrawArrays(GL_POINTS, 0, count);
+	glDrawArrays(GL_POINTS, 0, count);
+	count++;
 	
 	glDisableVertexAttribArray(PosLocation);
 	glDisableVertexAttribArray(ColorLocation);
@@ -235,15 +227,22 @@ GLvoid Mouse(int button, int state, int x, int y) {
 		count = 0;
 		GLfloat radius = 0.001f;
 		GLfloat opglPosX = (GLfloat)x / 400 - 1;
-		GLfloat opglposY = -((GLfloat)y / 300 - 1);
+		GLfloat opglPosY = -((GLfloat)y / 300 - 1);
 
-		for (int i = 0; i < 360 * 3; i++)
+		for (int i = 0; i < 180; i++)
 		{
-			shape.vertex[i][0] = opglPosX + cos(i / 360.0f * (2.0f * 3.141592)) * radius;  // x좌표
-			shape.vertex[i][1] = opglposY + sin(i / 360.0f * (2.0f * 3.141592)) * radius;   // y좌표
-			shape.colors[i][0] = 1.0f, shape.colors[i][1] = 0.0f, shape.colors[i][2] = 0.0f;
-			radius += 0.0003f;
-
+			shape.vertex[i][0] = opglPosX + cos(i / 60.0f * (2.0f * 3.141592)) * radius;  // x좌표
+			shape.vertex[i][1] = opglPosY + sin(i / 60.0f * (2.0f * 3.141592)) * radius;   // y좌표
+			shape.colors[i][0] = 1.0f, shape.colors[i][1] = 1.0f, shape.colors[i][2] = 1.0f;
+			radius += 0.001f;
+		}
+		opglPosX += 0.36;
+		for (int i = 180; i < 360; i++)
+		{
+			shape.vertex[i][0] = opglPosX + -(cos(i / 60.0f * (2.0f * 3.141592)) * radius);  // x좌표
+			shape.vertex[i][1] =  opglPosY + sin(i / 60.0f * (2.0f * 3.141592)) * radius;   // y좌표
+			shape.colors[i][0] = 1.0f, shape.colors[i][1] = 1.0f, shape.colors[i][2] = 1.0f;
+			radius -= 0.001f;
 		}
 	}
 	glutPostRedisplay();
@@ -254,6 +253,6 @@ GLvoid TimerFunction(int value)
 	/*상태 변화하는 함수를 넣어두는 용도로 많이 사용함*/
 	
 
-	glutTimerFunc(100, TimerFunction, 1);
+	glutTimerFunc(3, TimerFunction, 1);
 	glutPostRedisplay();
 }
