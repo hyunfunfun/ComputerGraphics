@@ -7,10 +7,12 @@ struct Shape {
 	GLuint vao, vbo[2];
 };
 
-Shape shape;
+Shape shape[5];
 int count = 1;
 bool pcheck = true;
-bool lcheck = false;
+bool lcheck = true;
+
+int drawcount = 1;
 GLfloat rColor=0, gColor=0, bColor=0;
 
 GLint width, height;
@@ -108,37 +110,41 @@ void Initvbovao()
 
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+	for(int i=0;i<5;i++)
+	{
+		glGenVertexArrays(1, &shape[i].vao);
+		glGenBuffers(2, shape[i].vbo);
 
-	glGenVertexArrays(1, &shape.vao);
-	glGenBuffers(2, shape.vbo);
+		glBindVertexArray(shape[i].vao);
+		glBindBuffer(GL_ARRAY_BUFFER, shape[i].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(shape[i].vertex), shape[i].vertex, GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glBindVertexArray(shape.vao);	
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.vertex), shape.vertex, GL_STATIC_DRAW);
-	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.colors), shape.colors, GL_STATIC_DRAW);
-	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0,0);
+		glBindBuffer(GL_ARRAY_BUFFER, shape[i].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(shape[i].colors), shape[i].colors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glEnableVertexAttribArray(PosLocation);
-	glEnableVertexAttribArray(ColorLocation);
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
 }
 
 void UpdateBuffer() {
 
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+	for(int i=0;i<5;i++)
+	{
+		glBindVertexArray(shape[i].vao);
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
 
-	glBindVertexArray(shape.vao);
-	glEnableVertexAttribArray(PosLocation);
-	glEnableVertexAttribArray(ColorLocation);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.vertex), shape.vertex, GL_STATIC_DRAW);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.colors), shape.colors, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, shape[i].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(shape[i].vertex), shape[i].vertex, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, shape[i].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(shape[i].colors), shape[i].colors, GL_STATIC_DRAW);
+	}
 }
 
 void Draw()
@@ -146,17 +152,19 @@ void Draw()
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
-	glBindVertexArray(shape.vao);
 
-	glPointSize(2);
-	
+	if (drawcount == 1) {
+		glBindVertexArray(shape[0].vao);
+
+		glPointSize(2);
+
 		if (pcheck == true)
 		{
 			if (count < 360) {
 				glDrawArrays(GL_POINTS, 0, count);
 				++count;
 			}
-			
+
 			if (count >= 360) {
 				glDrawArrays(GL_POINTS, 0, 360);
 			}
@@ -171,9 +179,44 @@ void Draw()
 				glDrawArrays(GL_LINE_STRIP, 0, 360);
 			}
 		}
-	
-	glDisableVertexAttribArray(PosLocation);
-	glDisableVertexAttribArray(ColorLocation);
+
+		glDisableVertexAttribArray(PosLocation);
+		glDisableVertexAttribArray(ColorLocation);
+	}
+	else
+	{
+		for (int i = 0; i < drawcount; i++)
+		{
+			glBindVertexArray(shape[i].vao);
+
+			glPointSize(2);
+
+			if (pcheck == true)
+			{
+				if (count < 360) {
+					glDrawArrays(GL_POINTS, 0, count);
+					++count;
+				}
+
+				if (count >= 360) {
+					glDrawArrays(GL_POINTS, 0, 360);
+				}
+			}
+			else if (lcheck == true) {
+				if (count < 360) {
+					glDrawArrays(GL_LINE_STRIP, 0, count);
+					++count;
+				}
+
+				if (count >= 360) {
+					glDrawArrays(GL_LINE_STRIP, 0, 360);
+				}
+			}
+
+			glDisableVertexAttribArray(PosLocation);
+			glDisableVertexAttribArray(ColorLocation);
+		}
+	}
 }
 
 void make_shaderProgram()
@@ -244,6 +287,21 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		lcheck = true;
 		pcheck = !pcheck;
 		break;
+	case '1':
+		drawcount = 1;
+		break;
+	case '2':
+		drawcount = 2;
+		break;
+	case '3':
+		drawcount = 3;
+		break;
+	case '4':
+		drawcount = 4;
+		break;
+	case '5':
+		drawcount = 5;
+		break;
 	}
 }
 
@@ -257,21 +315,45 @@ GLvoid Mouse(int button, int state, int x, int y) {
 		rColor = (rand() % 10) * 0.1;
 		gColor = (rand() % 10) * 0.1;
 		bColor = (rand() % 10) * 0.1;
-
-		for (int i = 0; i < 180; i++)
+		if(drawcount==1)
 		{
-			shape.vertex[i][0] = opglPosX + cos(i / 60.0f * (2.0f * 3.141592)) * radius;  // xÁÂÇ¥
-			shape.vertex[i][1] = opglPosY + sin(i / 60.0f * (2.0f * 3.141592)) * radius;   // yÁÂÇ¥
-			shape.colors[i][0] = 1.0f, shape.colors[i][1] = 1.0f, shape.colors[i][2] = 1.0f;
-			radius += 0.001f;
+			for (int i = 0; i < 180; i++)
+			{
+				shape[0].vertex[i][0] = opglPosX + cos(i / 60.0f * (2.0f * 3.141592)) * radius;  // xÁÂÇ¥
+				shape[0].vertex[i][1] = opglPosY + sin(i / 60.0f * (2.0f * 3.141592)) * radius;   // yÁÂÇ¥
+				shape[0].colors[i][0] = 1.0f, shape[0].colors[i][1] = 1.0f, shape[0].colors[i][2] = 1.0f;
+				radius += 0.001f;
+			}
+			opglPosX += 0.36;
+			for (int i = 180; i < 360; i++)
+			{
+				shape[0].vertex[i][0] = opglPosX + -(cos(i / 60.0f * (2.0f * 3.141592)) * radius);  // xÁÂÇ¥
+				shape[0].vertex[i][1] = opglPosY + sin(i / 60.0f * (2.0f * 3.141592)) * radius;   // yÁÂÇ¥
+				shape[0].colors[i][0] = 1.0f, shape[0].colors[i][1] = 1.0f, shape[0].colors[i][2] = 1.0f;
+				radius -= 0.001f;
+			}
 		}
-		opglPosX += 0.36;
-		for (int i = 180; i < 360; i++)
-		{
-			shape.vertex[i][0] = opglPosX + -(cos(i / 60.0f * (2.0f * 3.141592)) * radius);  // xÁÂÇ¥
-			shape.vertex[i][1] =  opglPosY + sin(i / 60.0f * (2.0f * 3.141592)) * radius;   // yÁÂÇ¥
-			shape.colors[i][0] = 1.0f, shape.colors[i][1] = 1.0f, shape.colors[i][2] = 1.0f;
-			radius -= 0.001f;
+		else {
+			for(int j=0;j<drawcount;j++)
+			{
+				opglPosX = ((rand() % 200) * 0.01)-1;
+				opglPosY = ((rand() % 200) * 0.01)-1;
+				for (int i = 0; i < 180; i++)
+				{
+					shape[j].vertex[i][0] = opglPosX + cos(i / 60.0f * (2.0f * 3.141592)) * radius;  // xÁÂÇ¥
+					shape[j].vertex[i][1] = opglPosY + sin(i / 60.0f * (2.0f * 3.141592)) * radius;   // yÁÂÇ¥
+					shape[j].colors[i][0] = 1.0f, shape[j].colors[i][1] = 1.0f, shape[j].colors[i][2] = 1.0f;
+					radius += 0.001f;
+				}
+				opglPosX += 0.36;
+				for (int i = 180; i < 360; i++)
+				{
+					shape[j].vertex[i][0] = opglPosX + -(cos(i / 60.0f * (2.0f * 3.141592)) * radius);  // xÁÂÇ¥
+					shape[j].vertex[i][1] = opglPosY + sin(i / 60.0f * (2.0f * 3.141592)) * radius;   // yÁÂÇ¥
+					shape[j].colors[i][0] = 1.0f, shape[j].colors[i][1] = 1.0f, shape[j].colors[i][2] = 1.0f;
+					radius -= 0.001f;
+				}
+			}
 		}
 	}
 	glutPostRedisplay();
