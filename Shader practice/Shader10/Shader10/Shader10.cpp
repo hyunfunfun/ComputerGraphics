@@ -9,7 +9,9 @@ struct Shape {
 
 Shape shape;
 int count = 1;
-
+bool pcheck = true;
+bool lcheck = false;
+GLfloat rColor=0, gColor=0, bColor=0;
 
 GLint width, height;
 GLuint shaderProgramID;
@@ -84,8 +86,6 @@ char* filetobuf(const char* file)
 
 
 GLvoid drawScene() {
-	GLfloat rColor, gColor, bColor;
-	rColor = bColor = gColor = 0.0;
 
 	glClearColor(rColor, gColor, bColor, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -149,9 +149,28 @@ void Draw()
 	glBindVertexArray(shape.vao);
 
 	glPointSize(2);
+	
+		if (pcheck == true)
+		{
+			if (count < 360) {
+				glDrawArrays(GL_POINTS, 0, count);
+				++count;
+			}
+			
+			if (count >= 360) {
+				glDrawArrays(GL_POINTS, 0, 360);
+			}
+		}
+		else if (lcheck == true) {
+			if (count < 360) {
+				glDrawArrays(GL_LINE_STRIP, 0, count);
+				++count;
+			}
 
-	glDrawArrays(GL_POINTS, 0, count);
-	count++;
+			if (count >= 360) {
+				glDrawArrays(GL_LINE_STRIP, 0, 360);
+			}
+		}
 	
 	glDisableVertexAttribArray(PosLocation);
 	glDisableVertexAttribArray(ColorLocation);
@@ -217,7 +236,14 @@ void make_fragmentShaders()
 
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-
+	case 'p':
+		pcheck = true;
+		lcheck = !lcheck;
+		break;
+	case 'l':
+		lcheck = true;
+		pcheck = !pcheck;
+		break;
 	}
 }
 
@@ -228,6 +254,9 @@ GLvoid Mouse(int button, int state, int x, int y) {
 		GLfloat radius = 0.001f;
 		GLfloat opglPosX = (GLfloat)x / 400 - 1;
 		GLfloat opglPosY = -((GLfloat)y / 300 - 1);
+		rColor = (rand() % 10) * 0.1;
+		gColor = (rand() % 10) * 0.1;
+		bColor = (rand() % 10) * 0.1;
 
 		for (int i = 0; i < 180; i++)
 		{
