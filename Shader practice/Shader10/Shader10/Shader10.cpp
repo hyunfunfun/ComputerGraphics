@@ -356,7 +356,7 @@ GLvoid Mouse(int button, int state, int x, int y) {
 			}
 		}
 	}
-	glutPostRedisplay();
+	//glutPostRedisplay();
 }
 
 GLvoid TimerFunction(int value)
