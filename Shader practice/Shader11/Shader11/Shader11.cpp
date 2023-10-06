@@ -11,6 +11,13 @@ struct Shape {
 
 Shape shape[4];
 
+int count = 4;
+int count_ = 0;
+bool check1 = true;
+bool check2 = true;
+bool check3 = true;
+bool check4 = true;
+
 GLfloat point[3] = {
 	0.0,0.0,0.0
 };
@@ -184,7 +191,7 @@ void Draw()
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
-	for (int i = 0; i < 4; i++)
+	for (int i = count_; i < count; i++)
 	{
 		if (shape[i].status == 1)
 		{
@@ -281,7 +288,45 @@ void make_fragmentShaders()
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'l':
-		
+		count = 1;
+		count_ = 0;
+		check1 = false;
+		check2 = true;
+		check3 = true;
+		check4 = true;
+		Set();
+		break;
+	case 't':
+		count = 2;
+		count_ = 1;
+		check1 = true;
+		check2 = false;
+		check3 = true;
+		check4 = true;
+		Set();
+		break;
+	case 'r':
+		count = 3;
+		count_ = 2;
+		check1 = true;
+		check2 = true;
+		check3 = false;
+		check4 = true;
+		Set();
+		break;
+	case 'p':
+		count = 4;
+		count_ = 3;
+		check1 = true;
+		check2 = true;
+		check3 = true;
+		check4 = false;
+		Set();
+		break;
+	case 'a':
+		count = 4;
+		count_ = 0;
+		Set();
 		break;
 	}
 }
@@ -357,7 +402,10 @@ GLvoid TimerFunction(int value)
 				shape[0].vertex[1][1] -= move;
 			}
 			if ((shape[0].vertex[2][0] <= tri[2][0] - 0.5) && (shape[0].vertex[1][1] <= tri[1][1] + 0.5)) {
-				shape[0].presta = 2;
+				if(check1==true)
+				{
+					shape[0].presta = 2;
+				}
 				shape[0].vertex[5][0] = shape[0].vertex[2][0];
 				shape[0].vertex[5][1] = shape[0].vertex[2][1];
 			}
@@ -499,7 +547,10 @@ GLvoid TimerFunction(int value)
 				shape[1].vertex[5][0] += move;
 			}
 			if ((shape[1].vertex[2][0] <= rec[2][0] + 0.5) && (shape[1].vertex[5][1] >= rec[5][1] + 0.5)) {
-				shape[1].presta = 3;
+				if(check2==true)
+				{
+					shape[1].presta = 3;
+				}
 				shape[1].vertex[8][0] = shape[1].vertex[5][0];
 				shape[1].vertex[8][1] = shape[1].vertex[5][1];
 			}
@@ -663,7 +714,10 @@ GLvoid TimerFunction(int value)
 			if ((shape[2].vertex[0][0] >= penta[0][0] - 0.5) && (shape[2].vertex[1][0] <= penta[1][0] - 0.5) && (shape[2].vertex[2][0] <= penta[2][0] - 0.5) &&
 				(shape[2].vertex[2][1] <= penta[2][1] - 0.5) && (shape[2].vertex[5][0] >= penta[5][0] - 0.5) && (shape[2].vertex[5][1] <= penta[5][1] - 0.5) &&
 				(shape[2].vertex[8][0] <= penta[8][0] - 0.5)) {
-				shape[2].presta = 4;
+				if(check3==true)
+				{
+					shape[2].presta = 4;
+				}
 			}
 		}
 		if (shape[2].presta == 4) {
@@ -810,7 +864,10 @@ GLvoid TimerFunction(int value)
 				shape[3].vertex[1][0] = shape[3].vertex[0][0];
 				shape[3].vertex[1][1] = shape[3].vertex[0][1];
 				shape[3].status = 5;
-				shape[3].presta = 5;
+				if(check4==true)
+				{
+					shape[3].presta = 5;
+				}
 			}
 		}
 		if (shape[3].presta == 5)//Á¡-¼±
