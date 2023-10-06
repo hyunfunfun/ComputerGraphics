@@ -307,6 +307,8 @@ void Set() {
 			shape[1].vertex[i][0] = tri[i][0] + 0.5;
 			shape[1].vertex[i][1] = tri[i][1] + 0.5;
 		}
+		shape[1].vertex[5][0] = shape[1].vertex[2][0];
+		shape[1].vertex[5][1] = shape[1].vertex[2][1];
 		for (int i = 0; i < 9; i++) {
 			shape[1].colors[i][0] = 1.0, shape[1].colors[i][1] = 1.0, shape[1].colors[i][2] = 0.0;
 		}
@@ -318,6 +320,8 @@ void Set() {
 			shape[2].vertex[i][0] = rec[i][0] - 0.5;
 			shape[2].vertex[i][1] = rec[i][1] - 0.5;
 		}
+		shape[2].vertex[8][0] = shape[2].vertex[5][0];
+		shape[2].vertex[8][1] = shape[2].vertex[5][1];
 		for (int i = 0; i < 9; i++) {
 			shape[2].colors[i][0] = 0.0, shape[2].colors[i][1] = 1.0, shape[2].colors[i][2] = 0.0;
 		}
@@ -341,124 +345,496 @@ GLvoid TimerFunction(int value)
 	float move = 0.001;
 	/*상태 변화하는 함수를 넣어두는 용도로 많이 사용함*/
 
-	if(shape[0].presta==1)//선-삼각
+	//1
 	{
-		shape[0].status = 2;
-		if (shape[0].vertex[2][0] > tri[2][0] - 0.5) {
-			shape[0].vertex[2][0] -= move;
-		}
-		if (shape[0].vertex[1][1] > tri[1][1] + 0.5) {
-			shape[0].vertex[1][1] -= move;
-		}
-		if ((shape[0].vertex[2][0] <= tri[2][0] - 0.5) && (shape[0].vertex[1][1] <= tri[1][1] + 0.5)) {
-			shape[0].presta = 2;
-			shape[0].vertex[5][0] = shape[0].vertex[2][0];
-			shape[0].vertex[5][1] = shape[0].vertex[2][1];
-		}
-	}
-	if (shape[0].presta == 2)//삼각-사각
-	{
-		shape[0].status = 3;
-		shape[0].vertex[3][0] = shape[0].vertex[1][0];
-		shape[0].vertex[3][1] = shape[0].vertex[1][1];
-		shape[0].vertex[4][0] = shape[0].vertex[2][0];
-		shape[0].vertex[4][1] = shape[0].vertex[2][1];
-		if (shape[0].vertex[2][0] > rec[2][0] - 0.5) {
-			shape[0].vertex[2][0] -= move;
-		}
-		if (shape[0].vertex[5][0] < rec[5][0]+0.5) {
-			shape[0].vertex[5][0] += move;
-		}
-		if ((shape[0].vertex[2][0] <= rec[2][0] - 0.5) && (shape[0].vertex[5][1] >= rec[5][1] + 0.5)) {
-			shape[0].presta = 3;
-			shape[0].vertex[8][0] = shape[0].vertex[5][0];
-			shape[0].vertex[8][1] = shape[0].vertex[5][1];
-		}
-	}
-	if (shape[0].presta == 3)//사각-오각
-	{
-		shape[0].status = 4;
-		shape[0].vertex[3][0] = shape[0].vertex[1][0];
-		shape[0].vertex[3][1] = shape[0].vertex[1][1];
-		shape[0].vertex[4][0] = shape[0].vertex[2][0];
-		shape[0].vertex[4][1] = shape[0].vertex[2][1];
-		shape[0].vertex[6][0] = shape[0].vertex[4][0];
-		shape[0].vertex[6][1] = shape[0].vertex[4][1];
-		shape[0].vertex[7][0] = shape[0].vertex[5][0];
-		shape[0].vertex[7][1] = shape[0].vertex[5][1];
-		if (shape[0].vertex[0][0] < penta[0][0] - 0.5) {
-			shape[0].vertex[0][0] += move;
-		}
-		if (shape[0].vertex[1][0] > penta[1][0] - 0.5) {
-			shape[0].vertex[1][0] -= move;
-		}
-		if (shape[0].vertex[2][0] > penta[2][0] - 0.5) {
-			shape[0].vertex[2][0] -= move;
-		}
-		if (shape[0].vertex[2][1] > penta[2][1] + 0.5) {
-			shape[0].vertex[2][1] -= move;
-		}
-		if (shape[0].vertex[5][0] < penta[5][0]-0.5) {
-			shape[0].vertex[5][0] += move;
-		}
-		if (shape[0].vertex[5][1] > penta[5][1] + 0.5) {
-			shape[0].vertex[5][1] -= move;
-		}
-		if (shape[0].vertex[8][0] > penta[8][0] - 0.5) {
-			shape[0].vertex[8][0] -= move;
-		}
-		if ((shape[0].vertex[0][0] >= penta[0][0] - 0.5) && (shape[0].vertex[1][0] <= penta[1][0] - 0.5) && (shape[0].vertex[2][0] <= penta[2][0] - 0.5) &&
-			(shape[0].vertex[2][1] <= penta[2][1] + 0.5) && (shape[0].vertex[5][0] >= penta[5][0] - 0.5) && (shape[0].vertex[5][1] <= penta[5][1] + 0.5) &&
-			(shape[0].vertex[8][0] <= penta[8][0] - 0.5)) {
-			shape[0].presta = 4;
-		}
-	}
-	if (shape[0].presta == 4) {
-		for (int i = 0; i < 9; i++) {
-			if (shape[0].vertex[i][0] > point[0] - 0.5) {
-				shape[0].vertex[i][0] -= move;
+		if (shape[0].presta == 1)//선-삼각
+		{
+			shape[0].status = 2;
+			if (shape[0].vertex[2][0] > tri[2][0] - 0.5) {
+				shape[0].vertex[2][0] -= move;
 			}
-			if (shape[0].vertex[i][0] < point[0] - 0.5) {
-				shape[0].vertex[i][0] += move;
+			if (shape[0].vertex[1][1] > tri[1][1] + 0.5) {
+				shape[0].vertex[1][1] -= move;
 			}
-			if (shape[0].vertex[i][1] > point[1] + 0.5) {
-				shape[0].vertex[i][1] -= move;
-			}					   
-			if (shape[0].vertex[i][1] < point[1] + 0.5) {
-				shape[0].vertex[i][1] += move;
+			if ((shape[0].vertex[2][0] <= tri[2][0] - 0.5) && (shape[0].vertex[1][1] <= tri[1][1] + 0.5)) {
+				shape[0].presta = 2;
+				shape[0].vertex[5][0] = shape[0].vertex[2][0];
+				shape[0].vertex[5][1] = shape[0].vertex[2][1];
 			}
 		}
-		if ((shape[0].vertex[2][0] >= point[0] - 0.501) && (shape[0].vertex[5][0] <= point[0] - 0.491)) {
-			std::cout << "1" << std::endl;
-			shape[0].vertex[0][0] = point[0] - 0.5;
-			shape[0].vertex[0][1] = point[1] + 0.5;
-			shape[0].vertex[1][0] = shape[0].vertex[0][0];
-			shape[0].vertex[1][1] = shape[0].vertex[0][1];
-			shape[0].status = 5;
-			shape[0].presta = 5;
+		if (shape[0].presta == 2)//삼각-사각
+		{
+			shape[0].status = 3;
+			shape[0].vertex[3][0] = shape[0].vertex[1][0];
+			shape[0].vertex[3][1] = shape[0].vertex[1][1];
+			shape[0].vertex[4][0] = shape[0].vertex[2][0];
+			shape[0].vertex[4][1] = shape[0].vertex[2][1];
+			if (shape[0].vertex[2][0] > rec[2][0] - 0.5) {
+				shape[0].vertex[2][0] -= move;
+			}
+			if (shape[0].vertex[5][0] < rec[5][0] + 0.5) {
+				shape[0].vertex[5][0] += move;
+			}
+			if ((shape[0].vertex[2][0] <= rec[2][0] - 0.5) && (shape[0].vertex[5][1] >= rec[5][1] + 0.5)) {
+				shape[0].presta = 3;
+				shape[0].vertex[8][0] = shape[0].vertex[5][0];
+				shape[0].vertex[8][1] = shape[0].vertex[5][1];
+			}
 		}
-	}
-	if (shape[0].presta == 5)//점-선
-	{
-		shape[0].status = 1;
+		if (shape[0].presta == 3)//사각-오각
+		{
+			shape[0].status = 4;
+			shape[0].vertex[3][0] = shape[0].vertex[1][0];
+			shape[0].vertex[3][1] = shape[0].vertex[1][1];
+			shape[0].vertex[4][0] = shape[0].vertex[2][0];
+			shape[0].vertex[4][1] = shape[0].vertex[2][1];
+			shape[0].vertex[6][0] = shape[0].vertex[4][0];
+			shape[0].vertex[6][1] = shape[0].vertex[4][1];
+			shape[0].vertex[7][0] = shape[0].vertex[5][0];
+			shape[0].vertex[7][1] = shape[0].vertex[5][1];
+			if (shape[0].vertex[0][0] < penta[0][0] - 0.5) {
+				shape[0].vertex[0][0] += move;
+			}
+			if (shape[0].vertex[1][0] > penta[1][0] - 0.5) {
+				shape[0].vertex[1][0] -= move;
+			}
+			if (shape[0].vertex[2][0] > penta[2][0] - 0.5) {
+				shape[0].vertex[2][0] -= move;
+			}
+			if (shape[0].vertex[2][1] > penta[2][1] + 0.5) {
+				shape[0].vertex[2][1] -= move;
+			}
+			if (shape[0].vertex[5][0] < penta[5][0] - 0.5) {
+				shape[0].vertex[5][0] += move;
+			}
+			if (shape[0].vertex[5][1] > penta[5][1] + 0.5) {
+				shape[0].vertex[5][1] -= move;
+			}
+			if (shape[0].vertex[8][0] > penta[8][0] - 0.5) {
+				shape[0].vertex[8][0] -= move;
+			}
+			if ((shape[0].vertex[0][0] >= penta[0][0] - 0.5) && (shape[0].vertex[1][0] <= penta[1][0] - 0.5) && (shape[0].vertex[2][0] <= penta[2][0] - 0.5) &&
+				(shape[0].vertex[2][1] <= penta[2][1] + 0.5) && (shape[0].vertex[5][0] >= penta[5][0] - 0.5) && (shape[0].vertex[5][1] <= penta[5][1] + 0.5) &&
+				(shape[0].vertex[8][0] <= penta[8][0] - 0.5)) {
+				shape[0].presta = 4;
+			}
+		}
+		if (shape[0].presta == 4) {
+			for (int i = 0; i < 9; i++) {
+				if (shape[0].vertex[i][0] > point[0] - 0.5) {
+					shape[0].vertex[i][0] -= move;
+				}
+				if (shape[0].vertex[i][0] < point[0] - 0.5) {
+					shape[0].vertex[i][0] += move;
+				}
+				if (shape[0].vertex[i][1] > point[1] + 0.5) {
+					shape[0].vertex[i][1] -= move;
+				}
+				if (shape[0].vertex[i][1] < point[1] + 0.5) {
+					shape[0].vertex[i][1] += move;
+				}
+			}
+			if ((shape[0].vertex[2][0] >= point[0] - 0.501) && (shape[0].vertex[5][0] <= point[0] - 0.491)) {
+				shape[0].vertex[0][0] = point[0] - 0.5;
+				shape[0].vertex[0][1] = point[1] + 0.5;
+				shape[0].vertex[1][0] = shape[0].vertex[0][0];
+				shape[0].vertex[1][1] = shape[0].vertex[0][1];
+				shape[0].status = 5;
+				shape[0].presta = 5;
+			}
+		}
+		if (shape[0].presta == 5)//점-선
+		{
+			shape[0].status = 1;
 
-		if (shape[0].vertex[0][0] > line[0][0] - 0.5) {
-			shape[0].vertex[0][0] -= move;
+			if (shape[0].vertex[0][0] > line[0][0] - 0.5) {
+				shape[0].vertex[0][0] -= move;
+			}
+			if (shape[0].vertex[0][1] > line[0][1] + 0.5) {
+				shape[0].vertex[0][1] -= move;
+			}
+			if (shape[0].vertex[1][0] < line[1][0] - 0.5) {
+				shape[0].vertex[1][0] += move;
+			}
+			if (shape[0].vertex[1][1] < line[1][1] + 0.5) {
+				shape[0].vertex[1][1] += move;
+			}
+			if ((shape[0].vertex[0][0] <= line[0][0] - 0.5) && (shape[0].vertex[0][1] <= line[0][1] + 0.5) &&
+				(shape[0].vertex[1][0] >= line[1][0] - 0.5) && (shape[0].vertex[1][1] >= line[0][1] + 0.5)) {
+				shape[0].vertex[2][0] = line[1][0] - 0.5;
+				shape[0].vertex[2][1] = line[1][1] + 0.5;
+				shape[0].presta = 1;
+			}
 		}
-		if (shape[0].vertex[0][1] > line[0][1] + 0.5) {
-			shape[0].vertex[0][1] -= move;
+	}
+
+	//2
+	{
+		if (shape[1].presta == 1)//선-삼각
+		{
+			shape[1].status = 2;
+			if (shape[1].vertex[2][0] > tri[2][0] + 0.5) {
+				shape[1].vertex[2][0] -= move;
+			}
+			if (shape[1].vertex[1][1] > tri[1][1] + 0.5) {
+				shape[1].vertex[1][1] -= move;
+			}
+			if ((shape[1].vertex[2][0] <= tri[2][0] + 0.5) && (shape[1].vertex[1][1] <= tri[1][1] + 0.5)) {
+				shape[1].presta = 2;
+				shape[1].vertex[5][0] = shape[1].vertex[2][0];
+				shape[1].vertex[5][1] = shape[1].vertex[2][1];
+			}
 		}
-		if (shape[0].vertex[1][0] < line[1][0] - 0.5) {
-			shape[0].vertex[1][0] += move;
+		if (shape[1].presta == 2)//삼각-사각
+		{
+			shape[1].status = 3;
+			shape[1].vertex[3][0] = shape[1].vertex[1][0];
+			shape[1].vertex[3][1] = shape[1].vertex[1][1];
+			shape[1].vertex[4][0] = shape[1].vertex[2][0];
+			shape[1].vertex[4][1] = shape[1].vertex[2][1];
+			if (shape[1].vertex[2][0] > rec[2][0] + 0.5) {
+				shape[1].vertex[2][0] -= move;
+			}
+			if (shape[1].vertex[5][0] < rec[5][0] + 0.5) {
+				shape[1].vertex[5][0] += move;
+			}
+			if ((shape[1].vertex[2][0] <= rec[2][0] + 0.5) && (shape[1].vertex[5][1] >= rec[5][1] + 0.5)) {
+				shape[1].presta = 3;
+				shape[1].vertex[8][0] = shape[1].vertex[5][0];
+				shape[1].vertex[8][1] = shape[1].vertex[5][1];
+			}
 		}
-		if (shape[0].vertex[1][1] < line[1][1] + 0.5) {
-			shape[0].vertex[1][1] += move;
+		if (shape[1].presta == 3)//사각-오각
+		{
+			shape[1].status = 4;
+			shape[1].vertex[3][0] = shape[1].vertex[1][0];
+			shape[1].vertex[3][1] = shape[1].vertex[1][1];
+			shape[1].vertex[4][0] = shape[1].vertex[2][0];
+			shape[1].vertex[4][1] = shape[1].vertex[2][1];
+			shape[1].vertex[6][0] = shape[1].vertex[4][0];
+			shape[1].vertex[6][1] = shape[1].vertex[4][1];
+			shape[1].vertex[7][0] = shape[1].vertex[5][0];
+			shape[1].vertex[7][1] = shape[1].vertex[5][1];
+			if (shape[1].vertex[0][0] < penta[0][0] + 0.5) {
+				shape[1].vertex[0][0] += move;
+			}
+			if (shape[1].vertex[1][0] > penta[1][0] + 0.5) {
+				shape[1].vertex[1][0] -= move;
+			}
+			if (shape[1].vertex[2][0] > penta[2][0] + 0.5) {
+				shape[1].vertex[2][0] -= move;
+			}
+			if (shape[1].vertex[2][1] > penta[2][1] + 0.5) {
+				shape[1].vertex[2][1] -= move;
+			}
+			if (shape[1].vertex[5][0] < penta[5][0] + 0.5) {
+				shape[1].vertex[5][0] += move;
+			}
+			if (shape[1].vertex[5][1] > penta[5][1] + 0.5) {
+				shape[1].vertex[5][1] -= move;
+			}
+			if (shape[1].vertex[8][0] > penta[8][0] + 0.5) {
+				shape[1].vertex[8][0] -= move;
+			}
+			if ((shape[1].vertex[0][0] >= penta[0][0] + 0.5) && (shape[1].vertex[1][0] <= penta[1][0] + 0.5) && (shape[1].vertex[2][0] <= penta[2][0] + 0.5) &&
+				(shape[1].vertex[2][1] <= penta[2][1] + 0.5) && (shape[1].vertex[5][0] >= penta[5][0] + 0.5) && (shape[1].vertex[5][1] <= penta[5][1] + 0.5) &&
+				(shape[1].vertex[8][0] <= penta[8][0] + 0.5)) {
+				shape[1].presta = 4;
+			}
 		}
-		if ((shape[0].vertex[0][0] <= line[0][0] - 0.5) && (shape[0].vertex[0][1] <= line[0][1] + 0.5) &&
-			(shape[0].vertex[1][0] >= line[1][0] - 0.5) && (shape[0].vertex[1][1] >= line[0][1] + 0.5)) {
-			shape[0].vertex[2][0] = line[1][0] - 0.5;
-			shape[0].vertex[2][1] = line[1][1] + 0.5;
-			shape[0].presta = 1;
+		if (shape[1].presta == 4) {
+			for (int i = 0; i < 9; i++) {
+				if (shape[1].vertex[i][0] > point[0] + 0.5) {
+					shape[1].vertex[i][0] -= move;
+				}
+				if (shape[1].vertex[i][0] < point[0] + 0.5) {
+					shape[1].vertex[i][0] += move;
+				}
+				if (shape[1].vertex[i][1] > point[1] + 0.5) {
+					shape[1].vertex[i][1] -= move;
+				}
+				if (shape[1].vertex[i][1] < point[1] + 0.5) {
+					shape[1].vertex[i][1] += move;
+				}
+			}
+			if ((shape[1].vertex[2][0] >= point[0] + 0.491) && (shape[1].vertex[5][0] <= point[0] + 0.501)) {
+				std::cout << "2" << std::endl;
+				shape[1].vertex[0][0] = point[0] + 0.5;
+				shape[1].vertex[0][1] = point[1] + 0.5;
+				shape[1].vertex[1][0] = shape[1].vertex[0][0];
+				shape[1].vertex[1][1] = shape[1].vertex[0][1];
+				shape[1].status = 5;
+				shape[1].presta = 5;
+			}
+		}
+		if (shape[1].presta == 5)//점-선
+		{
+			shape[1].status = 1;
+
+			if (shape[1].vertex[0][0] > line[0][0] + 0.5) {
+				shape[1].vertex[0][0] -= move;
+			}
+			if (shape[1].vertex[0][1] > line[0][1] + 0.5) {
+				shape[1].vertex[0][1] -= move;
+			}
+			if (shape[1].vertex[1][0] < line[1][0] + 0.5) {
+				shape[1].vertex[1][0] += move;
+			}
+			if (shape[1].vertex[1][1] < line[1][1] + 0.5) {
+				shape[1].vertex[1][1] += move;
+			}
+			if ((shape[1].vertex[0][0] <= line[0][0] + 0.5) && (shape[1].vertex[0][1] <= line[0][1] + 0.5) &&
+				(shape[1].vertex[1][0] >= line[1][0] + 0.5) && (shape[1].vertex[1][1] >= line[0][1] + 0.5)) {
+				shape[1].vertex[2][0] = line[1][0] + 0.5;
+				shape[1].vertex[2][1] = line[1][1] + 0.5;
+				shape[1].presta = 1;
+			}
+		}
+	}
+
+	//3
+	{
+		if (shape[2].presta == 1)//선-삼각
+		{
+			shape[2].status = 2;
+			if (shape[2].vertex[2][0] > tri[2][0] - 0.5) {
+				shape[2].vertex[2][0] -= move;
+			}
+			if (shape[2].vertex[1][1] > tri[1][1] - 0.5) {
+				shape[2].vertex[1][1] -= move;
+			}
+			if ((shape[2].vertex[2][0] <= tri[2][0] - 0.5) && (shape[2].vertex[1][1] <= tri[1][1] - 0.5)) {
+				shape[2].presta = 2;
+				shape[2].vertex[5][0] = shape[2].vertex[2][0];
+				shape[2].vertex[5][1] = shape[2].vertex[2][1];
+			}
+		}
+		if (shape[2].presta == 2)//삼각-사각
+		{
+			shape[2].status = 3;
+			shape[2].vertex[3][0] = shape[2].vertex[1][0];
+			shape[2].vertex[3][1] = shape[2].vertex[1][1];
+			shape[2].vertex[4][0] = shape[2].vertex[2][0];
+			shape[2].vertex[4][1] = shape[2].vertex[2][1];
+			if (shape[2].vertex[2][0] > rec[2][0] - 0.5) {
+				shape[2].vertex[2][0] -= move;
+			}
+			if (shape[2].vertex[5][0] < rec[5][0] - 0.5) {
+				shape[2].vertex[5][0] += move;
+			}
+			if ((shape[2].vertex[2][0] <= rec[2][0] - 0.5) && (shape[2].vertex[5][1] >= rec[5][1] - 0.5)) {
+				shape[2].presta = 3;
+				shape[2].vertex[8][0] = shape[2].vertex[5][0];
+				shape[2].vertex[8][1] = shape[2].vertex[5][1];
+			}
+		}
+		if (shape[2].presta == 3)//사각-오각
+		{
+			shape[2].status = 4;
+			shape[2].vertex[3][0] = shape[2].vertex[1][0];
+			shape[2].vertex[3][1] = shape[2].vertex[1][1];
+			shape[2].vertex[4][0] = shape[2].vertex[2][0];
+			shape[2].vertex[4][1] = shape[2].vertex[2][1];
+			shape[2].vertex[6][0] = shape[2].vertex[4][0];
+			shape[2].vertex[6][1] = shape[2].vertex[4][1];
+			shape[2].vertex[7][0] = shape[2].vertex[5][0];
+			shape[2].vertex[7][1] = shape[2].vertex[5][1];
+			if (shape[2].vertex[0][0] < penta[0][0] - 0.5) {
+				shape[2].vertex[0][0] += move;
+			}
+			if (shape[2].vertex[1][0] > penta[1][0] - 0.5) {
+				shape[2].vertex[1][0] -= move;
+			}
+			if (shape[2].vertex[2][0] > penta[2][0] - 0.5) {
+				shape[2].vertex[2][0] -= move;
+			}
+			if (shape[2].vertex[2][1] > penta[2][1] - 0.5) {
+				shape[2].vertex[2][1] -= move;
+			}
+			if (shape[2].vertex[5][0] < penta[5][0] - 0.5) {
+				shape[2].vertex[5][0] += move;
+			}
+			if (shape[2].vertex[5][1] > penta[5][1] - 0.5) {
+				shape[2].vertex[5][1] -= move;
+			}
+			if (shape[2].vertex[8][0] > penta[8][0] - 0.5) {
+				shape[2].vertex[8][0] -= move;
+			}
+			if ((shape[2].vertex[0][0] >= penta[0][0] - 0.5) && (shape[2].vertex[1][0] <= penta[1][0] - 0.5) && (shape[2].vertex[2][0] <= penta[2][0] - 0.5) &&
+				(shape[2].vertex[2][1] <= penta[2][1] - 0.5) && (shape[2].vertex[5][0] >= penta[5][0] - 0.5) && (shape[2].vertex[5][1] <= penta[5][1] - 0.5) &&
+				(shape[2].vertex[8][0] <= penta[8][0] - 0.5)) {
+				shape[2].presta = 4;
+			}
+		}
+		if (shape[2].presta == 4) {
+			for (int i = 0; i < 9; i++) {
+				if (shape[2].vertex[i][0] > point[0] - 0.5) {
+					shape[2].vertex[i][0] -= move;
+				}
+				if (shape[2].vertex[i][0] < point[0] - 0.5) {
+					shape[2].vertex[i][0] += move;
+				}
+				if (shape[2].vertex[i][1] > point[1] - 0.5) {
+					shape[2].vertex[i][1] -= move;
+				}
+				if (shape[2].vertex[i][1] < point[1] - 0.5) {
+					shape[2].vertex[i][1] += move;
+				}
+			}
+			if ((shape[2].vertex[2][0] >= point[0] - 0.501) && (shape[2].vertex[5][0] <= point[0] - 0.491)) {
+				shape[2].vertex[0][0] = point[0] - 0.5;
+				shape[2].vertex[0][1] = point[1] - 0.5;
+				shape[2].vertex[1][0] = shape[2].vertex[0][0];
+				shape[2].vertex[1][1] = shape[2].vertex[0][1];
+				shape[2].status = 5;
+				shape[2].presta = 5;
+			}
+		}
+		if (shape[2].presta == 5)//점-선
+		{
+			shape[2].status = 1;
+
+			if (shape[2].vertex[0][0] > line[0][0] - 0.5) {
+				shape[2].vertex[0][0] -= move;
+			}
+			if (shape[2].vertex[0][1] > line[0][1] - 0.5) {
+				shape[2].vertex[0][1] -= move;
+			}
+			if (shape[2].vertex[1][0] < line[1][0] - 0.5) {
+				shape[2].vertex[1][0] += move;
+			}
+			if (shape[2].vertex[1][1] < line[1][1] - 0.5) {
+				shape[2].vertex[1][1] += move;
+			}
+			if ((shape[2].vertex[0][0] <= line[0][0] - 0.5) && (shape[2].vertex[0][1] <= line[0][1] - 0.5) &&
+				(shape[2].vertex[1][0] >= line[1][0] - 0.5) && (shape[2].vertex[1][1] >= line[0][1] - 0.5)) {
+				shape[2].vertex[2][0] = line[1][0] - 0.5;
+				shape[2].vertex[2][1] = line[1][1] - 0.5;
+				shape[2].presta = 1;
+			}
+		}
+	}
+
+	//4
+	{
+		if (shape[3].presta == 1)//선-삼각
+		{
+			shape[3].status = 2;
+			if (shape[3].vertex[2][0] > tri[2][0] + 0.5) {
+				shape[3].vertex[2][0] -= move;
+			}
+			if (shape[3].vertex[1][1] > tri[1][1] - 0.5) {
+				shape[3].vertex[1][1] -= move;
+			}
+			if ((shape[3].vertex[2][0] <= tri[2][0] + 0.5) && (shape[3].vertex[1][1] <= tri[1][1] - 0.5)) {
+				shape[3].presta = 2;
+				shape[3].vertex[5][0] = shape[3].vertex[2][0];
+				shape[3].vertex[5][1] = shape[3].vertex[2][1];
+			}
+		}
+		if (shape[3].presta == 2)//삼각-사각
+		{
+			shape[3].status = 3;
+			shape[3].vertex[3][0] = shape[3].vertex[1][0];
+			shape[3].vertex[3][1] = shape[3].vertex[1][1];
+			shape[3].vertex[4][0] = shape[3].vertex[2][0];
+			shape[3].vertex[4][1] = shape[3].vertex[2][1];
+			if (shape[3].vertex[2][0] > rec[2][0] + 0.5) {
+				shape[3].vertex[2][0] -= move;
+			}
+			if (shape[3].vertex[5][0] < rec[5][0] + 0.5) {
+				shape[3].vertex[5][0] += move;
+			}
+			if ((shape[3].vertex[2][0] <= rec[2][0] + 0.5) && (shape[3].vertex[5][1] >= rec[5][1] - 0.5)) {
+				shape[3].presta = 3;
+				shape[3].vertex[8][0] = shape[3].vertex[5][0];
+				shape[3].vertex[8][1] = shape[3].vertex[5][1];
+			}
+		}
+		if (shape[3].presta == 3)//사각-오각
+		{
+			shape[3].status = 4;
+			shape[3].vertex[3][0] = shape[3].vertex[1][0];
+			shape[3].vertex[3][1] = shape[3].vertex[1][1];
+			shape[3].vertex[4][0] = shape[3].vertex[2][0];
+			shape[3].vertex[4][1] = shape[3].vertex[2][1];
+			shape[3].vertex[6][0] = shape[3].vertex[4][0];
+			shape[3].vertex[6][1] = shape[3].vertex[4][1];
+			shape[3].vertex[7][0] = shape[3].vertex[5][0];
+			shape[3].vertex[7][1] = shape[3].vertex[5][1];
+			if (shape[3].vertex[0][0] < penta[0][0] + 0.5) {
+				shape[3].vertex[0][0] += move;
+			}
+			if (shape[3].vertex[1][0] > penta[1][0] + 0.5) {
+				shape[3].vertex[1][0] -= move;
+			}
+			if (shape[3].vertex[2][0] > penta[2][0] + 0.5) {
+				shape[3].vertex[2][0] -= move;
+			}
+			if (shape[3].vertex[2][1] > penta[2][1] - 0.5) {
+				shape[3].vertex[2][1] -= move;
+			}
+			if (shape[3].vertex[5][0] < penta[5][0] + 0.5) {
+				shape[3].vertex[5][0] += move;
+			}
+			if (shape[3].vertex[5][1] > penta[5][1] - 0.5) {
+				shape[3].vertex[5][1] -= move;
+			}
+			if (shape[3].vertex[8][0] > penta[8][0] + 0.5) {
+				shape[3].vertex[8][0] -= move;
+			}
+			if ((shape[3].vertex[0][0] >= penta[0][0] + 0.5) && (shape[3].vertex[1][0] <= penta[1][0] + 0.5) && (shape[3].vertex[2][0] <= penta[2][0] + 0.5) &&
+				(shape[3].vertex[2][1] <= penta[2][1] - 0.5) && (shape[3].vertex[5][0] >= penta[5][0] + 0.5) && (shape[3].vertex[5][1] <= penta[5][1] - 0.5) &&
+				(shape[3].vertex[8][0] <= penta[8][0] + 0.5)) {
+				shape[3].presta = 4;
+			}
+		}
+		if (shape[3].presta == 4) {
+			for (int i = 0; i < 9; i++) {
+				if (shape[3].vertex[i][0] > point[0] + 0.5) {
+					shape[3].vertex[i][0] -= move;
+				}
+				if (shape[3].vertex[i][0] < point[0] + 0.5) {
+					shape[3].vertex[i][0] += move;
+				}
+				if (shape[3].vertex[i][1] > point[1] - 0.5) {
+					shape[3].vertex[i][1] -= move;
+				}
+				if (shape[3].vertex[i][1] < point[1] - 0.5) {
+					shape[3].vertex[i][1] += move;
+				}
+			}
+			if ((shape[3].vertex[2][0] >= point[0] + 0.491) && (shape[3].vertex[5][0] <= point[0] + 0.501)) {
+				shape[3].vertex[0][0] = point[0] + 0.5;
+				shape[3].vertex[0][1] = point[1] - 0.5;
+				shape[3].vertex[1][0] = shape[3].vertex[0][0];
+				shape[3].vertex[1][1] = shape[3].vertex[0][1];
+				shape[3].status = 5;
+				shape[3].presta = 5;
+			}
+		}
+		if (shape[3].presta == 5)//점-선
+		{
+			shape[3].status = 1;
+
+			if (shape[3].vertex[0][0] > line[0][0] + 0.5) {
+				shape[3].vertex[0][0] -= move;
+			}
+			if (shape[3].vertex[0][1] > line[0][1] - 0.5) {
+				shape[3].vertex[0][1] -= move;
+			}
+			if (shape[3].vertex[1][0] < line[1][0] + 0.5) {
+				shape[3].vertex[1][0] += move;
+			}
+			if (shape[3].vertex[1][1] < line[1][1] - 0.5) {
+				shape[3].vertex[1][1] += move;
+			}
+			if ((shape[3].vertex[0][0] <= line[0][0] + 0.5) && (shape[3].vertex[0][1] <= line[0][1] - 0.5) &&
+				(shape[3].vertex[1][0] >= line[1][0] + 0.5) && (shape[3].vertex[1][1] >= line[0][1] - 0.5)) {
+				shape[3].vertex[2][0] = line[1][0] + 0.5;
+				shape[3].vertex[2][1] = line[1][1] - 0.5;
+				shape[3].presta = 1;
+			}
 		}
 	}
 
