@@ -24,7 +24,10 @@ unsigned int index[] = {
 };
 Shape shape;
 
-
+int out_rec = 0;
+bool in_rec = false;
+float prevx = 0;
+float prevy = 0;
 GLfloat rColor=1, gColor=1, bColor=1;
 
 GLint width, height;
@@ -36,6 +39,8 @@ GLchar* vertexSource, * fragmentSource;
 /*OPGL관렴 함수*/
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
+GLvoid Mouse(int button, int state, int x, int y);
+GLvoid Motion(int x, int y);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -69,6 +74,8 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 	/*콜백 함수*/
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
+	glutMouseFunc(Mouse);
+	glutMotionFunc(Motion);
 	glutMainLoop();
 }
 
@@ -222,4 +229,66 @@ void make_fragmentShaders()
 		std::cerr << "ERROR: fragment shader 컴파일 실패\n" << errorLog << std::endl;
 		return;
 	}
+}
+
+GLvoid Mouse(int button, int state, int x, int y) {
+	float ox = (float)x / 400 - 1;
+	float oy = -((float)y / 300 - 1);
+	prevx = ox;
+	prevy = oy;
+	float range = 0.1;
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		if ((ox >= shape.vertex[0][0] - range) && (ox <= shape.vertex[0][0] + range) && (oy >= shape.vertex[0][1] - range) && (oy <= shape.vertex[0][1] + range)) {
+			out_rec = 1;
+		}
+		else if ((ox >= shape.vertex[2][0] - range) && (ox <= shape.vertex[2][0] + range) && (oy >= shape.vertex[2][1] - range) && (oy <= shape.vertex[2][1] + range)) {
+			out_rec = 2;
+		}
+		else if ((ox >= shape.vertex[4][0] - range) && (ox <= shape.vertex[4][0] + range) && (oy >= shape.vertex[4][1] - range) && (oy <= shape.vertex[4][1] + range)) {
+			out_rec = 3;
+		}
+		else if ((ox >= shape.vertex[6][0] - range) && (ox <= shape.vertex[6][0] + range) && (oy >= shape.vertex[6][1] - range) && (oy <= shape.vertex[6][1] + range)) {
+			out_rec = 4;
+		}
+		else if ((ox > shape.vertex[0][0]) && (ox < shape.vertex[3][0]) && (oy > shape.vertex[0][1]) && (oy < shape.vertex[3][1])) {
+			in_rec = true;
+		}
+	}
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		out_rec = 0;
+		in_rec = false;
+	}
+}
+
+
+GLvoid Motion(int x, int y) {
+
+	float ox = (float)x / 400 - 1;
+	float oy = -((float)y / 300 - 1);
+	
+	if (out_rec == 1) {
+		shape.vertex[0][0] = shape.vertex[7][0] = ox;
+		shape.vertex[0][1] = shape.vertex[7][1] = oy;
+	}
+	else if (out_rec == 2) {
+		shape.vertex[1][0] = shape.vertex[2][0] = ox;
+		shape.vertex[1][1] = shape.vertex[2][1] = oy;
+	}
+	else if (out_rec == 3) {
+		shape.vertex[3][0] = shape.vertex[4][0] = ox;
+		shape.vertex[3][1] = shape.vertex[4][1] = oy;
+	}
+	else if (out_rec == 4) {
+		shape.vertex[5][0] = shape.vertex[6][0] = ox;
+		shape.vertex[5][1] = shape.vertex[6][1] = oy;
+	}
+	if (in_rec == true) {
+		for (int i = 0; i < 8; i++) {
+			shape.vertex[i][0] += (ox - prevx);
+			shape.vertex[i][1] += (oy-prevy);
+		}
+		prevx = ox;
+		prevy = oy;
+	}
+	glutPostRedisplay();
 }
