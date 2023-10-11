@@ -165,6 +165,8 @@ void Initvbovao()
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 	for(int i=0;i<15;i++)
 	{
+		if (toucharray[i] == false)
+		{
 		glGenVertexArrays(1, &shape[i].vao);
 		glGenBuffers(2, shape[i].vbo);
 		glGenBuffers(1, &shape[i].ebo);
@@ -177,15 +179,15 @@ void Initvbovao()
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-		if (shape[i].vercount == 3) {
+		if (shape[i].vercount == 4) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[i].ebo);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(recindex), recindex, GL_STATIC_DRAW);
 		}
-		else if (shape[i].vercount == 4) {
+		else if (shape[i].vercount == 5) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[i].ebo);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(penindex), penindex, GL_STATIC_DRAW);
 		}
-		else if (shape[i].vercount == 5) {
+		else if (shape[i].vercount == 6) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[i].ebo);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(hexindex), hexindex, GL_STATIC_DRAW);
 		}
@@ -196,6 +198,7 @@ void Initvbovao()
 
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(ColorLocation);
+		}
 	}
 	
 }
@@ -206,28 +209,31 @@ void UpdateBuffer() {
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 	for(int i=0;i<15;i++)
 	{
-		glBindVertexArray(shape[i].vao);
-		glEnableVertexAttribArray(PosLocation);
-		glEnableVertexAttribArray(ColorLocation);
+		if (toucharray[i] == false)
+		{
+			glBindVertexArray(shape[i].vao);
+			glEnableVertexAttribArray(PosLocation);
+			glEnableVertexAttribArray(ColorLocation);
 
-		glBindBuffer(GL_ARRAY_BUFFER, shape[i].vbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(shape[i].vertex), shape[i].vertex, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, shape[i].vbo[0]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(shape[i].vertex), shape[i].vertex, GL_STATIC_DRAW);
 
-		if (shape[i].vercount == 3) {
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[i].ebo);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(recindex), recindex, GL_STATIC_DRAW);
-		}
-		else if (shape[i].vercount == 4) {
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[i].ebo);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(penindex), penindex, GL_STATIC_DRAW);
-		}
-		else if (shape[i].vercount == 5) {
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[i].ebo);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(hexindex), hexindex, GL_STATIC_DRAW);
-		}
+			if (shape[i].vercount == 4) {
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[i].ebo);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(recindex), recindex, GL_STATIC_DRAW);
+			}
+			else if (shape[i].vercount == 5) {
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[i].ebo);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(penindex), penindex, GL_STATIC_DRAW);
+			}
+			else if (shape[i].vercount == 6) {
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape[i].ebo);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(hexindex), hexindex, GL_STATIC_DRAW);
+			}
 
-		glBindBuffer(GL_ARRAY_BUFFER, shape[i].vbo[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(shape[i].colors), shape[i].colors, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, shape[i].vbo[1]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(shape[i].colors), shape[i].colors, GL_STATIC_DRAW);
+		}
 	}
 }
 
@@ -240,24 +246,24 @@ void Draw()
 		if(toucharray[i]==false)
 		{
 			glBindVertexArray(shape[i].vao);
-			if (shape[i].vercount == 0) {
+			if (shape[i].vercount == 1) {
 				glPointSize(10);
 				glDrawArrays(GL_POINTS, 0, 1);
 			}
-			if (shape[i].vercount == 1) {
+			if (shape[i].vercount == 2) {
 				glLineWidth(5);
 				glDrawArrays(GL_LINES, 0, 2);
 			}
-			if (shape[i].vercount == 2) {
+			if (shape[i].vercount == 3) {
 				glDrawArrays(GL_TRIANGLES, 0, 3);
 			}
-			if (shape[i].vercount == 3) {
+			if (shape[i].vercount == 4) {
 				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			}
-			if (shape[i].vercount == 4) {
+			if (shape[i].vercount == 5) {
 				glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 			}
-			if (shape[i].vercount == 5) {
+			if (shape[i].vercount == 6) {
 				glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 			}
 		}
@@ -330,7 +336,7 @@ void make_fragmentShaders()
 GLvoid Set() {
 	float x = -0.9;
 	float y = -0.9;
-	int obcount = -1;
+	int obcount = 0;
 	for (int i = 0; i < 15; i++) {
 		if (i % 3 == 0) {
 			obcount++;
@@ -338,14 +344,14 @@ GLvoid Set() {
 		shape[i].vercount = obcount;
 	}
 	for (int i = 0; i < 15; i++) {
-		if (shape[i].vercount==0) {
+		if (shape[i].vercount==1) {
 			shape[i].vertex[0][0] = point[0]+x;
 			shape[i].vertex[0][1] = point[1]+y;
 			for (int j = 0; j < 6; j++) {
 				shape[i].colors[j][0] = 0.0, shape[i].colors[j][1] = 1.0, shape[i].colors[j][2] = 0.0;
 			}
 		}
-		if (shape[i].vercount == 1) {
+		if (shape[i].vercount == 2) {
 			for (int j = 0; j < 2; j++) {
 				shape[i].vertex[j][0] = line[j][0] + x;
 				shape[i].vertex[j][1] = line[j][1] + y;
@@ -354,7 +360,7 @@ GLvoid Set() {
 				shape[i].colors[j][0] = 1.0, shape[i].colors[j][1] = 0.0, shape[i].colors[j][2] = 0.0;
 			}
 		}
-		if (shape[i].vercount == 2) {
+		if (shape[i].vercount == 3) {
 			for (int j = 0; j < 3; j++) {
 				shape[i].vertex[j][0] = tri[j][0]+x;
 				shape[i].vertex[j][1] = tri[j][1]+y;
@@ -363,7 +369,7 @@ GLvoid Set() {
 				shape[i].colors[j][0] = 1.0, shape[i].colors[j][1] = 0.0, shape[i].colors[j][2] = 1.0;
 			}
 		}
-		if (shape[i].vercount == 3) {
+		if (shape[i].vercount == 4) {
 			for (int j = 0; j < 4; j++) {
 				shape[i].vertex[j][0] = rec[j][0] + x;
 				shape[i].vertex[j][1] = rec[j][1]+y;
@@ -372,7 +378,7 @@ GLvoid Set() {
 				shape[i].colors[j][0] = 0.0, shape[i].colors[j][1] = 1.0, shape[i].colors[j][2] = 1.0;
 			}
 		}
-		if (shape[i].vercount == 4) {
+		if (shape[i].vercount == 5) {
 			for (int j = 0; j < 5; j++) {
 				shape[i].vertex[j][0] = penta[j][0]+x;
 				shape[i].vertex[j][1] = penta[j][1]+y;
@@ -381,7 +387,7 @@ GLvoid Set() {
 				shape[i].colors[j][0] = 1.0, shape[i].colors[j][1] = 1.0, shape[i].colors[j][2] = 0.0;
 			}
 		}
-		if (shape[i].vercount == 5) {
+		if (shape[i].vercount == 6) {
 			for (int j = 0; j < 6; j++) {
 				shape[i].vertex[j][0] = hexa[j][0] + x;
 				shape[i].vertex[j][1] = hexa[j][1] + y;
@@ -430,11 +436,51 @@ GLvoid Motion(int x, int y) {
 		shape[select].vertex[i][1] += (oy - prevy);
 	}
 	for (int i = 0; i < 15; i++) {
-		if (i != select && shape[select].vertex[0][0]<shape[i].vertex[0][0] + range && shape[select].vertex[0][0] + range > shape[i].vertex[0][0]
+		if (i != select && toucharray[i]==false&& shape[select].vertex[0][0]<shape[i].vertex[0][0] + range && shape[select].vertex[0][0] + range > shape[i].vertex[0][0]
 			&& shape[select].vertex[0][1]<shape[i].vertex[0][1] + range && shape[select].vertex[0][1] + range > shape[i].vertex[0][1]) {
+
+			shape[select].vercount += shape[i].vercount;
+			if (shape[select].vercount > 6) {
+				shape[select].vercount -= 6;
+			}
 			toucharray[i] = true;
+			if (shape[select].vercount == 1) {
+				shape[select].vertex[0][0] = point[0] + ox;
+				shape[select].vertex[0][1] = point[1] + oy;
+			}
+			if (shape[select].vercount == 2) {
+				for (int j = 0; j < 2; j++) {
+					shape[select].vertex[j][0] = line[j][0] + ox;
+					shape[select].vertex[j][1] = line[j][1] + oy;
+				}
+			}
+			if (shape[select].vercount == 3) {
+				for (int j = 0; j < 3; j++) {
+					shape[select].vertex[j][0] = tri[j][0] + ox;
+					shape[select].vertex[j][1] = tri[j][1] + oy;
+				}
+			}
+			if (shape[select].vercount == 4) {
+				for (int j = 0; j < 4; j++) {
+					shape[select].vertex[j][0] = rec[j][0] + ox;
+					shape[select].vertex[j][1] = rec[j][1] + oy;
+				}
+			}
+			if (shape[select].vercount == 5) {
+				for (int j = 0; j < 5; j++) {
+					shape[select].vertex[j][0] = penta[j][0] + ox;
+					shape[select].vertex[j][1] = penta[j][1] + oy;
+				}
+			}
+			if (shape[select].vercount == 6) {
+				for (int j = 0; j < 6; j++) {
+					shape[select].vertex[j][0] = hexa[j][0] + ox;
+					shape[select].vertex[j][1] = hexa[j][1] + oy;
+				}
+			}
 		}
 	}
+
 	prevx = ox;
 	prevy = oy;
 	
