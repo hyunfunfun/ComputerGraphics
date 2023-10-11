@@ -9,7 +9,7 @@ struct Shape {
 	int vercount;
 };
 
-
+bool toucharray[15] = {false};
 Shape shape[15];
 
 int select = -1;
@@ -237,26 +237,29 @@ void Draw()
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
 	for (int i = 0; i < 15; i++) {
-		glBindVertexArray(shape[i].vao);
-		if (shape[i].vercount == 0) {
-			glPointSize(10);
-			glDrawArrays(GL_POINTS, 0, 1);
-		}
-		if (shape[i].vercount == 1) {
-			glLineWidth(5);
-			glDrawArrays(GL_LINES, 0, 2);
-		}
-		if (shape[i].vercount == 2) {
-			glDrawArrays(GL_TRIANGLES, 0, 3);
-		}
-		if (shape[i].vercount == 3) {
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		}
-		if (shape[i].vercount == 4) {
-			glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
-		}
-		if (shape[i].vercount == 5) {
-			glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+		if(toucharray[i]==false)
+		{
+			glBindVertexArray(shape[i].vao);
+			if (shape[i].vercount == 0) {
+				glPointSize(10);
+				glDrawArrays(GL_POINTS, 0, 1);
+			}
+			if (shape[i].vercount == 1) {
+				glLineWidth(5);
+				glDrawArrays(GL_LINES, 0, 2);
+			}
+			if (shape[i].vercount == 2) {
+				glDrawArrays(GL_TRIANGLES, 0, 3);
+			}
+			if (shape[i].vercount == 3) {
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			}
+			if (shape[i].vercount == 4) {
+				glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+			}
+			if (shape[i].vercount == 5) {
+				glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+			}
 		}
 
 	}
@@ -425,6 +428,12 @@ GLvoid Motion(int x, int y) {
 	for (int i = 0; i < 6; i++) {
 		shape[select].vertex[i][0] += (ox - prevx);
 		shape[select].vertex[i][1] += (oy - prevy);
+	}
+	for (int i = 0; i < 15; i++) {
+		if (i != select && shape[select].vertex[0][0]<shape[i].vertex[0][0] + range && shape[select].vertex[0][0] + range > shape[i].vertex[0][0]
+			&& shape[select].vertex[0][1]<shape[i].vertex[0][1] + range && shape[select].vertex[0][1] + range > shape[i].vertex[0][1]) {
+			toucharray[i] = true;
+		}
 	}
 	prevx = ox;
 	prevy = oy;
