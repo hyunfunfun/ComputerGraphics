@@ -6,10 +6,13 @@ struct Shape {
 	GLfloat colors[6][3] = {0};
 	GLuint vao, vbo[2];
 	GLuint ebo;
+	int status = 1;
 	int vercount;
 };
 
 bool toucharray[15] = {false};
+bool mergearray[15] = { false };
+
 Shape shape[15];
 
 int select = -1;
@@ -30,6 +33,7 @@ GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
 GLvoid Motion(int x, int y);
 GLvoid Set();
+void Bound(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -117,6 +121,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 	glutReshapeFunc(Reshape);
 	glutMouseFunc(Mouse);
 	glutMotionFunc(Motion);
+	glutTimerFunc(3, Bound, 1);
 	glutMainLoop();
 }
 
@@ -412,7 +417,7 @@ GLvoid Mouse(int button, int state, int x, int y) {
 	prevx = ox;
 	prevy = oy;
 	for (int i = 0; i < 15; i++) {
-		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && toucharray[i]==false
 			&& ox > shape[i].vertex[0][0] && ox<shape[i].vertex[0][0] + 0.1 && oy>shape[i].vertex[0][1] && oy < shape[i].vertex[0][1] + 0.1) {
 			select = i;
 			break;
@@ -438,11 +443,11 @@ GLvoid Motion(int x, int y) {
 	for (int i = 0; i < 15; i++) {
 		if (i != select && toucharray[i]==false&& shape[select].vertex[0][0]<shape[i].vertex[0][0] + range && shape[select].vertex[0][0] + range > shape[i].vertex[0][0]
 			&& shape[select].vertex[0][1]<shape[i].vertex[0][1] + range && shape[select].vertex[0][1] + range > shape[i].vertex[0][1]) {
-
 			shape[select].vercount += shape[i].vercount;
 			if (shape[select].vercount > 6) {
 				shape[select].vercount -= 6;
 			}
+			mergearray[select] = true;
 			toucharray[i] = true;
 			if (shape[select].vercount == 1) {
 				shape[select].vertex[0][0] = point[0] + ox;
@@ -485,4 +490,71 @@ GLvoid Motion(int x, int y) {
 	prevy = oy;
 	
 	glutPostRedisplay();
+}
+
+void Bound(int value) {
+
+	float move0 = 0.001;
+	for (int i = 0; i < 15; i++) {
+		if (mergearray[i] == true) {
+			if (shape[i].status == 1) {
+				if (shape[i].vertex[1][0] >= 1) {
+					shape[i].status = 2;
+				}
+				else if (shape[i].vertex[2][1] >= 1) {
+					shape[i].status = 4;
+				}
+				else {
+					for (int j = 0; j < 6; j++) {
+						shape[i].vertex[j][0] += move0;
+						shape[i].vertex[j][1] += move0;
+					}
+				}
+			}
+			if (shape[i].status == 2) {
+				if (shape[i].vertex[2][1] >= 1) {
+					shape[i].status = 3;
+				}
+				else if (shape[i].vertex[0][0] <= -1) {
+					shape[i].status = 1;
+				}
+				else {
+					for (int j = 0; j < 6; j++) {
+						shape[i].vertex[j][0] -= move0;
+						shape[i].vertex[j][1] += move0;
+					}
+				}
+			}
+			if (shape[i].status == 3) {
+				if (shape[i].vertex[0][0] <= -1) {
+					shape[i].status = 4;
+				}
+				else if (shape[i].vertex[0][1] <= -1) {
+					shape[i].status = 2;
+				}
+				else {
+					for (int j = 0; j < 6; j++) {
+						shape[i].vertex[j][0] -= move0;
+						shape[i].vertex[j][1] -= move0;
+					}
+				}
+			}
+			if (shape[i].status == 4) {
+				if (shape[i].vertex[0][1] <= -1) {
+					shape[i].status = 1;
+				}
+				else if (shape[i].vertex[1][0] >= 1) {
+					shape[i].status = 3.0;
+				}
+				else {
+					for (int j = 0; j < 6; j++) {
+						shape[i].vertex[j][0] += move0;
+						shape[i].vertex[j][1] -= move0;
+					}
+				}
+			}
+		}
+	}
+	glutPostRedisplay();
+	glutTimerFunc(3, Bound, 1);
 }
