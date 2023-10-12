@@ -1,269 +1,447 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "Header.h"
 
-struct Shape {
-	GLfloat vertex[8][3];
-	GLfloat colors[8][3];
-	GLuint vao, vbo[2];
-	GLuint ebo;
-};
+using namespace std;
 
-unsigned int index[] = {
-		0,1,3,
-		1,2,3
-};
-Shape shape;
-GLfloat rColor=1, gColor=1, bColor=1;
+const int WIN_X = 10, WIN_Y = 10;
+const int WIN_W = 800, WIN_H = 800;
 
-GLint width, height;
+const glm::vec3 background_rgb = glm::vec3(1.0f, 1.0f, 1.0f);
+
+bool isCulling = true;
+bool isFill = true;
+double xMove = 0.0, yMove = 0.0, zMove = 0.0;
+float xRotateAni = 0.0f;
+float yRotateAni = 0.0f;
+int rotateKey = 0;
+
+GLfloat mx = 0.0f;
+GLfloat my = 0.0f;
+
+int framebufferWidth, framebufferHeight;
+GLuint triangleVertexArrayObject;
 GLuint shaderProgramID;
-GLuint vertexShader;
-GLuint fragmentShader;
-GLchar* vertexSource, * fragmentSource;
+GLuint trianglePositionVertexBufferObjectID, triangleColorVertexBufferObjectID;
+GLuint trianglePositionElementBufferObject;
 
-/*OPGL관렴 함수*/
-GLvoid drawScene();
-GLvoid Reshape(int w, int h);
+std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
 
-/*셰이더 관련 함수*/
-void make_vertexShaders();
-void make_fragmentShaders();
-void make_shaderProgram();
+std::vector< glm::vec3 > vertices;
+std::vector< glm::vec2 > uvs;
+std::vector< glm::vec3 > normals;
 
-/*vao, vbo 관련 함수*/
-void Initvbovao();
-void UpdateBuffer();
-void Draw();
+bool isCube = true;
 
-void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
+char* File_To_Buf(const char* file)
 {
-	width = 800;
-	height = 600;
-	//--- 윈도우 생성하기
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowPosition(100, 100);
-	glutInitWindowSize(width, height);
+	ifstream in(file, ios_base::binary);
 
-	glutCreateWindow("Drill10");
-	//--- GLEW 초기화하기
-	glewExperimental = GL_TRUE;
-	glewInit();
-
-	/*초기화 함수*/
-	make_shaderProgram();
-	Initvbovao();
-
-	/*콜백 함수*/
-	glutDisplayFunc(drawScene);
-	glutReshapeFunc(Reshape);
-	glutMainLoop();
-}
-
-char* filetobuf(const char* file)
-{
-	FILE* fptr;
-	long length;
-	char* buf;
-	fptr = fopen(file, "rb"); // Open file for reading
-	if (!fptr) // Return NULL on failure
-		return NULL;
-	fseek(fptr, 0, SEEK_END); // Seek to the end of the file
-	length = ftell(fptr); // Find out how many bytes into the file we are
-	buf = (char*)malloc(length + 1); // Allocate a buffer for the entire length of the file and a null terminator
-	fseek(fptr, 0, SEEK_SET); // Go back to the beginning of the file
-	fread(buf, length, 1, fptr); // Read the contents of the file in to the buffer
-	fclose(fptr); // Close the file
-	buf[length] = 0; // Null terminator
-	return buf; // Return the buffer
-}
-
-void ReadObj(FILE* path) {
-	char count[128];
-	int vertexnum = 0;
-	int facenum = 0;
-	int uvnum = 0;
-	//--- 1. 전체 버텍스 개수 및 삼각형 개수 세기
-	while (!feof(path)) {
-		fscanf(path, "%s", count);
-		if (count[0] == 'v' && count[1] == '\0')
-			vertexnum++;
-		else if (count[0] == 'f' && count[1] == '\0')
-			facenum++;
-		else if (count[0] == 'v' && count[1] == 't' && count[3] == '\0')
-			uvnum++;
-		memset(count, '\0', sizeof(count));
+	if (!in) {
+		cerr << file << "파일 못찾음";
+		exit(1);
 	}
-	rewind(path);
-	int vertIndex = 0;
-	int faceIndex = 0;
-	int uvIndex = 0;
-	//--- 2. 메모리 할당
-	glm::vec3* vertex = new glm::vec3[vertexnum];
-	glm::vec3* face = new glm::vec3[facenum];
-	glm::vec3* uvdata = new glm::vec3[facenum];
-	glm::vec2* uv = new glm::vec2[uvnum];
-	char bind[128];
-	//--- 3. 할당된 메모리에 각 버텍스, 페이스, uv 정보 입력
-	while (!feof(path)) {
-		fscanf(path, "%s", bind);
-		if (bind[0] == 'v' && bind[1] == '\0') {
-			fscanf(path, "%f %f %f\n",
-				&vertex[vertIndex].x, &vertex[vertIndex].y, &vertex[vertIndex].z);
-			vertIndex++;
+
+	in.seekg(0, ios_base::end);
+	long len = in.tellg();
+	char* buf = new char[len + 1];
+	in.seekg(0, ios_base::beg);
+
+	int cnt = -1;
+	while (in >> noskipws >> buf[++cnt]) {}
+	buf[len] = 0;
+
+	return buf;
+}
+
+//오브젝트 로드하는 것만 테스트하고 나머지는 알아서 해결해보자
+bool  Load_Object(const char* path) {
+	vertexIndices.clear();
+	uvIndices.clear();
+	normalIndices.clear();
+	vertices.clear();
+	uvs.clear();
+	normals.clear();
+
+	ifstream in(path);
+	if (!in) {
+		cerr << path << "파일 못찾음";
+		exit(1);
+	}
+
+	//vector<char> lineHeader(istream_iterator<char>{in}, {});
+
+	while (in) {
+		string lineHeader;
+		in >> lineHeader;
+		if (lineHeader == "v") {
+			glm::vec3 vertex;
+			in >> vertex.x >> vertex.y >> vertex.z;
+			vertices.push_back(vertex);
 		}
-		else if (bind[0] == 'f' && bind[1] == '\0') {
-			unsigned int temp_face[3], temp_uv[3], temp_normal[3];
-			fscanf(path, "%d/%d/%d %d/%d/%d %d/%d/%d\n",
-				&temp_face[0], &temp_uv[0], &temp_normal[0],
-				&temp_face[1], &temp_uv[1], &temp_normal[1],
-				&temp_face[2], &temp_uv[2], &temp_normal[2]);
-			face[faceIndex].x = temp_face[0];
-			face[faceIndex].y = temp_face[1];
-			face[faceIndex].z = temp_face[2];
-			uvdata[faceIndex].x = temp_uv[0];
-			uvdata[faceIndex].y = temp_uv[1];
-			uvdata[faceIndex].z = temp_uv[2];
-			faceIndex++;
+		else if (lineHeader == "vt") {
+			glm::vec2 uv;
+			in >> uv.x >> uv.y;
+			uvs.push_back(uv);
 		}
-		else if (bind[0] == 'v' && bind[1] == 't' && bind[2] == '\0') {
-			fscanf(path, "%f %f\n", &uv[uvIndex].x, &uv[uvIndex].y);
-			uvIndex++;
+		else if (lineHeader == "vn") {
+			glm::vec3 normal;
+			in >> normal.x >> normal.y >> normal.z;
+			normals.push_back(normal);
+		}
+		else if (lineHeader == "f") {
+			char a;
+			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
+
+			for (int i = 0; i < 3; i++)
+			{
+				in >> vertexIndex[i] >> a >> uvIndex[i] >> a >> normalIndex[i];
+				vertexIndices.push_back(vertexIndex[i] - 1);
+				uvIndices.push_back(uvIndex[i] - 1);
+				normalIndices.push_back(normalIndex[i] - 1);
+			}
 		}
 	}
-	//--- 필요한 경우 읽어온 값을 전역 변수 등에 저장
+
+	return true;
 }
 
+bool Make_Shader_Program() {
+	//세이더 코드 파일 불러오기
+	const GLchar* vertexShaderSource = File_To_Buf("Resources_VertexShader.glsl");
+	const GLchar* fragmentShaderSource = File_To_Buf("Resources_FragmentShader.glsl");
 
-
-GLvoid drawScene() {
-
-	glClearColor(rColor, gColor, bColor, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glUseProgram(shaderProgramID);
-	/*vao vbo 자동 업데이트*/
-	UpdateBuffer();
-	/*그리기*/
-	Draw();
-
-	glutSwapBuffers(); //--- 화면에 출력하기
-}
-
-GLvoid Reshape(int w, int h) {
-	glViewport(0, 0, w, h);
-}
-
-void Initvbovao()
-{
-
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
-	glGenVertexArrays(1, &shape.vao);
-	glGenBuffers(2, shape.vbo);
-
-	glBindVertexArray(shape.vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.vertex), shape.vertex, GL_STATIC_DRAW);
-	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.colors), shape.colors, GL_STATIC_DRAW);
-	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-
-	glEnableVertexAttribArray(PosLocation);
-	glEnableVertexAttribArray(ColorLocation);
-	
-}
-
-void UpdateBuffer() {
-
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
-	glBindVertexArray(shape.vao);
-	glEnableVertexAttribArray(PosLocation);
-	glEnableVertexAttribArray(ColorLocation);
-
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.vertex), shape.vertex, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.colors), shape.colors, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape.ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
-}
-
-void Draw()
-{
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
-
-	glBindVertexArray(shape.vao);
-	glLineWidth(5);
-	
-	glDrawArrays(GL_LINES, 0, 8);
-	glDisableVertexAttribArray(PosLocation);
-	glDisableVertexAttribArray(ColorLocation);
-	
-}
-
-void make_shaderProgram()
-{
-	make_vertexShaders(); //--- 버텍스 세이더 만들기
-	make_fragmentShaders(); //--- 프래그먼트 세이더 만들기
-	//-- shader Program
-	shaderProgramID = glCreateProgram();
-	glAttachShader(shaderProgramID, vertexShader);
-	glAttachShader(shaderProgramID, fragmentShader);
-	glLinkProgram(shaderProgramID);
-	//--- 세이더 삭제하기
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-	//--- Shader Program 사용하기
-	glUseProgram(shaderProgramID);
-}
-
-void make_vertexShaders()
-{
-	vertexSource = filetobuf("vertex.glsl");
-	//--- 버텍스 세이더 객체 만들기
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	//--- 세이더 코드를 세이더 객체에 넣기
-	glShaderSource(vertexShader, 1, (const GLchar**)&vertexSource, 0);
-	//--- 버텍스 세이더 컴파일하기
+	//세이더 객체 만들기
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	//세이더 객체에 세이더 코드 붙이기
+	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	//세이더 객체 컴파일하기
 	glCompileShader(vertexShader);
-	//--- 컴파일이 제대로 되지 않은 경우: 에러 체크
+
 	GLint result;
 	GLchar errorLog[512];
+
+	//세이더 상태 가져오기
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
 		glGetShaderInfoLog(vertexShader, 512, NULL, errorLog);
-		std::cerr << "ERROR: vertex shader 컴파일 실패\n" << errorLog << std::endl;
-		return;
+		cerr << "ERROR: vertex shader 컴파일 실패\n" << errorLog << endl;
+		return false;
 	}
-}
 
-void make_fragmentShaders()
-{
-	fragmentSource = filetobuf("fragment.glsl");
-	//--- 프래그먼트 세이더 객체 만들기
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	//--- 세이더 코드를 세이더 객체에 넣기
-	glShaderSource(fragmentShader, 1, (const GLchar**)&fragmentSource, 0);
-	//--- 프래그먼트 세이더 컴파일
+	//세이더 객체 만들기
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	//세이더 객체에 세이더 코드 붙이기
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	//세이더 객체 컴파일하기
 	glCompileShader(fragmentShader);
-	//--- 컴파일이 제대로 되지 않은 경우: 컴파일 에러 체크
-	GLint result;
-	GLchar errorLog[512];
+	//세이더 상태 가져오기
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
 		glGetShaderInfoLog(fragmentShader, 512, NULL, errorLog);
-		std::cerr << "ERROR: fragment shader 컴파일 실패\n" << errorLog << std::endl;
-		return;
+		cerr << "ERROR: fragment shader 컴파일 실패\n" << errorLog << endl;
+		return false;
 	}
+
+	//세이더 프로그램 생성
+	shaderProgramID = glCreateProgram();
+	//세이더 프로그램에 세이더 객체들을 붙이기
+	glAttachShader(shaderProgramID, vertexShader);
+	glAttachShader(shaderProgramID, fragmentShader);
+	//세이더 프로그램 링크
+	glLinkProgram(shaderProgramID);
+
+	//세이더 객체 삭제하기
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	//프로그램 상태 가져오기
+	glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &result);
+	if (!result) {
+		glGetProgramInfoLog(shaderProgramID, 512, NULL, errorLog);
+		cerr << "ERROR: shader program 연결 실패\n" << errorLog << endl;
+		return false;
+	}
+	//세이더 프로그램 활성화
+	glUseProgram(shaderProgramID);
+
+	return true;
+}
+
+bool Set_VAO() {
+	//삼각형을 구성하는 vertex 데이터 - position과 color
+
+	isCube ? Load_Object("Resources_cube.obj") : Load_Object("Resources_piramid.obj");
+
+	float color[] = {
+	   0.5f, 0.0f, 0.5f,//4
+	   0.0f, 0.0f, 1.0f,//0
+	   0.0f, 0.0f, 0.0f,//3
+
+	   0.5f, 0.0f, 0.5f,//4
+	   0.0f, 0.0f, 0.0f,//3
+	   1.0f, 0.0f, 0.0f,//7
+
+	   0.0f, 1.0f, 0.0f,//2
+	   0.5f, 0.5f, 0.0f,//6
+	   1.0f, 0.0f, 0.0f,//7
+
+	   0.0f, 1.0f, 0.0f,//2
+	   1.0f, 0.0f, 0.0f,//7
+	   0.0f, 0.0f, 0.0f,//3
+
+	   0.0f, 0.5f, 0.5f,//1
+	   1.0f, 1.0f, 1.0f,//5
+	   0.0f, 1.0f, 0.0f,//2
+
+	   1.0f, 1.0f, 1.0f,//5
+	   0.5f, 0.5f, 0.0f,//6
+	   0.0f, 1.0f, 0.0f,//2
+
+	   0.0f, 0.0f, 1.0f,//0
+	   0.5f, 0.0f, 0.5f,//4
+	   0.0f, 0.5f, 0.5f,//1
+
+	   0.5f, 0.0f, 0.5f,//4
+	   1.0f, 1.0f, 1.0f,//5
+	   0.0f, 0.5f, 0.5f,//1
+
+	   0.5f, 0.0f, 0.5f,//4
+	   1.0f, 0.0f, 0.0f,//7
+	   1.0f, 1.0f, 1.0f,//5
+
+	   1.0f, 0.0f, 0.0f,//7
+	   0.5f, 0.5f, 0.0f,//6
+	   1.0f, 1.0f, 1.0f,//5
+
+	   0.0f, 0.0f, 1.0f,//0
+	   0.0f, 0.5f, 0.5f,//1
+	   0.0f, 1.0f, 0.0f,//2
+
+	   0.0f, 0.0f, 1.0f,//0
+	   0.0f, 1.0f, 0.0f,//2
+	   0.0f, 0.0f, 0.0f,//3
+
+	   0.0f, 0.0f, 0.0f,
+	   0.0f, 0.0f, 0.0f,
+	   0.0f, 0.0f, 0.0f,
+	   0.0f, 0.0f, 0.0f
+	};
+
+	//버텍스 배열 오브젝트 (VAO) 이름 생성
+	glGenVertexArrays(1, &triangleVertexArrayObject);
+	//VAO를 바인드한다.
+	glBindVertexArray(triangleVertexArrayObject);
+
+	//Vertex Buffer Object(VBO)를 생성하여 vertex 데이터를 복사한다.
+
+	//버텍스 버퍼 오브젝트 (VBO) 이름 생성
+	glGenBuffers(1, &trianglePositionVertexBufferObjectID);
+	//버퍼 오브젝트를 바인드 한다.
+	glBindBuffer(GL_ARRAY_BUFFER, trianglePositionVertexBufferObjectID);
+	//버퍼 오브젝트의 데이터를 생성
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+	//엘리멘트 버퍼 오브젝트 (EBO) 이름 생성
+	glGenBuffers(1, &trianglePositionElementBufferObject);
+	//버퍼 오브젝트를 바인드 한다.
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, trianglePositionElementBufferObject);
+	//버퍼 오브젝트의 데이터를 생성
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(unsigned int), &vertexIndices[0], GL_STATIC_DRAW);
+
+	//위치 가져오기 함수
+	GLint positionAttribute = glGetAttribLocation(shaderProgramID, "positionAttribute");
+	if (positionAttribute == -1) {
+		cerr << "position 속성 설정 실패" << endl;
+		return false;
+	}
+	//버텍스 속성 데이터의 배열을 정의
+	glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//버텍스 속성 배열을 사용하도록 한다.
+	glEnableVertexAttribArray(positionAttribute);
+
+	//칼라 버퍼 오브젝트 (VBO) 이름 생성
+	glGenBuffers(1, &triangleColorVertexBufferObjectID);
+	//버퍼 오브젝트를 바인드 한다.
+	glBindBuffer(GL_ARRAY_BUFFER, triangleColorVertexBufferObjectID);
+	//버퍼 오브젝트의 데이터를 생성
+	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+
+	//위치 가져오기 함수
+	GLint colorAttribute = glGetAttribLocation(shaderProgramID, "colorAttribute");
+	if (colorAttribute == -1) {
+		cerr << "color 속성 설정 실패" << endl;
+		return false;
+	}
+	//버퍼 오브젝트를 바인드 한다.
+	glBindBuffer(GL_ARRAY_BUFFER, triangleColorVertexBufferObjectID);
+	//버텍스 속성 데이터의 배열을 정의
+	glVertexAttribPointer(colorAttribute, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//버텍스 속성 배열을 사용하도록 한다.
+	glEnableVertexAttribArray(colorAttribute);
+
+
+	glBindVertexArray(0);
+
+
+	return true;
+}
+
+//--- 콜백 함수: 그리기 콜백 함수 
+GLvoid drawScene()
+{
+	// 바탕색을 설정
+	glClearColor(background_rgb.x, background_rgb.y, background_rgb.z, 1.0f);
+	// 설정된 색으로 전체를 칠하기
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	isCulling ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+	isCulling ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
+	isFill ? glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	//만들어진 세이더 프로그램 사용하기
+	glUseProgram(shaderProgramID);
+
+	glm::mat4 TR = glm::mat4(1.0f);
+	TR = glm::translate(TR, glm::vec3(xMove, yMove, zMove));
+	TR = glm::rotate(TR, glm::radians(30.0f + xRotateAni), glm::vec3(1.0, 0.0, 0.0));
+	TR = glm::rotate(TR, glm::radians(-30.0f + yRotateAni), glm::vec3(0.0, 1.0, 0.0));
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "transform"); //--- 버텍스 세이더에서모델 변환 위치 가져오기
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변환 값 적용하기
+
+	// 사용할 VAO 불러오기
+	glBindVertexArray(triangleVertexArrayObject);
+
+	//배열 데이터로부터 프리미티브 렌더링 하기
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	glDrawArrays(GL_LINES, 36, 40);
+	//glDrawArrays(GL_TRIANGLES, 0, 12);
+	// 화면에 출력하기
+	glutSwapBuffers();
+}
+
+//--- 콜백 함수: 다시 그리기 콜백 함수 
+GLvoid Reshape(int w, int h)
+{
+	glViewport(0, 0, w, h);
+}
+
+GLvoid TimerFunction1(int value)
+{
+	glutPostRedisplay(); // 화면 재 출력
+	if (rotateKey == 1)
+		xRotateAni += 0.5f;
+	if (rotateKey == 2)
+		xRotateAni -= 0.5f;
+	if (rotateKey == 3)
+		yRotateAni += 0.5f;
+	if (rotateKey == 4)
+		yRotateAni -= 0.5f;
+	glutTimerFunc(100, TimerFunction1, 1);
+}
+
+GLvoid Keyboard(unsigned char key, int x, int y)
+{
+	switch (key) {
+	case 'c':
+		isCube = true;
+		Set_VAO();
+		break;
+	case 'p':
+		isCube = false;
+		Set_VAO();
+		break;
+	case 'h':
+		isCulling = 1 - isCulling;
+		break;
+	case 'x':
+		rotateKey = 1;
+		glutTimerFunc(100, TimerFunction1, 1);
+		break;
+	case 'X':
+		rotateKey = 2;
+		glutTimerFunc(100, TimerFunction1, 1);
+		break;
+	case 'y':
+		rotateKey = 3;
+		glutTimerFunc(100, TimerFunction1, 1);
+		break;
+	case 'Y':
+		rotateKey = 4;
+		glutTimerFunc(100, TimerFunction1, 1);
+		break;
+	case 'w':
+		isFill = false;
+		break;
+	case 'W':
+		isFill = true;
+		break;
+	case 'j':
+		xMove -= 0.1;
+		break;
+	case 'l':
+		xMove += 0.1;
+		break;
+	case 'i':
+		yMove += 0.1;
+		break;
+	case 'k':
+		yMove -= 0.1;
+		break;
+	case 'S':
+		rotateKey = 0;
+		xMove = 0.0, yMove = 0.0f, zMove = 0.0f;
+		xRotateAni = 0.0f;
+		yRotateAni = 0.0f;
+		break;
+	}
+	glutPostRedisplay(); //--- 배경색이 바뀔때마다 출력 콜백함수를 호출하여 화면을 refresh 한다
+}
+
+
+void Mouse(int button, int state, int x, int y)
+{
+	GLfloat half_w = WIN_W / 2.0f;
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		mx = (x - half_w) / half_w;
+		my = (half_w - y) / half_w;
+	}
+	Set_VAO();
+	glutPostRedisplay();
+}
+
+int main(int argc, char** argv)
+{
+	//윈도우 생성
+	glutInit(&argc, argv);																// glut 초기화
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);				// 디스플레이 모드 설정
+	glutInitWindowPosition(WIN_X, WIN_Y);								// 윈도우의 위치 지정
+	glutInitWindowSize(WIN_W, WIN_H);									// 윈도우의 크기 지정
+	glutCreateWindow("Example1");												// 윈도우 생성(윈도우 이름)
+
+	//GLEW 초기화하기
+	glewExperimental = GL_TRUE;
+	if (glewInit() != GLEW_OK)
+	{
+		std::cerr << "Unable to initialize GLEW" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	else
+		std::cout << "GLEW Initialized\n";
+
+	if (!Make_Shader_Program()) {
+		cerr << "Error: Shader Program 생성 실패" << endl;
+		std::exit(EXIT_FAILURE);
+	}
+
+	if (!Set_VAO()) {
+		cerr << "Error: VAO 생성 실패" << endl;
+		std::exit(EXIT_FAILURE);
+	}
+
+	glutDisplayFunc(drawScene);													// 출력 함수의 지정
+	glutReshapeFunc(Reshape);														// 다시 그리기 함수 지정
+	glutKeyboardFunc(Keyboard);
+	glutMouseFunc(Mouse);
+	glutMainLoop();																			// 이벤트 처리 시작
 }
