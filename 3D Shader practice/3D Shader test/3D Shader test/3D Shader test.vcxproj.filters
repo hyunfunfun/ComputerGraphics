@@ -20,10 +20,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment.glsl">
+    <None Include="Resources_VertexShader.glsl">
       <Filter>소스 파일</Filter>
     </None>
-    <None Include="vertex.glsl">
+    <None Include="Resources_FragmentShader.glsl">
       <Filter>소스 파일</Filter>
     </None>
   </ItemGroup>
@@ -33,7 +33,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="3D obj.obj">
+    <Object Include="3D object.obj">
       <Filter>소스 파일</Filter>
     </Object>
   </ItemGroup>

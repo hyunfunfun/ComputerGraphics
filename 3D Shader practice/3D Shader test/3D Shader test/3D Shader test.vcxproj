@@ -131,14 +131,14 @@
     <ClCompile Include="3D shader test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment.glsl" />
-    <None Include="vertex.glsl" />
+    <None Include="Resources_FragmentShader.glsl" />
+    <None Include="Resources_VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header.h" />
   </ItemGroup>
   <ItemGroup>
-    <Object Include="3D obj.obj" />
+    <Object Include="3D object.obj" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
