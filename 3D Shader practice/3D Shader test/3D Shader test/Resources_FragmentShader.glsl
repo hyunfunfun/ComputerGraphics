@@ -1,8 +1,9 @@
 #version 330 core
 
-in vec3 out_Color;
-out vec4 FragColor;
+in vec3 passColorAttribute;
+out vec4 fragmentColor;
 
-void main(void){
-	FragColor=vec4(out_Color,1.0);
-}
+void main()
+{
+	fragmentColor = vec4(passColorAttribute, 1.0);
+};

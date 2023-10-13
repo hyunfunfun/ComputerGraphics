@@ -132,13 +132,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources_FragmentShader.glsl" />
-    <None Include="Resources_VertexShadervertex.glsl" />
+    <None Include="Resources_VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3D_Shader_test.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="Resources_cube.obj" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

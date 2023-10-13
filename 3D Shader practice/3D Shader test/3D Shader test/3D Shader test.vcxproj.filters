@@ -23,7 +23,7 @@
     <None Include="Resources_FragmentShader.glsl">
       <Filter>소스 파일</Filter>
     </None>
-    <None Include="Resources_VertexShadervertex.glsl">
+    <None Include="Resources_VertexShader.glsl">
       <Filter>소스 파일</Filter>
     </None>
   </ItemGroup>
@@ -31,10 +31,5 @@
     <ClCompile Include="3D_Shader_test.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="Resources_cube.obj">
-      <Filter>소스 파일</Filter>
-    </Object>
   </ItemGroup>
 </Project>
