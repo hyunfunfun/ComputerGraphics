@@ -250,8 +250,8 @@ GLvoid drawScene() {
 	glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 	Tx = glm::translate(Tx, glm::vec3(0.0, 0.0, 0.0)); //--- x축으로 이동 행렬
-	Rz = glm::rotate(Rz, glm::radians(10.0f), glm::vec3(1.0, 0.0, 0.0)); //--- z축에 대하여 회전 행렬
-	Rz = glm::rotate(Rz, glm::radians(-10.0f), glm::vec3(0.0, 1.0, 0.0)); //--- z축에 대하여 회전 행렬
+	Rz = glm::rotate(Rz, glm::radians(10.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+	Rz = glm::rotate(Rz, glm::radians(-10.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 
 	TR = Tx * Rz; //--- 합성 변환 행렬: 회전  이동
 
