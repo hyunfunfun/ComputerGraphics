@@ -171,7 +171,8 @@ bool Make_Shader_Program() {
 bool Set_VAO() {
 	//삼각형을 구성하는 vertex 데이터 - position과 color
 
-	Load_Object("test.obj");
+	//Load_Object("test.obj");
+	isCube ? Load_Object("test.obj") : Load_Object("Resourcespiramid.obj");
 	float color[] = {
 	   0.5f, 0.0f, 0.5f,//4
 	   0.0f, 0.0f, 1.0f,//0
