@@ -12,6 +12,7 @@
 #include <random>
 #include <fstream>
 #include <iterator>
+#include <time.h>
 
 struct Shape {
 	GLuint vbo[2], vao, ebo;
@@ -165,6 +166,11 @@ GLfloat colors1[][3] = {
 int face = 0;
 int faceof = 0;
 
+int ran = 0;
+int ran1 = 0;
+
+int mode = 0;
+
 
 GLfloat rColor = 0, gColor = 0, bColor = 0;
 
@@ -207,6 +213,9 @@ char* filetobuf(const char* file)
 }
 
 int main(int argc, char** argv) {
+
+	srand(time(NULL));
+
     glutInit(&argc, argv);
 	width = 800, height = 600;
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -320,16 +329,30 @@ void Draw()
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
-	if (face == 3) {
+	if (mode==2) {
 		glBindVertexArray(s[1].vao);
 
 		glDrawArrays(GL_TRIANGLES, faceof, face);
 	}
-	if (face == 6) {
+	if (mode==1) {
 		glBindVertexArray(s[0].vao);
 
 		glDrawArrays(GL_TRIANGLES, faceof, face);
 	}
+	if (mode == 3) {
+		glBindVertexArray(s[0].vao);
+
+		glDrawArrays(GL_TRIANGLES, ran, face);
+		glDrawArrays(GL_TRIANGLES, ran1, face);
+	}
+
+	if (mode == 4) {
+		glBindVertexArray(s[1].vao);
+
+		glDrawArrays(GL_TRIANGLES, ran, face);
+		glDrawArrays(GL_TRIANGLES, ran1, face);
+	}
+
 
 	//glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, (void*)0);
 	//glDisableVertexAttribArray(PosLocation);
@@ -398,53 +421,83 @@ void make_fragmentShaders()
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case '1':
+		mode = 1;
 		face = 6;
 		faceof = 0;
 		glutPostRedisplay();
 		break;
 	case '2':
+		mode = 1;
 		face = 6;
 		faceof = 6;
 		glutPostRedisplay();
 		break;
 	case '3':
+		mode = 1;
 		face = 6;
 		faceof = 12;
 		glutPostRedisplay();
 		break;
 	case '4':
+		mode = 1;
 		face = 6;
 		faceof = 18;
 		glutPostRedisplay();
 		break;
 	case '5':
+		mode = 1;
 		face = 6;
 		faceof = 24;
 		glutPostRedisplay();
 		break;
 	case '6':
+		mode = 1;
 		face = 6;
 		faceof = 30;
 		glutPostRedisplay();
 		break;
 	case '7':
+		mode = 2;
 		face = 3;
 		faceof = 0;
 		glutPostRedisplay();
 		break;
 	case '8':
+		mode = 2;
 		face = 3;
 		faceof = 3;
 		glutPostRedisplay();
 		break;
 	case '9':
+		mode = 2;
 		face = 3;
 		faceof = 6;
 		glutPostRedisplay();
 		break;
 	case '0':
+		mode = 2;
 		face = 3;
 		faceof = 9;
+		glutPostRedisplay();
+		break;
+	case 'c':
+		mode = 3;
+		face = 6;
+		ran = (rand() % 6) * 6;
+		ran1 = (rand() % 6) * 6;
+		while (ran == ran1) {
+			ran1 = (rand() % 6) * 6;
+		}
+		glutPostRedisplay();
+		break;
+	case 't':
+		mode = 4;
+		face = 3;
+		ran = (rand() % 4) * 3;
+		ran1 = (rand() % 4) * 3;
+		while (ran == ran1) {
+			ran1 = (rand() % 4) * 3;
+		}
 		glutPostRedisplay();
 		break;
 	}
