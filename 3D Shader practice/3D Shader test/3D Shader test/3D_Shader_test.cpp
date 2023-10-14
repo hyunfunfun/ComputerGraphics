@@ -171,7 +171,6 @@ bool Make_Shader_Program() {
 bool Set_VAO() {
 	//삼각형을 구성하는 vertex 데이터 - position과 color
 
-	//isCube ? Load_Object("C:\Users\gram\OneDrive\바탕 화면\test.obj") : Load_Object("Resources_piramid.obj");
 	Load_Object("test.obj");
 	float color[] = {
 	   0.5f, 0.0f, 0.5f,//4
