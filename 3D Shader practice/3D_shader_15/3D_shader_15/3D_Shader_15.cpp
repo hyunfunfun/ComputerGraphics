@@ -18,7 +18,7 @@ struct Shape {
 	GLuint vbo[2], vao, ebo;
 };
 
-Shape s[2];
+Shape s[3];
 
 //정육면체
 GLfloat vertex[][3] = {
@@ -175,16 +175,19 @@ GLfloat colors1[][3] = {
 	 { 0.0, 0.0, 1.0 },	//3
 };
 
-
-
-int face = 0;
-int faceof = 0;
-
-int ran = 0;
-int ran1 = 0;
-
 int mode = 0;
-
+GLfloat line[][3] = {
+	{0.0,1.0,0.0},
+	{0.0,-1.0,0.0},
+	{-1.0,0.0,0.0},
+	{1.0,0.0,0.0}
+};
+GLfloat linecolors[][3] = {
+	{0.0,0.0,0.0},
+	{0.0,0.0,0.0},
+	{0.0,0.0,0.0},
+	{0.0,0.0,0.0}
+};
 
 GLfloat rColor = 1, gColor = 1, bColor = 1;
 
@@ -260,22 +263,7 @@ GLvoid drawScene() {
 	glClearColor(rColor, gColor, bColor, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
-	glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
-	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
-	Tx = glm::translate(Tx, glm::vec3(0.0, 0.0, 0.0)); //--- x축으로 이동 행렬
-	Rz = glm::rotate(Rz, glm::radians(30.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-	Rz = glm::rotate(Rz, glm::radians(-30.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-
-	TR = Tx * Rz; //--- 합성 변환 행렬: 회전  이동
-
-	//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
-	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
-
-
 	glUseProgram(shaderProgramID);
-	
 	
 	/*vao vbo 자동 업데이트*/
 	/*그리기*/
@@ -336,6 +324,27 @@ void Initvbovao()
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(ColorLocation);
 	}
+	{
+		glGenVertexArrays(1, &s[2].vao);
+		glGenBuffers(2, s[2].vbo);
+		//glGenBuffers(1, &ebo);
+
+		glBindVertexArray(s[2].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(line), line, GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(linecolors), linecolors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
 }
 
 void Draw()
@@ -343,6 +352,32 @@ void Draw()
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+	glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+	Tx = glm::translate(Tx, glm::vec3(0.0, 0.0, 0.0)); //--- x축으로 이동 행렬
+	Rz = glm::rotate(Rz, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+	Rz = glm::rotate(Rz, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+
+	TR = Tx * Rz; //--- 합성 변환 행렬: 회전  이동
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+	//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
+	glBindVertexArray(s[2].vao);
+	glLineWidth(2);
+	glDrawArrays(GL_LINES, 0, 4);
+
+
+	Tx = glm::translate(Tx, glm::vec3(0.0, 0.0, 0.0)); //--- x축으로 이동 행렬
+	Rz = glm::rotate(Rz, glm::radians(30.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+	Rz = glm::rotate(Rz, glm::radians(-30.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+
+	TR = Tx * Rz; //--- 합성 변환 행렬: 회전  이동
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+	//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
 	if (mode==0) {
 		glBindVertexArray(s[0].vao);
 
