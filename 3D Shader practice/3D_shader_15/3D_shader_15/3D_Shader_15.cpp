@@ -13,6 +13,7 @@
 #include <fstream>
 #include <iterator>
 #include <time.h>
+#include <conio.h>
 
 struct Shape {
 	GLuint vbo[2], vao, ebo;
@@ -185,9 +186,11 @@ bool culling = true;
 bool wire = true;
 
 bool timer = false;
+int Key = 0;
 float xRotateAni = 0.0f;
 float yRotateAni = 0.0f;
-int rotateKey = 0;
+int rotateKey = 0; 
+double xMove = 0.0, yMove = 0.0, zMove = 0.0;
 
 GLfloat line[][3] = {
 	{0.0,1.0,0.5},
@@ -215,6 +218,7 @@ GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid keyboard(unsigned char key, int x, int y);
 GLvoid Timer(int value);
+void spckeycallback(int key, int x, int y);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -266,6 +270,7 @@ int main(int argc, char** argv) {
     glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
 	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(spckeycallback);
     glutMainLoop();
 
     return 0;
@@ -383,7 +388,7 @@ void Draw()
 	glDrawArrays(GL_LINES, 0, 4);
 
 
-	Tx = glm::translate(Tx, glm::vec3(0.0, 0.0, 0.0)); //--- x축으로 이동 행렬
+	Tx = glm::translate(Tx, glm::vec3(xMove, yMove, zMove)); //--- x축으로 이동 행렬
 	Rz = glm::rotate(Rz, glm::radians(30.0f + xRotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 	Rz = glm::rotate(Rz, glm::radians(-30.0f + yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 
@@ -488,23 +493,18 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case'c':
 		mode = 0;
-		glutPostRedisplay();
 		break;
 	case 'p':
 		mode = 1;
-		glutPostRedisplay();
 		break;
 	case 'h':
 		culling ? culling = false : culling = true;
-		glutPostRedisplay();
 		break;
 	case 'w':
 		wire = false;
-		glutPostRedisplay();
 		break;
 	case 'W':
 		wire = true;
-		glutPostRedisplay();
 		break;
 	case 'x':
 		timer ? timer = false : timer = true;
@@ -526,5 +526,33 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		rotateKey = 4;
 		glutTimerFunc(10, Timer, 1);
 		break;
+	case 's':
+		timer = false;
+		rotateKey = 0;
+		xMove = 0.0, yMove = 0.0f, zMove = 0.0f;
+		xRotateAni = 0.0f;
+		yRotateAni = 0.0f;
+		break;
 	}
+	glutPostRedisplay();
+}
+
+void spckeycallback(int key, int x, int y) {
+	switch (key){
+	case GLUT_KEY_LEFT:
+		xMove -= 0.1;
+		break;
+	case GLUT_KEY_RIGHT:
+		xMove += 0.1;
+		break;
+	case GLUT_KEY_UP:
+		yMove += 0.1;
+		break;
+	case GLUT_KEY_DOWN:
+		yMove -= 0.1;
+		break;
+	default:
+		break;
+	}
+	glutPostRedisplay();
 }
