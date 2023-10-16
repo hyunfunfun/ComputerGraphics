@@ -183,6 +183,12 @@ GLfloat colors1[][3] = {
 int mode = 0;
 bool culling = true;
 bool wire = true;
+
+bool timer = false;
+float xRotateAni = 0.0f;
+float yRotateAni = 0.0f;
+int rotateKey = 0;
+
 GLfloat line[][3] = {
 	{0.0,1.0,0.5},
 	{0.0,-1.0,0.5},
@@ -208,6 +214,7 @@ GLchar* vertexSource, * fragmentSource;
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid keyboard(unsigned char key, int x, int y);
+GLvoid Timer(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -377,8 +384,8 @@ void Draw()
 
 
 	Tx = glm::translate(Tx, glm::vec3(0.0, 0.0, 0.0)); //--- x축으로 이동 행렬
-	Rz = glm::rotate(Rz, glm::radians(30.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-	Rz = glm::rotate(Rz, glm::radians(-30.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+	Rz = glm::rotate(Rz, glm::radians(30.0f + xRotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+	Rz = glm::rotate(Rz, glm::radians(-30.0f + yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 
 	TR = Tx * Rz; //--- 합성 변환 행렬: 회전  이동
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
@@ -461,6 +468,22 @@ void make_fragmentShaders()
 	}
 }
 
+GLvoid Timer(int value){
+	if(timer==true)
+	{
+		glutPostRedisplay(); // 화면 재 출력
+		if (rotateKey == 1)
+			xRotateAni += 0.5f;
+		if (rotateKey == 2)
+			xRotateAni -= 0.5f;
+		if (rotateKey == 3)
+			yRotateAni += 0.5f;
+		if (rotateKey == 4)
+			yRotateAni -= 0.5f;
+		glutTimerFunc(10, Timer, 1);
+	}
+}
+
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case'c':
@@ -482,6 +505,26 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case 'W':
 		wire = true;
 		glutPostRedisplay();
+		break;
+	case 'x':
+		timer ? timer = false : timer = true;
+		rotateKey = 1;
+		glutTimerFunc(10, Timer, 1);
+		break;
+	case 'X':
+		timer ? timer = false : timer = true;
+		rotateKey = 2;
+		glutTimerFunc(10, Timer, 1);
+		break;
+	case 'y':
+		timer ? timer = false : timer = true;
+		rotateKey = 3;
+		glutTimerFunc(10, Timer, 1);
+		break;
+	case 'Y':
+		timer ? timer = false : timer = true;
+		rotateKey = 4;
+		glutTimerFunc(10, Timer, 1);
 		break;
 	}
 }
