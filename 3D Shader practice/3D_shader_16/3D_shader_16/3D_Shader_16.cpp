@@ -81,11 +81,14 @@ std::vector< glm::vec3 > normals;
 
 bool timer = false;
 bool gong = false;
+bool obj = false;
+
 float x1RotateAni = 30.0f;
 float y1RotateAni = -30.0f;
 float x2RotateAni = 30.0f;
 float y2RotateAni = -30.0f;
 int rotateKey = 0; 
+int gongkey = 0;
 
 bool obj1ani = false;
 bool obj2ani = false;
@@ -237,7 +240,7 @@ GLvoid Reshape(int w, int h) {
 
 void Initvbovao()
 {
-	Load_Object("cube.obj");
+	obj ? Load_Object("cone.obj") : Load_Object("cube.obj");
 
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
@@ -252,9 +255,12 @@ void Initvbovao()
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, s[0].vbo[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		if (obj==false)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, s[0].vbo[1]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		}
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s[0].ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(unsigned int), &vertexIndices[0], GL_STATIC_DRAW);
@@ -263,7 +269,7 @@ void Initvbovao()
 		glEnableVertexAttribArray(ColorLocation);
 	}
 
-	Load_Object("sphere.obj");
+	obj ? Load_Object("cylinder.obj") : Load_Object("sphere.obj");
 	{
 		glGenVertexArrays(1, &s[1].vao);
 		glGenBuffers(1, s[1].vbo);
@@ -353,13 +359,19 @@ void Drawleft() {
 		Rz = glm::rotate(Rz, glm::radians(x1RotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		Rz = glm::rotate(Rz, glm::radians(y1RotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		Sx = glm::scale(Sx, glm::vec3(0.5, 0.5, 0.5));
-		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		if(gong==false)
+		{
+			TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		}
+		else if (gong == true) {
+			TR = Rz * Tx * Sx; //--- 합성 변환 행렬: 회전  이동
+		}
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
 		glBindVertexArray(s[0].vao);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 1000, GL_UNSIGNED_INT, 0);
 	}
 }
 void Drawright() {
@@ -378,7 +390,13 @@ void Drawright() {
 		Rz = glm::rotate(Rz, glm::radians(x2RotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		Rz = glm::rotate(Rz, glm::radians(y2RotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		Sx = glm::scale(Sx, glm::vec3(0.5, 0.5, 0.5));
-		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		if (gong == false)
+		{
+			TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		}
+		else if (gong == true) {
+			TR = Rz * Tx * Sx; //--- 합성 변환 행렬: 회전  이동
+		}
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
@@ -451,26 +469,39 @@ GLvoid Timer(int value){
 	{
 
 		glutPostRedisplay(); // 화면 재 출력
-		if(obj1ani==true)
+		if(gong==false)
 		{
-			if (rotateKey == 1)
-				x1RotateAni += 0.5f;
-			if (rotateKey == 2)
-				x1RotateAni -= 0.5f;
-			if (rotateKey == 3)
-				y1RotateAni += 0.5f;
-			if (rotateKey == 4)
-				y1RotateAni -= 0.5f;
+			if (obj1ani == true)
+			{
+				if (rotateKey == 1)
+					x1RotateAni += 0.5f;
+				if (rotateKey == 2)
+					x1RotateAni -= 0.5f;
+				if (rotateKey == 3)
+					y1RotateAni += 0.5f;
+				if (rotateKey == 4)
+					y1RotateAni -= 0.5f;
+			}
+			if (obj2ani == true) {
+				if (rotateKey == 1)
+					x2RotateAni += 0.5f;
+				if (rotateKey == 2)
+					x2RotateAni -= 0.5f;
+				if (rotateKey == 3)
+					y2RotateAni += 0.5f;
+				if (rotateKey == 4)
+					y2RotateAni -= 0.5f;
+			}
 		}
-		if (obj2ani == true){
-			if (rotateKey == 1)
-				x2RotateAni += 0.5f;
-			if (rotateKey == 2)
-				x2RotateAni -= 0.5f;
-			if (rotateKey == 3)
+		else if (gong == true) {
+			if (gongkey == 1) {
+				y1RotateAni += 0.5f;
 				y2RotateAni += 0.5f;
-			if (rotateKey == 4)
+			}
+			if (gongkey == 2) {
+				y1RotateAni -= 0.5f;
 				y2RotateAni -= 0.5f;
+			}
 		}
 		glutTimerFunc(10, Timer, 1);
 	}
@@ -500,11 +531,14 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		break;
 	case 's':
 		timer = false;
+		obj = false;
+		gong = false;
+		Initvbovao();
 		rotateKey = 0;
-		x1RotateAni = 0.0f;
-		y1RotateAni = 0.0f;
-		x2RotateAni = 0.0f;
-		y2RotateAni = 0.0f;
+		x1RotateAni = 30.0f;
+		y1RotateAni = -30.0f;
+		x2RotateAni = 30.0f;
+		y2RotateAni = -30.0f;
 		break;
 	case '1':
 		obj1ani = true;
@@ -517,6 +551,30 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case '3':
 		obj1ani = true;
 		obj2ani = true;
+		break;
+	case 'r':
+		x1RotateAni = 30.0f;
+		x2RotateAni = 30.0f;
+		y1RotateAni = -30.0f;
+		y2RotateAni = -30.0f;
+		gong ? gong = false : gong = true;
+		timer ? timer = false : timer = true;
+		gongkey = 1;
+		glutTimerFunc(10, Timer, 1);
+		break;
+	case 'R':
+		x1RotateAni = 30.0f;
+		x2RotateAni = 30.0f;
+		y1RotateAni = -30.0f;
+		y2RotateAni = -30.0f;
+		gong ? gong = false : gong = true;
+		timer ? timer = false : timer = true;
+		gongkey = 2;
+		glutTimerFunc(10, Timer, 1);
+		break;
+	case 'c':
+		obj ? obj = false : obj = true;
+		Initvbovao();
 		break;
 	}
 	glutPostRedisplay();
