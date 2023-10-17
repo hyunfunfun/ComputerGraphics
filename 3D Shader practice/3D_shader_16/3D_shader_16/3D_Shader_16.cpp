@@ -81,10 +81,14 @@ std::vector< glm::vec3 > normals;
 
 bool timer = false;
 bool gong = false;
-float xRotateAni = 0.0f;
-float yRotateAni = 0.0f;
+float x1RotateAni = 30.0f;
+float y1RotateAni = -30.0f;
+float x2RotateAni = 30.0f;
+float y2RotateAni = -30.0f;
 int rotateKey = 0; 
-int rotatekey = 0;
+
+bool obj1ani = false;
+bool obj2ani = false;
 
 double x1move = 0.5;
 double x2move = -1.0;
@@ -111,6 +115,8 @@ void make_shaderProgram();
 /*vao, vbo 관련 함수*/
 void Initvbovao();
 void Draw();
+void Drawleft();
+void Drawright();
 
 char* filetobuf(const char* file)
 {
@@ -219,6 +225,8 @@ GLvoid drawScene() {
 	
 	/*그리기*/
 	Draw();
+	Drawleft();
+	Drawright();
 
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
@@ -324,10 +332,26 @@ void Draw()
 	}
 
 
+	//glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, (void*)0);
+	//glDisableVertexAttribArray(PosLocation);
+	//glDisableVertexAttribArray(ColorLocation);
+
+}
+void Drawleft() {
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+	glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+	glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
 	{
-		Tx = glm::translate(Tx, glm::vec3(0.5, 0, 0)); //--- x축으로 이동 행렬
-		Rz = glm::rotate(Rz, glm::radians(xRotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		Rz = glm::rotate(Rz, glm::radians(yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Tx = glm::translate(Tx, glm::vec3(-0.5, 0, 0)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(x1RotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(y1RotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		Sx = glm::scale(Sx, glm::vec3(0.5, 0.5, 0.5));
 		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
 
@@ -336,13 +360,24 @@ void Draw()
 		glBindVertexArray(s[0].vao);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-		Tx = glm::translate(Tx, glm::vec3(0, 0, 0)); //--- x축으로 이동 행렬
 	}
+}
+void Drawright() {
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+	glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+	glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{
-		Tx = glm::translate(Tx, glm::vec3(-1.0, 0, 0)); //--- x축으로 이동 행렬
-		Rz = glm::rotate(Rz, glm::radians(xRotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		Rz = glm::rotate(Rz, glm::radians(yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Tx = glm::translate(Tx, glm::vec3(0.5, 0, 0)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(x2RotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(y2RotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(0.5, 0.5, 0.5));
 		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
@@ -350,14 +385,7 @@ void Draw()
 		glBindVertexArray(s[1].vao);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDrawElements(GL_TRIANGLES, 3000, GL_UNSIGNED_INT, 0);
-		Tx = glm::translate(Tx, glm::vec3(0, 0, 0)); //--- x축으로 이동 행렬
 	}
-
-
-	//glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, (void*)0);
-	//glDisableVertexAttribArray(PosLocation);
-	//glDisableVertexAttribArray(ColorLocation);
-
 }
 
 void make_shaderProgram()
@@ -421,15 +449,29 @@ void make_fragmentShaders()
 GLvoid Timer(int value){
 	if(timer==true)
 	{
+
 		glutPostRedisplay(); // 화면 재 출력
-		if (rotateKey == 1)
-			xRotateAni += 0.5f;
-		if (rotateKey == 2)
-			xRotateAni -= 0.5f;
-		if (rotateKey == 3)
-			yRotateAni += 0.5f;
-		if (rotateKey == 4)
-			yRotateAni -= 0.5f;
+		if(obj1ani==true)
+		{
+			if (rotateKey == 1)
+				x1RotateAni += 0.5f;
+			if (rotateKey == 2)
+				x1RotateAni -= 0.5f;
+			if (rotateKey == 3)
+				y1RotateAni += 0.5f;
+			if (rotateKey == 4)
+				y1RotateAni -= 0.5f;
+		}
+		if (obj2ani == true){
+			if (rotateKey == 1)
+				x2RotateAni += 0.5f;
+			if (rotateKey == 2)
+				x2RotateAni -= 0.5f;
+			if (rotateKey == 3)
+				y2RotateAni += 0.5f;
+			if (rotateKey == 4)
+				y2RotateAni -= 0.5f;
+		}
 		glutTimerFunc(10, Timer, 1);
 	}
 }
@@ -459,8 +501,22 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case 's':
 		timer = false;
 		rotateKey = 0;
-		xRotateAni = 0.0f;
-		yRotateAni = 0.0f;
+		x1RotateAni = 0.0f;
+		y1RotateAni = 0.0f;
+		x2RotateAni = 0.0f;
+		y2RotateAni = 0.0f;
+		break;
+	case '1':
+		obj1ani = true;
+		obj2ani = false;
+		break;
+	case '2':
+		obj2ani = true;
+		obj1ani = false;
+		break;
+	case '3':
+		obj1ani = true;
+		obj2ani = true;
 		break;
 	}
 	glutPostRedisplay();

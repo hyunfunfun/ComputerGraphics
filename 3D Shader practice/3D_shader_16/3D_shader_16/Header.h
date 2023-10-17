@@ -12,5 +12,6 @@
 #include <random>
 #include <fstream>
 #include <iterator>
+#include <conio.h>
 
 using namespace std;
