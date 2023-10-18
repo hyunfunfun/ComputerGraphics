@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="3D_Shader_test2.cpp">
+    <ClCompile Include="3D_Shader_14.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
