@@ -81,12 +81,19 @@ std::vector< glm::vec3 > vertices;
 std::vector< glm::vec2 > uvs;
 std::vector< glm::vec3 > normals;
 
-//타이머
-bool timer = false;
+//스파이럴타이머
 bool rtimer = false;
 bool donespi = false;
 int spicount = 1;
-GLfloat radius = 0.1f;
+
+//t타이머
+bool ttimer = false;
+float disx1 = 0.0f;
+float disz1 = 0.0f;
+float disx2 = 0.0f;
+float disz2 = 0.0f;
+int t1 = 0;
+int t2 = 0;
 
 
 bool select = false;
@@ -108,6 +115,7 @@ double z2move = 0.0;
 double scale1 = 0.2;
 double scale2 = 0.2;
 
+GLfloat radius = 0.1f;
 GLfloat rColor = 1, gColor = 1, bColor = 1;
 
 GLint width, height;
@@ -122,7 +130,7 @@ GLvoid Reshape(int w, int h);
 GLvoid keyboard(unsigned char key, int x, int y);
 GLvoid spiTimer(int value);
 GLvoid spiTimer2(int value);
-GLvoid TTImer(int value);
+GLvoid TTimer(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -249,7 +257,8 @@ GLvoid drawScene() {
 	Draw();
 	Drawleft();
 	Drawright();
-	Drawspi();
+	if(rtimer==true)
+		Drawspi();
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
 
@@ -559,8 +568,31 @@ GLvoid spiTimer2(int value) {
 		glutTimerFunc(20, spiTimer2, value);
 	}
 }
-GLvoid TTImer(int value) {
-
+GLvoid TTimer(int value) {
+	if (ttimer == true) {
+		if (t1 < 100) {
+			x1move -= disx1;
+			z1move -= disz1;
+			t1++;
+		}
+		else if (t1 < 200) {
+			x1move += disx1;
+			z1move += disz1;
+			t1++;
+		}
+		if (t2 < 100) {
+			x2move -= disx2;
+			z2move -= disz2;
+			t2++;
+		}
+		else if (t2 < 200) {
+			x2move += disx2;
+			z2move += disz2;
+			t2++;
+		}
+		glutPostRedisplay();
+		glutTimerFunc(10, TTimer, 0);
+	}
 }
 
 GLvoid keyboard(unsigned char key, int x, int y) {
@@ -610,6 +642,15 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		glutTimerFunc(20, spiTimer2, 0);
 		break;
 	case 't':
+		t1 = 0;
+		t2 = 0;
+		disx1 = x1move / 100;
+		disz1 = z1move / 100;
+		disx2 = x2move / 100;
+		disz2 = z2move / 100;
+
+		ttimer ? ttimer = false : ttimer = true;
+		glutTimerFunc(10, TTimer, 0);
 		break;
 	}
 	glutPostRedisplay();
