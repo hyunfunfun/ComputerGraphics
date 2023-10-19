@@ -84,6 +84,7 @@ std::vector< glm::vec3 > normals;
 //타이머
 bool timer = false;
 bool rtimer = false;
+bool donespi = false;
 int spicount = 1;
 GLfloat radius = 0.1f;
 
@@ -104,8 +105,8 @@ double y2move = 0.0;
 double z1move = 0.0;
 double z2move = 0.0;
 
-double scale1 = 0.5;
-double scale2 = 0.5;
+double scale1 = 0.2;
+double scale2 = 0.2;
 
 GLfloat rColor = 1, gColor = 1, bColor = 1;
 
@@ -119,7 +120,9 @@ GLchar* vertexSource, * fragmentSource;
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid keyboard(unsigned char key, int x, int y);
-GLvoid Timer(int value);
+GLvoid spiTimer(int value);
+GLvoid spiTimer2(int value);
+GLvoid TTImer(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -329,7 +332,7 @@ void Initvbovao()
 			spivertex[i][0] = cos(i / 100.0f * (2.0f * 3.141592)) * radius;  // x좌표
 			spivertex[i][2] = sin(i / 100.0f * (2.0f * 3.141592)) * radius;   // y좌표
 			spicolors[i][0] = 1.0f, spicolors[i][1] = 0.0f, spicolors[i][2] = 0.0f;
-			radius += 0.002f;
+			radius += 0.003f;
 		}
 		glGenVertexArrays(1, &s[3].vao);
 		glGenBuffers(2, s[3].vbo);
@@ -460,7 +463,15 @@ void Drawspi()
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
 		glBindVertexArray(s[3].vao);
-		glDrawArrays(GL_LINE_STRIP, 0, spicount);
+		if (spicount < 360) {
+			++spicount;
+			glDrawArrays(GL_LINE_STRIP, 0, spicount);
+		}
+		else
+		{
+			donespi = true;
+			glDrawArrays(GL_LINE_STRIP, 0, 360);
+		}
 	}
 }
 
@@ -524,19 +535,32 @@ void make_fragmentShaders()
 	}
 }
 
-GLvoid Timer(int value){
-	if(timer==true)
-	{
-
-		glutPostRedisplay(); // 화면 재 출력
-		glutTimerFunc(10, Timer, 1);
-	}
+GLvoid spiTimer(int value){
 	if (rtimer == true) {
-		if (spicount < 360)
-			++spicount;
+		if(donespi==true)
+		{
+			x1move = spivertex[value][0];
+			z1move = spivertex[value][2];
+			value++;
+		}
 		glutPostRedisplay(); // 화면 재 출력
-		glutTimerFunc(10, Timer, 1);
+		glutTimerFunc(10, spiTimer, value);
 	}
+}
+GLvoid spiTimer2(int value) {
+	if (rtimer == true) {
+		if (donespi == true)
+		{
+			x2move = spivertex[value][0];
+			z2move = spivertex[value][2];
+			value++;
+		}
+		glutPostRedisplay(); // 화면 재 출력
+		glutTimerFunc(20, spiTimer2, value);
+	}
+}
+GLvoid TTImer(int value) {
+
 }
 
 GLvoid keyboard(unsigned char key, int x, int y) {
@@ -579,9 +603,15 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		select ? scale1 -= 0.01 : scale2 -= 0.01;
 		break;
 	case 'r':
+		spicount = 0;
+		donespi = false;
 		rtimer ? rtimer = false : rtimer = true;
-		glutTimerFunc(10, Timer, 1);
+		glutTimerFunc(10, spiTimer, 0);
+		glutTimerFunc(20, spiTimer2, 0);
+		break;
+	case 't':
 		break;
 	}
 	glutPostRedisplay();
+
 }
