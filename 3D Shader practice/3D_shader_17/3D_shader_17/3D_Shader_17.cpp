@@ -83,16 +83,18 @@ bool timer = false;
 
 
 bool select = false;
-bool selectall = false;
 
 bool moveobj = false;
+
+int rotateKey = 0;
+int gongkey = 0;
+
+bool scale = false;
+
 float x1Rotate = 30.0f;
 float y1Rotate = -30.0f;
 float x2Rotate = 30.0f;
 float y2Rotate = -30.0f;
-int rotateKey = 0; 
-int gongkey = 0;
-
 
 double x1move = -0.5;
 double y1move = 0.0;
@@ -100,6 +102,9 @@ double x2move = 0.5;
 double y2move = 0.0;
 double z1move = 0.0;
 double z2move = 0.0;
+
+double scale1 = 0.5;
+double scale2 = 0.5;
 
 GLfloat rColor = 1, gColor = 1, bColor = 1;
 
@@ -364,8 +369,11 @@ void Drawleft() {
 		Tx = glm::translate(Tx, glm::vec3(x1move, y1move, z1move)); //--- x축으로 이동 행렬
 		Rz = glm::rotate(Rz, glm::radians(x1Rotate), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		Rz = glm::rotate(Rz, glm::radians(y1Rotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		Sx = glm::scale(Sx, glm::vec3(0.2, 0.2, 0.2));
-		TR = Rz * Tx * Sx; //--- 합성 변환 행렬: 회전  이동
+		Sx = glm::scale(Sx, glm::vec3(scale1, scale1, scale1));
+		if(scale==false)
+			TR = Rz * Tx * Sx; //제자리 신축
+		else if(scale==true)
+			TR = Sx * Rz * Tx;  //원점 신축
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
@@ -389,8 +397,11 @@ void Drawright() {
 		Tx = glm::translate(Tx, glm::vec3(x2move, y2move, z2move)); //--- x축으로 이동 행렬
 		Rz = glm::rotate(Rz, glm::radians(x2Rotate), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		Rz = glm::rotate(Rz, glm::radians(y2Rotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		Sx = glm::scale(Sx, glm::vec3(0.2, 0.2, 0.2));
-		TR = Rz * Tx * Sx; //--- 합성 변환 행렬: 회전  이동
+		Sx = glm::scale(Sx, glm::vec3(scale2, scale2, scale2));
+		if (scale == false)
+			TR = Rz * Tx * Sx; //제자리 신축
+		else if (scale == true)
+			TR = Sx * Rz * Tx;  //원점 신축
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
@@ -469,26 +480,42 @@ GLvoid Timer(int value){
 
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-	case 'v':
+	case 'q':
 		select ? select = false : select = true;
 		break;
 	case 'z':
-		select ? x1move -= 0.1 : x2move -= 0.1;
+		select ? x1move -= 0.01 : x2move -= 0.01;
 		break;
 	case 'a':
-		select ? x1move += 0.1 : x2move += 0.1;
+		select ? x1move += 0.01 : x2move += 0.01;
 		break;
 	case 'x':
-		select ? y1move -= 0.1 : y2move -= 0.1;
+		select ? y1move -= 0.01 : y2move -= 0.01;
 		break;
 	case 's':
-		select ? y1move += 0.1 : y2move += 0.1;
+		select ? y1move += 0.01 : y2move += 0.01;
 		break;
 	case 'c':
-		select ? z1move -= 0.1 : z2move -= 0.1;
+		select ? z1move -= 0.01 : z2move -= 0.01;
 		break;
 	case 'd':
-		select ? z1move += 0.1 : z2move += 0.1;
+		select ? z1move += 0.01 : z2move += 0.01;
+		break;
+	case 'v':
+		scale = false;
+		select ? scale1 += 0.01 : scale2 += 0.01;
+		break;
+	case 'f':
+		scale = false;
+		select ? scale1 -= 0.01 : scale2 -= 0.01;
+		break;
+	case 'b':
+		scale = true;
+		select ? scale1 += 0.01 : scale2 += 0.01;
+		break;
+	case 'g':
+		scale = true;
+		select ? scale1 -= 0.01 : scale2 -= 0.01;
 		break;
 	}
 	glutPostRedisplay();
