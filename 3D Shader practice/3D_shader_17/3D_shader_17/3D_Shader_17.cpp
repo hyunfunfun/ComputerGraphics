@@ -5,8 +5,10 @@ struct Shape {
 	GLuint vbo[2], vao, ebo;
 };
 
-Shape s[3];
+Shape s[4];
 
+GLfloat spivertex[360][3] = { 0 };
+GLfloat spicolors[360][3] = { 0 };
 float colors[] = {
 	   0.5f, 0.0f, 0.5f,//4
 	   0.0f, 0.0f, 1.0f,//0
@@ -79,18 +81,17 @@ std::vector< glm::vec3 > vertices;
 std::vector< glm::vec2 > uvs;
 std::vector< glm::vec3 > normals;
 
+//타이머
 bool timer = false;
+bool rtimer = false;
+int spicount = 1;
+GLfloat radius = 0.1f;
 
 
 bool select = false;
-
-bool moveobj = false;
-
-int rotateKey = 0;
-int gongkey = 0;
-
 bool scale = false;
 
+//위치,회전,신축
 float x1Rotate = 30.0f;
 float y1Rotate = -30.0f;
 float x2Rotate = 30.0f;
@@ -130,6 +131,7 @@ void Initvbovao();
 void Draw();
 void Drawleft();
 void Drawright();
+void Drawspi();
 
 char* filetobuf(const char* file)
 {
@@ -244,7 +246,7 @@ GLvoid drawScene() {
 	Draw();
 	Drawleft();
 	Drawright();
-
+	Drawspi();
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
 
@@ -316,6 +318,32 @@ void Initvbovao()
 
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
+
+	{
+		for (int i = 0; i < 360; i++)
+		{
+			spivertex[i][0] = cos(i / 100.0f * (2.0f * 3.141592)) * radius;  // x좌표
+			spivertex[i][2] = sin(i / 100.0f * (2.0f * 3.141592)) * radius;   // y좌표
+			spicolors[i][0] = 1.0f, spicolors[i][1] = 0.0f, spicolors[i][2] = 0.0f;
+			radius += 0.002f;
+		}
+		glGenVertexArrays(1, &s[3].vao);
+		glGenBuffers(2, s[3].vbo);
+		//glGenBuffers(1, &ebo);
+
+		glBindVertexArray(s[3].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[3].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(spivertex), spivertex, GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[3].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(spicolors), spicolors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(ColorLocation);
@@ -411,6 +439,33 @@ void Drawright() {
 	}
 }
 
+void Drawspi()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+	glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+	glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+	{
+		Tx = glm::translate(Tx, glm::vec3(0, 0, 0)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(30.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(-30.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR = Tx * Rz; //--- 합성 변환 행렬: 회전  이동
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[3].vao);
+		glDrawArrays(GL_LINE_STRIP, 0, spicount);
+	}
+}
+
+
+
 void make_shaderProgram()
 {
 	make_vertexShaders(); //--- 버텍스 세이더 만들기
@@ -476,6 +531,12 @@ GLvoid Timer(int value){
 		glutPostRedisplay(); // 화면 재 출력
 		glutTimerFunc(10, Timer, 1);
 	}
+	if (rtimer == true) {
+		if (spicount < 360)
+			++spicount;
+		glutPostRedisplay(); // 화면 재 출력
+		glutTimerFunc(10, Timer, 1);
+	}
 }
 
 GLvoid keyboard(unsigned char key, int x, int y) {
@@ -484,22 +545,22 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		select ? select = false : select = true;
 		break;
 	case 'z':
-		select ? x1move -= 0.01 : x2move -= 0.01;
+		select ? x1move -= 0.05 : x2move -= 0.05;
 		break;
 	case 'a':
-		select ? x1move += 0.01 : x2move += 0.01;
+		select ? x1move += 0.05 : x2move += 0.05;
 		break;
 	case 'x':
-		select ? y1move -= 0.01 : y2move -= 0.01;
+		select ? y1move -= 0.05 : y2move -= 0.05;
 		break;
 	case 's':
-		select ? y1move += 0.01 : y2move += 0.01;
+		select ? y1move += 0.05 : y2move += 0.05;
 		break;
 	case 'c':
-		select ? z1move -= 0.01 : z2move -= 0.01;
+		select ? z1move -= 0.05 : z2move -= 0.05;
 		break;
 	case 'd':
-		select ? z1move += 0.01 : z2move += 0.01;
+		select ? z1move += 0.05 : z2move += 0.05;
 		break;
 	case 'v':
 		scale = false;
@@ -516,6 +577,10 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case 'g':
 		scale = true;
 		select ? scale1 -= 0.01 : scale2 -= 0.01;
+		break;
+	case 'r':
+		rtimer ? rtimer = false : rtimer = true;
+		glutTimerFunc(10, Timer, 1);
 		break;
 	}
 	glutPostRedisplay();
