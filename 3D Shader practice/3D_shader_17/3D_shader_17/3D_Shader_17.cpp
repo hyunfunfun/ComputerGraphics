@@ -103,6 +103,9 @@ bool timer1 = false;
 bool timer2 = false;
 double rot = 0.0f;
 
+//3타이머
+bool timer3 = false;
+
 bool select = false;
 bool scale = false;
 
@@ -140,6 +143,7 @@ GLvoid spiTimer2(int value);
 GLvoid TTimer(int value);
 GLvoid Timer1(int value);
 GLvoid Timer2(int value);
+GLvoid Timer3(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -648,6 +652,33 @@ GLvoid Timer2(int value) {
 	}
 }
 
+GLvoid Timer3(int value) {
+	if (timer3 == true) {
+		if (t1 < 100) {
+			x1move -= disx1;
+			y1move -= disx1;
+			t1++;
+		}
+		else if (t1 < 200) {
+			x1move += disx2;
+			y1move += disx1;
+			t1++;
+		}
+		if (t2 < 100) {
+			x2move -= disx2;
+			y2move -= disx2;
+			t2++;
+		}
+		else if (t2 < 200) {
+			x2move += disx1;
+			y2move += disx2;
+			t2++;
+		}
+		glutPostRedisplay();
+		glutTimerFunc(10, Timer3, 0);
+	}
+}
+
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'q':
@@ -742,6 +773,19 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		timer1 = false;
 		timer2 ? timer2 = false : timer2 = true;
 		glutTimerFunc(10, Timer2, 0);
+		break;
+	case '3':
+		t1 = 0;
+		t2 = 0;
+		disx1 = x1move / 100;
+		disz1 = z1move / 100;
+		disx2 = x2move / 100;
+		disz2 = z2move / 100;
+		rtimer = false;
+		timer3 ? timer3 = false : timer3 = true;
+		timer1 = false;
+		timer2 = false;
+		glutTimerFunc(10, Timer3, 0);
 		break;
 	}
 	glutPostRedisplay();
