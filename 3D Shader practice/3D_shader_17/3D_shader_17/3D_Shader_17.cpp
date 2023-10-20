@@ -99,6 +99,9 @@ int t2 = 0;
 //1타이머
 bool timer1 = false;
 
+//2타이머
+bool timer2 = false;
+double rot = 0.0f;
 
 bool select = false;
 bool scale = false;
@@ -136,6 +139,7 @@ GLvoid spiTimer(int value);
 GLvoid spiTimer2(int value);
 GLvoid TTimer(int value);
 GLvoid Timer1(int value);
+GLvoid Timer2(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -627,6 +631,23 @@ GLvoid Timer1(int value) {
 	}
 }
 
+GLvoid Timer2(int value) {
+	if(timer2==true)
+	{
+		if (t1 < 100) {
+			x1move += disx1;
+			x2move += disx2;
+			z1move += disz1;
+			z2move += disz2;
+			y1Rotate += rot*2;
+			y2Rotate += rot*2;
+			t1++;
+			glutPostRedisplay();
+			glutTimerFunc(10, Timer2, 0);
+		}
+	}
+}
+
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'q':
@@ -670,6 +691,9 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		spicount = 0;
 		donespi = false;
 		rtimer ? rtimer = false : rtimer = true;
+		ttimer = false;
+		timer1 = false;
+		timer2 = false;
 		glutTimerFunc(10, spiTimer, 0);
 		glutTimerFunc(20, spiTimer2, 0);
 		break;
@@ -680,8 +704,10 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		disz1 = z1move / 100;
 		disx2 = x2move / 100;
 		disz2 = z2move / 100;
-
+		rtimer = false;
 		ttimer ? ttimer = false : ttimer = true;
+		timer1 = false;
+		timer2 = false;
 		glutTimerFunc(10, TTimer, 0);
 		break;
 	case '1':
@@ -691,9 +717,31 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		disz1 = z1move / 100;
 		disx2 = x2move / 100;
 		disz2 = z2move / 100;
-
+		rtimer = false;
+		ttimer = false;
 		timer1 ? timer1 = false : timer1 = true;
+		timer2 = false;
 		glutTimerFunc(10, Timer1, 0);
+		break;
+	case '2':
+		x1move = -0.5;
+		y1move = 0.0;
+		x2move = 0.5;
+		y2move = 0.0;
+		z1move = 0.0;
+		z2move = 0.0;
+		t1 = 0;
+		t2 = 0;
+		disx1 = (-x1move - x2move)/100;
+		disz1 = (-z1move - z2move)/100;
+		disx2 = (-x2move - x1move)/100;
+		disz2 = (-z2move - z1move)/100;
+		rot = (atan2(x1move - x2move, z1move - z2move) * 180 / 3.14) / 100;
+		rtimer = false;
+		ttimer = false;
+		timer1 = false;
+		timer2 ? timer2 = false : timer2 = true;
+		glutTimerFunc(10, Timer2, 0);
 		break;
 	}
 	glutPostRedisplay();
