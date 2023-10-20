@@ -128,7 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="3D_Shader_17.cpp" />
+    <ClCompile Include="3D_Shader_15.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.glsl" />
