@@ -5,7 +5,24 @@ struct Shape {
 	GLuint vbo[2], vao, ebo;
 };
 
-Shape s[3];
+struct Cube {
+	GLfloat cubevertex[6][3] = { 0 };
+	GLfloat cubecolors[6][3] = { 0 };
+
+	GLuint vbo[2], vao, ebo;
+};
+
+struct Cone {
+	GLfloat conevertex[6][3] = { 0 };
+	GLfloat conecolors[6][3] = { 0 };
+	GLuint vbo[2], vao, ebo;
+};
+
+
+
+Shape s;
+Cube c[6];
+Cone o[5];
 
 //정육면체
 GLfloat vertex[][3] = {
@@ -167,9 +184,13 @@ GLfloat colors1[][3] = {
 	 { 1.0, 1.0, 0.0 },	//4
 };
 
-float xRotateAni = 0.0f;
-float yRotateAni = 0.0f;
+float xRotateAni = 20.0f;
+float yRotateAni = 20.0f;
+
+float up = 0.0f;
 double xMove = 0.0, yMove = 0.0, zMove = 0.0;
+
+bool ttimer = false;
 
 bool culling = false;
 
@@ -201,6 +222,7 @@ GLchar* vertexSource, * fragmentSource;
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid keyboard(unsigned char key, int x, int y);
+GLvoid Timer(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -208,6 +230,7 @@ void make_fragmentShaders();
 void make_shaderProgram();
 
 /*vao, vbo 관련 함수*/
+void Setcube();
 void Initvbovao();
 void Draw();
 void Drawline();
@@ -244,6 +267,7 @@ int main(int argc, char** argv) {
 
 	/*초기화 함수*/
 	make_shaderProgram();
+	Setcube();
 	Initvbovao();
 
 	glutDisplayFunc(drawScene);
@@ -262,6 +286,12 @@ GLvoid drawScene() {
 	culling ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
 
 	glUseProgram(shaderProgramID);
+	glm::mat4 projection = glm::mat4(1.0f);
+	projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, -2.0f, 2.0f);
+	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
+	projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
+	unsigned int projectionLocation = glGetUniformLocation(shaderProgramID, "projectionTransform"); //--- 투영 변환 값 설정
+	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
 
 	/*그리기*/
 	Draw();
@@ -273,24 +303,38 @@ GLvoid Reshape(int w, int h) {
 	glViewport(0, 0, w, h);
 }
 
+void Setcube() {
+	for (int i = 0; i < 6; i++) {
+		for (int j = 0; j < 6; j++) {
+			c[i].cubevertex[j][0] = vertex[i * 6 + j][0];
+			c[i].cubevertex[j][1] = vertex[i * 6 + j][1];
+			c[i].cubevertex[j][2] = vertex[i * 6 + j][2];
+			c[i].cubecolors[j][0] = colors[i * 6 + j][0];
+			c[i].cubecolors[j][1] = colors[i * 6 + j][1];
+			c[i].cubecolors[j][2] = colors[i * 6 + j][2];
+		}
+	}
+}
+
 void Initvbovao()
 {
 
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+	for(int i=0;i<6;i++)
 	{
-		glGenVertexArrays(1, &s[0].vao);
-		glGenBuffers(2, s[0].vbo);
+		glGenVertexArrays(1, &c[i].vao);
+		glGenBuffers(2, c[i].vbo);
 		//glGenBuffers(1, &ebo);
 
-		glBindVertexArray(s[0].vao);
+		glBindVertexArray(c[i].vao);
 
-		glBindBuffer(GL_ARRAY_BUFFER, s[0].vbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, c[i].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(c[i].cubevertex), c[i].cubevertex, GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, s[0].vbo[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, c[i].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(c[i].cubecolors), c[i].cubecolors, GL_STATIC_DRAW);
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -298,20 +342,23 @@ void Initvbovao()
 
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(ColorLocation);
-	}
 
+		
+	}
+	
+	for (int i = 0; i < 5; i++)
 	{
-		glGenVertexArrays(1, &s[1].vao);
-		glGenBuffers(2, s[1].vbo);
+		glGenVertexArrays(1, &o[i].vao);
+		glGenBuffers(2, o[i].vbo);
 		//glGenBuffers(1, &ebo);
 
-		glBindVertexArray(s[1].vao);
+		glBindVertexArray(o[i].vao);
 
-		glBindBuffer(GL_ARRAY_BUFFER, s[1].vbo[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, o[i].vbo[0]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex1), vertex1, GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, s[1].vbo[1]);
+		glBindBuffer(GL_ARRAY_BUFFER, o[i].vbo[1]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -322,17 +369,17 @@ void Initvbovao()
 		glEnableVertexAttribArray(ColorLocation);
 	}
 	{
-		glGenVertexArrays(1, &s[2].vao);
-		glGenBuffers(2, s[2].vbo);
+		glGenVertexArrays(1, &s.vao);
+		glGenBuffers(2, s.vbo);
 		//glGenBuffers(1, &ebo);
 
-		glBindVertexArray(s[2].vao);
+		glBindVertexArray(s.vao);
 
-		glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, s.vbo[0]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(line), line, GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[1]);
+		glBindBuffer(GL_ARRAY_BUFFER, s.vbo[1]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(linecolors), linecolors, GL_STATIC_DRAW);
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -351,18 +398,24 @@ void Draw()
 
 	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
 
-	glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
-	glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
-	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
-	Tx = glm::translate(Tx, glm::vec3(0.0, 0.0, 0.0)); //--- x축으로 이동 행렬
-	Rz = glm::rotate(Rz, glm::radians(-20.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-	Rz = glm::rotate(Rz, glm::radians(-20.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+	for (int i = 0; i < 6; i++) {
+		glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+		glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 
-	TR = Tx * Rz; //--- 합성 변환 행렬: 회전  이동
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+		Tx = glm::translate(Tx, glm::vec3(xMove, yMove, zMove)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
-	glBindVertexArray(s[0].vao);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(c[i].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+	
+	
 
 
 	//glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, (void*)0);
@@ -384,14 +437,15 @@ void Drawline()
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{//line
-		Tx = glm::translate(Tx, glm::vec3(0, 0, 0.5)); //--- x축으로 이동 행렬
-		Rz = glm::rotate(Rz, glm::radians(-20.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		Rz = glm::rotate(Rz, glm::radians(-20.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR = Tx * Rz; //--- 합성 변환 행렬: 회전  이동
+		Tx = glm::translate(Tx, glm::vec3(0, 0, 0)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
-		glBindVertexArray(s[2].vao);
+		glBindVertexArray(s.vao);
 		glLineWidth(1);
 		glDrawArrays(GL_LINES, 0, 6);
 
@@ -461,11 +515,40 @@ void make_fragmentShaders()
 	}
 }
 
+GLvoid Timer(int value) {
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+	glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+	if (ttimer == true) {
+		glBindVertexArray(c[0].vao);
+		xRotateAni += 1;
+		Tx = glm::translate(Tx, glm::vec3(xMove, yMove, zMove)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR = Tx * Rz; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+		glutPostRedisplay();
+		glutTimerFunc(10, Timer, 1);
+	}
+}
+
 
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'h':
 		culling ? culling = false : culling = true;
+		break;
+	case 'y':
+		yRotateAni += 1;
+		break;
+	case 't':
+		ttimer ? ttimer = false : ttimer = true;
+		glutTimerFunc(10, Timer, 1);
 		break;
 	}
 	glutPostRedisplay();
