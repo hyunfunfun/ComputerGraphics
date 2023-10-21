@@ -18,8 +18,6 @@ struct Cone {
 	GLuint vbo[2], vao, ebo;
 };
 
-
-
 Shape s;
 Cube c[6];
 Cone o[5];
@@ -185,18 +183,19 @@ GLfloat colors1[][3] = {
 };
 float xRotateAni = 20.0f;
 float yRotateAni = 20.0f;
-float xRotateAni1 = 20.0f;
-float yRotateAni1 = 20.0f;
-float xRotateAni2 = 20.0f;
-float yRotateAni2 = 20.0f;
-float xRotateAni3 = 20.0f;
-float yRotateAni3 = 20.0f;
-float xRotateAni4 = 20.0f;
-float yRotateAni4 = 20.0f;
-float xRotateAni5 = 20.0f;
-float yRotateAni5 = 20.0f;
-float xRotateAni6 = 20.0f;
-float yRotateAni6 = 20.0f;
+
+float xRotateAni1 = 0.0f;
+float yRotateAni1 = 0.0f;
+float xRotateAni2 = 0.0f;
+float yRotateAni2 = 0.0f;
+float xRotateAni3 = 0.0f;
+float yRotateAni3 = 0.0f;
+float xRotateAni4 = 0.0f;
+float yRotateAni4 = 0.0f;
+float xRotateAni5 = 0.0f;
+float yRotateAni5 = 0.0f;
+float xRotateAni6 = 0.0f;
+float yRotateAni6 = 0.0f;
 
 float up = 0.0f;
 double xMove = 0.0, yMove = 0.0, zMove = 0.0;
@@ -207,12 +206,25 @@ double xMove4 = 0.0, yMove4 = 0.0, zMove4 = 0.0;
 double xMove5 = 0.0, yMove5 = 0.0, zMove5 = 0.0;
 double xMove6 = 0.0, yMove6 = 0.0, zMove6 = 0.0;
 
+//f
 bool ttimer = false;
+
+//f
 bool ftimer = false;
+bool fcheck = false;
+
+//s
 bool stimer = false;
+bool scheck = false;
+
+//b
+bool btmer = false;
+bool bcheck = false;
 
 bool pcheck = false;
 
+
+bool object = false;
 bool culling = false;
 
 GLfloat line[][3] = {
@@ -252,6 +264,7 @@ void make_shaderProgram();
 
 /*vao, vbo 관련 함수*/
 void Setcube();
+void Setpyramid();
 void Initvbovao();
 void Draw_cube_1();
 void Draw_cube_2();
@@ -259,6 +272,12 @@ void Draw_cube_3();
 void Draw_cube_4();
 void Draw_cube_5();
 void Draw_cube_6();
+
+void Draw_cone_1();
+void Draw_cone_2();
+void Draw_cone_3();
+void Draw_cone_4();
+void Draw_cone_5();
 void Drawline();
 
 char* filetobuf(const char* file)
@@ -294,7 +313,10 @@ int main(int argc, char** argv) {
 	/*초기화 함수*/
 	make_shaderProgram();
 	Setcube();
+	Setpyramid();
 	Initvbovao();
+
+	cout << "0:물체변경\n h: 은면제거 설정\n/ 해제  y : y축에 대하여 자전한다" << endl;
 
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
@@ -325,12 +347,22 @@ GLvoid drawScene() {
 
 
 	/*그리기*/
-	Draw_cube_1();
-	Draw_cube_2();
-	Draw_cube_3();
-	Draw_cube_4();
-	Draw_cube_5();
-	Draw_cube_6();
+	if(object==false)
+	{
+		Draw_cube_1();
+		Draw_cube_2();
+		Draw_cube_3();
+		Draw_cube_4();
+		Draw_cube_5();
+		Draw_cube_6();
+	}
+	else {
+		Draw_cone_1();
+		Draw_cone_2();
+		Draw_cone_3();
+		Draw_cone_4();
+		Draw_cone_5();
+	}
 
 	Drawline();
 	glutSwapBuffers(); //--- 화면에 출력하기
@@ -349,6 +381,27 @@ void Setcube() {
 			c[i].cubecolors[j][0] = colors[i * 6 + j][0];
 			c[i].cubecolors[j][1] = colors[i * 6 + j][1];
 			c[i].cubecolors[j][2] = colors[i * 6 + j][2];
+		}
+	}
+}
+
+void Setpyramid() {
+	for (int j = 0; j < 6; j++) {
+		o[0].conevertex[j][0] = vertex1[j][0];
+		o[0].conevertex[j][1] = vertex1[j][1];
+		o[0].conevertex[j][2] = vertex1[j][2];
+		o[0].conecolors[j][0] = colors1[j][0];
+		o[0].conecolors[j][1] = colors1[j][1];
+		o[0].conecolors[j][2] = colors1[j][2];
+	}
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 3; j++) {
+			o[i+1].conevertex[j][0] = vertex1[6 + (i*3+j)][0];
+			o[i+1].conevertex[j][1] = vertex1[6 + (i*3+j)][1];
+			o[i+1].conevertex[j][2] = vertex1[6 + (i*3+j)][2];
+			o[i+1].conecolors[j][0] = colors1[6 + (i*3+j)][0];
+			o[i+1].conecolors[j][1] = colors1[6 + (i*3+j)][1];
+			o[i+1].conecolors[j][2] = colors1[6 + (i*3+j)][2];
 		}
 	}
 }
@@ -392,11 +445,11 @@ void Initvbovao()
 		glBindVertexArray(o[i].vao);
 
 		glBindBuffer(GL_ARRAY_BUFFER, o[i].vbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex1), vertex1, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(o[i].conevertex), o[i].conevertex, GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, o[i].vbo[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(o[i].conecolors), o[i].conecolors, GL_STATIC_DRAW);
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -444,11 +497,7 @@ void Draw_cube_1()
 	Rz = glm::rotate(Rz, glm::radians(xRotateAni +xRotateAni1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 	Rz = glm::rotate(Rz, glm::radians(yRotateAni +yRotateAni1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 	Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
-	if (ttimer == true) {
-		TR = Rz * Tx * Sx;
-	}
-	else
-		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+	TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
 	glBindVertexArray(c[0].vao);
@@ -575,6 +624,127 @@ void Draw_cube_6()
 	}
 }
 
+void Draw_cone_1()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	for (int i = 0; i < 6; i++) {
+		glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+		glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+		Tx = glm::translate(Tx, glm::vec3(xMove6, yMove6, zMove6)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni + xRotateAni6), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni + yRotateAni6), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(o[0].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
+}
+
+void Draw_cone_2()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	for (int i = 0; i < 6; i++) {
+		glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+		glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+		Tx = glm::translate(Tx, glm::vec3(xMove6, yMove6, zMove6)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni + xRotateAni6), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni + yRotateAni6), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(o[1].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+}
+void Draw_cone_3()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	for (int i = 0; i < 6; i++) {
+		glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+		glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+		Tx = glm::translate(Tx, glm::vec3(xMove6, yMove6, zMove6)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni + xRotateAni6), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni + yRotateAni6), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(o[2].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+}
+void Draw_cone_4()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	for (int i = 0; i < 6; i++) {
+		glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+		glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+		Tx = glm::translate(Tx, glm::vec3(xMove6, yMove6, zMove6)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni + xRotateAni6), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni + yRotateAni6), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(o[3].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+}
+void Draw_cone_5()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	for (int i = 0; i < 6; i++) {
+		glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+		glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+		Tx = glm::translate(Tx, glm::vec3(xMove6, yMove6, zMove6)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni + xRotateAni6), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni + yRotateAni6), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(o[4].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+}
 
 void Drawline()
 {
@@ -668,24 +838,40 @@ void make_fragmentShaders()
 }
 
 GLvoid Timer(int value) {
+
+
 	
 	if (ttimer == true) {
 		xRotateAni1 += 1;
-		glutPostRedisplay();
-		glutTimerFunc(10, Timer, 1);
 	}
 	if (ftimer == true) {
-		xRotateAni4 += 1;
-		glutPostRedisplay();
-		glutTimerFunc(10, Timer, 1);
+		if (fcheck == false) {
+			xRotateAni4 += 1;
+			if (xRotateAni4 > 90)
+				fcheck = true;
+		}
+		else {
+			xRotateAni4 -= 1;
+			if (xRotateAni4 < 0)
+				fcheck = false;
+		}
 	}
 	if (stimer == true) {
-		yMove5 += 0.01;
-		yMove6 += 0.01;
-		
-		glutPostRedisplay();
-		glutTimerFunc(10, Timer, 1);
+		if (scheck == false) {
+			yMove5 += 0.01;
+			yMove6 += 0.01;
+			if (yMove5 > 1.0)
+				scheck = true;
+		}
+		else {
+			yMove5 -= 0.01;
+			yMove6 -= 0.01;
+			if (yMove5 < 0.0)
+				scheck = false;
+		}
 	}
+	glutPostRedisplay();
+	glutTimerFunc(10, Timer, 1);
 }
 
 
@@ -699,18 +885,28 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		break;
 	case 't':
 		ttimer ? ttimer = false : ttimer = true;
+		ftimer = false;
+		stimer = false;
 		glutTimerFunc(10, Timer, 1);
 		break;
 	case 'f':
+		ttimer = false;
 		ftimer ? ftimer = false : ftimer = true;
+		stimer = false;
 		glutTimerFunc(10, Timer, 1);
 		break;
 	case 's':
+		ttimer = false;
+		ftimer = false;
 		stimer ? stimer = false : stimer = true;
+
 		glutTimerFunc(10, Timer, 1);
 		break;
 	case 'p':
 		pcheck ? pcheck = false : pcheck = true;
+		break;
+	case '0':
+		object ? object = false : object = true;
 		break;
 	}
 	glutPostRedisplay();
