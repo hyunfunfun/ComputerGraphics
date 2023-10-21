@@ -183,14 +183,35 @@ GLfloat colors1[][3] = {
 	 { 0.0, 0.0, 1.0 },	//3
 	 { 1.0, 1.0, 0.0 },	//4
 };
-
 float xRotateAni = 20.0f;
 float yRotateAni = 20.0f;
+float xRotateAni1 = 20.0f;
+float yRotateAni1 = 20.0f;
+float xRotateAni2 = 20.0f;
+float yRotateAni2 = 20.0f;
+float xRotateAni3 = 20.0f;
+float yRotateAni3 = 20.0f;
+float xRotateAni4 = 20.0f;
+float yRotateAni4 = 20.0f;
+float xRotateAni5 = 20.0f;
+float yRotateAni5 = 20.0f;
+float xRotateAni6 = 20.0f;
+float yRotateAni6 = 20.0f;
 
 float up = 0.0f;
 double xMove = 0.0, yMove = 0.0, zMove = 0.0;
+double xMove1 = 0.0, yMove1 = 0.0, zMove1 = 0.0;
+double xMove2 = 0.0, yMove2 = 0.0, zMove2 = 0.0;
+double xMove3 = 0.0, yMove3 = 0.0, zMove3 = 0.0;
+double xMove4 = 0.0, yMove4 = 0.0, zMove4 = 0.0;
+double xMove5 = 0.0, yMove5 = 0.0, zMove5 = 0.0;
+double xMove6 = 0.0, yMove6 = 0.0, zMove6 = 0.0;
 
 bool ttimer = false;
+bool ftimer = false;
+bool stimer = false;
+
+bool pcheck = false;
 
 bool culling = false;
 
@@ -232,7 +253,12 @@ void make_shaderProgram();
 /*vao, vbo 관련 함수*/
 void Setcube();
 void Initvbovao();
-void Draw();
+void Draw_cube_1();
+void Draw_cube_2();
+void Draw_cube_3();
+void Draw_cube_4();
+void Draw_cube_5();
+void Draw_cube_6();
 void Drawline();
 
 char* filetobuf(const char* file)
@@ -287,14 +313,25 @@ GLvoid drawScene() {
 
 	glUseProgram(shaderProgramID);
 	glm::mat4 projection = glm::mat4(1.0f);
-	projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, -2.0f, 2.0f);
-	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
-	projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
+	if(pcheck==false)
+		projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, -2.0f, 2.0f);
+	else if (pcheck == true) {
+		projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
+		projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
+	}
 	unsigned int projectionLocation = glGetUniformLocation(shaderProgramID, "projectionTransform"); //--- 투영 변환 값 설정
 	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
 
+
+
 	/*그리기*/
-	Draw();
+	Draw_cube_1();
+	Draw_cube_2();
+	Draw_cube_3();
+	Draw_cube_4();
+	Draw_cube_5();
+	Draw_cube_6();
+
 	Drawline();
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
@@ -391,7 +428,33 @@ void Initvbovao()
 	}
 }
 
-void Draw()
+void Draw_cube_1()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+	glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+	glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+	Tx = glm::translate(Tx, glm::vec3(xMove1, yMove1, zMove1)); //--- x축으로 이동 행렬
+	Rz = glm::rotate(Rz, glm::radians(xRotateAni +xRotateAni1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+	Rz = glm::rotate(Rz, glm::radians(yRotateAni +yRotateAni1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+	Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+	if (ttimer == true) {
+		TR = Rz * Tx * Sx;
+	}
+	else
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+	glBindVertexArray(c[0].vao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+void Draw_cube_2()
 {
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
@@ -404,25 +467,114 @@ void Draw()
 		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
 		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 
-		Tx = glm::translate(Tx, glm::vec3(xMove, yMove, zMove)); //--- x축으로 이동 행렬
-		Rz = glm::rotate(Rz, glm::radians(xRotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		Rz = glm::rotate(Rz, glm::radians(yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Tx = glm::translate(Tx, glm::vec3(xMove2, yMove2, zMove2)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni +xRotateAni2), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni +yRotateAni2), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
 		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
-		glBindVertexArray(c[i].vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(c[1].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
-	
-	
-
-
-	//glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, (void*)0);
-	//glDisableVertexAttribArray(PosLocation);
-	//glDisableVertexAttribArray(ColorLocation);
-
 }
+void Draw_cube_3()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	for (int i = 0; i < 6; i++) {
+		glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+		glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+		Tx = glm::translate(Tx, glm::vec3(xMove3, yMove3, zMove3)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni +xRotateAni3), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni +yRotateAni3), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(c[2].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
+}
+void Draw_cube_4()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	for (int i = 0; i < 6; i++) {
+		glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+		glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+		Tx = glm::translate(Tx, glm::vec3(xMove4, yMove4, zMove4)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni +xRotateAni4), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni +yRotateAni4), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(c[3].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
+}
+void Draw_cube_5()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	for (int i = 0; i < 6; i++) {
+		glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+		glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+		Tx = glm::translate(Tx, glm::vec3(xMove5, yMove5, zMove5)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni +xRotateAni5), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni +yRotateAni5), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(c[4].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
+}
+void Draw_cube_6()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
+	for (int i = 0; i < 6; i++) {
+		glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
+		glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
+		glm::mat4 Sx = glm::mat4(1.0f); //--- 크기 행렬 선언
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+		Tx = glm::translate(Tx, glm::vec3(xMove6, yMove6, zMove6)); //--- x축으로 이동 행렬
+		Rz = glm::rotate(Rz, glm::radians(xRotateAni + xRotateAni6), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		Rz = glm::rotate(Rz, glm::radians(yRotateAni + yRotateAni6), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		Sx = glm::scale(Sx, glm::vec3(2, 2, 2)); //--- x축으로 이동 행렬
+		TR = Tx * Rz * Sx; //--- 합성 변환 행렬: 회전  이동
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(c[5].vao);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
+}
+
 
 void Drawline()
 {
@@ -516,22 +668,21 @@ void make_fragmentShaders()
 }
 
 GLvoid Timer(int value) {
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
-
-	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
-
-	glm::mat4 Tx = glm::mat4(1.0f); //--- 이동 행렬 선언
-	glm::mat4 Rz = glm::mat4(1.0f); //--- 회전 행렬 선언
-	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+	
 	if (ttimer == true) {
-		glBindVertexArray(c[0].vao);
-		xRotateAni += 1;
-		Tx = glm::translate(Tx, glm::vec3(xMove, yMove, zMove)); //--- x축으로 이동 행렬
-		Rz = glm::rotate(Rz, glm::radians(xRotateAni), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		Rz = glm::rotate(Rz, glm::radians(yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR = Tx * Rz; //--- 합성 변환 행렬: 회전  이동
-		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+		xRotateAni1 += 1;
+		glutPostRedisplay();
+		glutTimerFunc(10, Timer, 1);
+	}
+	if (ftimer == true) {
+		xRotateAni4 += 1;
+		glutPostRedisplay();
+		glutTimerFunc(10, Timer, 1);
+	}
+	if (stimer == true) {
+		yMove5 += 0.01;
+		yMove6 += 0.01;
+		
 		glutPostRedisplay();
 		glutTimerFunc(10, Timer, 1);
 	}
@@ -549,6 +700,17 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case 't':
 		ttimer ? ttimer = false : ttimer = true;
 		glutTimerFunc(10, Timer, 1);
+		break;
+	case 'f':
+		ftimer ? ftimer = false : ftimer = true;
+		glutTimerFunc(10, Timer, 1);
+		break;
+	case 's':
+		stimer ? stimer = false : stimer = true;
+		glutTimerFunc(10, Timer, 1);
+		break;
+	case 'p':
+		pcheck ? pcheck = false : pcheck = true;
 		break;
 	}
 	glutPostRedisplay();
