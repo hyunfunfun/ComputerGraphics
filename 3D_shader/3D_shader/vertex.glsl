@@ -10,6 +10,7 @@ uniform mat4 projectionTransform;
 
 void main(void){
 	gl_Position = projectionTransform * modelTransform * vec4(in_Position, 1.0); 
+	//gl_Position = modelTransform * vec4(in_Position, 1.0); 
 
 	out_Color=in_Color;
 }
