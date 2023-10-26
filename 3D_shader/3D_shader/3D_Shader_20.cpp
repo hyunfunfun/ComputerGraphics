@@ -51,6 +51,7 @@ int mode = 1;
 float yAngle = 1.0f;
 float dis = 5.0f;
 //timer
+bool timer = true;
 bool btimer = false;
 bool Btimer = false;
 
@@ -656,97 +657,118 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case 'A':
 		Atimer ? Atimer = false : Atimer = true;
 		break;
+	case 's':
+		timer = false;
+		break;
+	case 'S':
+		timer = true;
+		break;
+	case 'c':
+		xmove1 = 0.0;
+		yRotate1 = 0.0f;
+		yRotate2_1 = 0.0f;
+		yRotate2_2 = 0.0f;
+		xmove2 = 0.0;
+		zRotate1_1 = 0.0;
+		zRotate1_2 = 0.0;
+		yAngle = 0;
+		cameraPos.z = 5;
+		cameraPos.x = 0;
+		break;
 	}
 	glutPostRedisplay();
 }
 
 GLvoid Timer(int value) {
-	if (btimer == true) {
-		xmove1 += 0.01;
-	}
-	if (Btimer == true) {
-		xmove1 -= 0.01;
-	}
-	if (mtimer == true) {
-		yRotate1 += 1;
-	}
-	if (Mtimer == true) {
-		yRotate1 -= 1;
-	}
-	if (ftimer == true) {
-		if (yRotate2_1 > 360 || yRotate2_2 > 360) {
-			yRotate2_1 = 0;
-			yRotate2_2 = 0;
+	if(timer==true)
+	{
+		if (btimer == true) {
+			xmove1 += 0.01;
 		}
-		yRotate2_1 += 1;
-		yRotate2_2 -= 1;
-	}
-	if (Ftimer == true) {
-		if (yRotate2_1 > 360 || yRotate2_2 > 360) {
-			yRotate2_1 = 0;
-			yRotate2_2 = 0;
+		if (Btimer == true) {
+			xmove1 -= 0.01;
 		}
-		yRotate2_1 -= 1;
-		yRotate2_2 += 1;
-	}
-	if (etimer == true) {
-		if (yRotate2_1<10 && yRotate2_1>-10) {
-			if(xmove2>0.0)
-				xmove2 -= 0.01;
+		if (mtimer == true) {
+			yRotate1 += 1;
 		}
-		else {
-			if (yRotate2_1 > yRotate2_2) {
-				yRotate2_1 -= 1;
-				yRotate2_2 += 1;
+		if (Mtimer == true) {
+			yRotate1 -= 1;
+		}
+		if (ftimer == true) {
+			if (yRotate2_1 > 360 || yRotate2_2 > 360) {
+				yRotate2_1 = 0;
+				yRotate2_2 = 0;
+			}
+			yRotate2_1 += 1;
+			yRotate2_2 -= 1;
+		}
+		if (Ftimer == true) {
+			if (yRotate2_1 > 360 || yRotate2_2 > 360) {
+				yRotate2_1 = 0;
+				yRotate2_2 = 0;
+			}
+			yRotate2_1 -= 1;
+			yRotate2_2 += 1;
+		}
+		if (etimer == true) {
+			if (yRotate2_1<10 && yRotate2_1>-10) {
+				if (xmove2 > 0.0)
+					xmove2 -= 0.01;
 			}
 			else {
-				yRotate2_1 += 1;
-				yRotate2_2 -= 1;
+				if (yRotate2_1 > yRotate2_2) {
+					yRotate2_1 -= 1;
+					yRotate2_2 += 1;
+				}
+				else {
+					yRotate2_1 += 1;
+					yRotate2_2 -= 1;
+				}
 			}
 		}
-	}
-	if (ttimer == true) {
-		if (mode == 1) {
-			zRotate1_1 += 1;
-			zRotate1_2 -= 1;
-			if (zRotate1_1 > 90) {
-				mode = 2;
+		if (ttimer == true) {
+			if (mode == 1) {
+				zRotate1_1 += 1;
+				zRotate1_2 -= 1;
+				if (zRotate1_1 > 90) {
+					mode = 2;
+				}
+			}
+			else {
+				zRotate1_1 -= 1;
+				zRotate1_2 += 1;
+				if (zRotate1_1 < -90) {
+					mode = 1;
+				}
 			}
 		}
-		else {
-			zRotate1_1 -= 1;
-			zRotate1_2 += 1;
-			if (zRotate1_1 < -90) {
-				mode = 1;
+		if (Ttimer == true) {
+			if (mode == 1) {
+				zRotate1_1 -= 1;
+				zRotate1_2 += 1;
+				if (zRotate1_1 < -90) {
+					mode = 2;
+				}
+			}
+			else {
+				zRotate1_1 += 1;
+				zRotate1_2 -= 1;
+				if (zRotate1_1 > 90) {
+					mode = 1;
+				}
 			}
 		}
-	}
-	if (Ttimer == true) {
-		if (mode == 1) {
-			zRotate1_1 -= 1;
-			zRotate1_2 += 1;
-			if (zRotate1_1 < -90) {
-				mode = 2;
-			}
+		if (atimer == true) {
+			yAngle += 0.01;
+			cameraPos.z = dis * cos(yAngle);
+			cameraPos.x = dis * sin(yAngle);
 		}
-		else {
-			zRotate1_1 += 1;
-			zRotate1_2 -= 1;
-			if (zRotate1_1 > 90) {
-				mode = 1;
-			}
+		if (Atimer == true) {
+			yAngle -= 0.01;
+			cameraPos.z = dis * cos(yAngle);
+			cameraPos.x = dis * sin(yAngle);
 		}
+		glutPostRedisplay();
+		glutTimerFunc(10, Timer, 1);
 	}
-	if (atimer == true) {
-		yAngle += 0.01;
-		cameraPos.z = dis * cos(yAngle);
-		cameraPos.x = dis * sin(yAngle);
-	}
-	if (Atimer == true) {
-		yAngle -= 0.01;
-		cameraPos.z = dis * cos(yAngle);
-		cameraPos.x = dis * sin(yAngle);
-	}
-	glutPostRedisplay();
-	glutTimerFunc(10, Timer, 1);
 }
