@@ -22,24 +22,31 @@ std::vector< glm::vec3 > vertices;
 std::vector< glm::vec2 > uvs;
 std::vector< glm::vec3 > normals;
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f); //--- 카메라 위치
+glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f); //--- 카메라 바라보는 방향
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
+
 //위치,회전,신축
 
 double xmove1 = 0.0;
 double ymove1 = 0.0;
 double zmove1 = 0.0;
 
-float xRotate1 = 10.0f;
+float xRotate1 = 0.0f;
 float yRotate1 = 10.0f;
 float zRotate1 = 0.0f;
 
-
-
-
+float yAngle = 1.0f;
+float dis = 5.0f;
 //timer
 bool btimer = false;
 bool Btimer = false;
+
 bool mtimer = false;
 bool Mtimer = false;
+
+bool atimer = false;
+bool Atimer = false;
 int value1 = 1;
 
 GLfloat rColor = 0, gColor = 0, bColor = 0;
@@ -176,6 +183,11 @@ GLvoid drawScene() {
 	unsigned int projectionLocation = glGetUniformLocation(shaderProgramID, "projectionTransform"); //--- 투영 변환 값 설정
 	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
 
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
+	unsigned int viewLocation = glGetUniformLocation(shaderProgramID, "viewTransform"); //--- 뷰잉 변환 설정
+	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
+
 	/*그리기*/
 	Draw();
 	Drawtank();
@@ -269,6 +281,55 @@ void Initvbovao()
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(ColorLocation);
 	}
+	{//위 팔
+		for (int i = 0; i < 36; i++) {
+			s[3].colors[i][0] = 0.8;
+			s[3].colors[i][1] = 0.5;
+			s[3].colors[i][2] = 0.2;
+			s[4].colors[i][0] = 0.8;
+			s[4].colors[i][1] = 0.5;
+			s[4].colors[i][2] = 0.2;
+		}
+		glGenVertexArrays(1, &s[3].vao);
+		glGenBuffers(2, s[3].vbo);
+		glGenBuffers(1, &s[3].ebo);
+
+		glBindVertexArray(s[3].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[3].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[3].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(s[3].colors), s[3].colors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s[3].ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(unsigned int), &vertexIndices[0], GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+
+		glGenVertexArrays(1, &s[4].vao);
+		glGenBuffers(2, s[4].vbo);
+		glGenBuffers(1, &s[4].ebo);
+
+		glBindVertexArray(s[4].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[4].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[4].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(s[4].colors), s[4].colors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s[4].ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(unsigned int), &vertexIndices[0], GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
 }
 void Draw() {//바닥
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
@@ -278,7 +339,7 @@ void Draw() {//바닥
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{
-		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR = glm::translate(TR, glm::vec3(0, -0.2, 0)); //--- x축으로 이동 행렬
 		TR = glm::scale(TR, glm::vec3(2, 2, 2));
@@ -298,7 +359,7 @@ void Drawtank() {//탱크
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{
-		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR = glm::translate(TR, glm::vec3(xmove1, ymove1, zmove1)); //--- x축으로 이동 행렬
 		TR = glm::scale(TR, glm::vec3(1.5, 1, 1.5));
@@ -323,6 +384,37 @@ void Drawtank() {//탱크
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
+
+	glm::mat4 TR3 = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+	{
+		TR3 = glm::translate(TR3, glm::vec3(xmove1-0.2, ymove1 + 0.4, zmove1+0.3)); //--- x축으로 이동 행렬
+		TR3 = glm::rotate(TR3, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR3 = glm::rotate(TR3, glm::radians(yRotate1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR3 = glm::scale(TR3, glm::vec3(0.3, 0.3, 0.6));
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR3)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[3].vao);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	}
+
+	glm::mat4 TR4 = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+	{
+		TR4 = glm::translate(TR4, glm::vec3(xmove1 + 0.2, ymove1 + 0.4, zmove1+0.3)); //--- x축으로 이동 행렬
+		TR4 = glm::rotate(TR4, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR4 = glm::rotate(TR4, glm::radians(yRotate1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR4 = glm::scale(TR4, glm::vec3(0.3, 0.3, 0.6));
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR4)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[4].vao);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	}
+
 }
 void make_shaderProgram()
 {
@@ -396,6 +488,45 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case 'M':
 		Mtimer ? Mtimer = false : Mtimer = true;
 		break;
+	case 'z':
+		cameraPos.z += 0.1;
+		dis = cameraPos.z;
+		break;
+	case 'Z':
+		cameraPos.z -= 0.1;
+		break;
+	case 'x':
+		cameraPos.x += 0.1;
+		break;
+	case 'X':
+		cameraPos.x -= 0.1;
+		break;
+	case 'y':
+		yAngle += 0.1;
+		cameraDirection.z = dis * cos(yAngle);
+		cameraDirection.x = dis * sin(yAngle);
+		break;
+	case 'Y':
+		yAngle -= 0.1;
+		cameraDirection.z = dis * cos(yAngle);
+		cameraDirection.x = dis * sin(yAngle);
+		break;
+	case 'r':
+		yAngle += 0.1;
+		cameraPos.z = dis * cos(yAngle);
+		cameraPos.x = dis * sin(yAngle);
+		break;
+	case 'R':
+		yAngle -= 0.1; 
+		cameraPos.z = dis * cos(yAngle);
+		cameraPos.x = dis * sin(yAngle);
+		break;
+	case 'a':
+		atimer ? atimer = false : atimer = true;
+		break;
+	case 'A':
+		Atimer ? Atimer = false : Atimer = true;
+		break;
 	}
 	glutPostRedisplay();
 }
@@ -412,6 +543,16 @@ GLvoid Timer(int value) {
 	}
 	if (Mtimer == true) {
 		yRotate1 -= 1;
+	}
+	if (atimer == true) {
+		yAngle += 0.01;
+		cameraPos.z = dis * cos(yAngle);
+		cameraPos.x = dis * sin(yAngle);
+	}
+	if (Atimer == true) {
+		yAngle -= 0.01;
+		cameraPos.z = dis * cos(yAngle);
+		cameraPos.x = dis * sin(yAngle);
 	}
 	glutPostRedisplay();
 	glutTimerFunc(10, Timer, 1);
