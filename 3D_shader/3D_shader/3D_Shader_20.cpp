@@ -32,9 +32,21 @@ double xmove1 = 0.0;
 double ymove1 = 0.0;
 double zmove1 = 0.0;
 
+double xmove2 = 0.2;
+double ymove2 = 0.1;
+double zmove2 = 0.4;
+
 float xRotate1 = 0.0f;
-float yRotate1 = 10.0f;
-float zRotate1 = 0.0f;
+float yRotate1 = 0.0f;
+float zRotate1_1 = 0.0f;
+float zRotate1_2 = 0.0f;
+
+float xRotate2 = 0.0f;
+float yRotate2_1 = 0.0f;
+float yRotate2_2 = 0.0f;
+float zRotate2 = 0.0f;
+
+int mode = 1;
 
 float yAngle = 1.0f;
 float dis = 5.0f;
@@ -44,6 +56,15 @@ bool Btimer = false;
 
 bool mtimer = false;
 bool Mtimer = false;
+
+bool ftimer = false;
+bool Ftimer = false;
+
+bool etimer = false;
+bool Etimer = false;
+
+bool ttimer = false;
+bool Ttimer = false;
 
 bool atimer = false;
 bool Atimer = false;
@@ -184,6 +205,7 @@ GLvoid drawScene() {
 	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
 
 	glm::mat4 view = glm::mat4(1.0f);
+	cameraPos.y = 3.0;
 	view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
 	unsigned int viewLocation = glGetUniformLocation(shaderProgramID, "viewTransform"); //--- 뷰잉 변환 설정
 	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
@@ -389,7 +411,7 @@ void Draw() {//바닥
 
 	{
 		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR = glm::translate(TR, glm::vec3(0, -0.2, 0)); //--- x축으로 이동 행렬
 		TR = glm::scale(TR, glm::vec3(2, 2, 2));
 
@@ -409,7 +431,7 @@ void Drawtank() {//탱크
 
 	{
 		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR = glm::translate(TR, glm::vec3(xmove1, ymove1, zmove1)); //--- x축으로 이동 행렬
 		TR = glm::scale(TR, glm::vec3(1.5, 1, 1.5));
 
@@ -437,10 +459,12 @@ void Drawtank() {//탱크
 	glm::mat4 TR3 = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{
-		TR3 = glm::translate(TR3, glm::vec3(xmove1-0.2, ymove1 + 0.4, zmove1+0.3)); //--- x축으로 이동 행렬
-		TR3 = glm::rotate(TR3, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR3 = glm::translate(TR3, glm::vec3(xmove1, ymove1, zmove1)); //--- x축으로 이동 행렬
 		TR3 = glm::rotate(TR3, glm::radians(yRotate1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR3 = glm::scale(TR3, glm::vec3(0.3, 0.3, 0.6));
+		TR3 = glm::rotate(TR3, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR3 = glm::translate(TR3, glm::vec3(-0.2, 0.6, 0.0)); //--- x축으로 이동 행렬
+		TR3 = glm::rotate(TR3, glm::radians(zRotate1_1), glm::vec3(0.0, 0.0, 1.0)); //--- y축에 대하여 회전 행렬
+		TR3 = glm::scale(TR3, glm::vec3(0.3, 0.6, 0.3));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR3)); //--- modelTransform 변수에 변
 
@@ -452,10 +476,12 @@ void Drawtank() {//탱크
 	glm::mat4 TR4 = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{
-		TR4 = glm::translate(TR4, glm::vec3(xmove1 + 0.2, ymove1 + 0.4, zmove1+0.3)); //--- x축으로 이동 행렬
-		TR4 = glm::rotate(TR4, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR4 = glm::translate(TR4, glm::vec3(xmove1, ymove1, zmove1)); //--- x축으로 이동 행렬
 		TR4 = glm::rotate(TR4, glm::radians(yRotate1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR4 = glm::scale(TR4, glm::vec3(0.3, 0.3, 0.6));
+		TR4 = glm::rotate(TR4, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR4 = glm::translate(TR4, glm::vec3( 0.2, 0.6, 0.0)); //--- x축으로 이동 행렬
+		TR4 = glm::rotate(TR4, glm::radians(zRotate1_2), glm::vec3(0.0, 0.0, 1.0)); //--- y축에 대하여 회전 행렬
+		TR4 = glm::scale(TR4, glm::vec3(0.3, 0.6, 0.3));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR4)); //--- modelTransform 변수에 변
 
@@ -467,9 +493,10 @@ void Drawtank() {//탱크
 	glm::mat4 TR5 = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{
-		TR5 = glm::translate(TR5, glm::vec3(xmove1 + 0.2, ymove1 + 0.1, zmove1 + 0.3)); //--- x축으로 이동 행렬
-		TR5 = glm::rotate(TR5, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR5 = glm::rotate(TR5, glm::radians(yRotate1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR5 = glm::translate(TR5, glm::vec3(xmove1, ymove1, zmove1)); //--- x축으로 이동 행렬
+		TR5 = glm::rotate(TR5, glm::radians(xRotate2), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR5 = glm::rotate(TR5, glm::radians(yRotate2_1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR5 = glm::translate(TR5, glm::vec3(xmove2, ymove2, zmove2)); //--- x축으로 이동 행렬
 		TR5 = glm::scale(TR5, glm::vec3(0.4, 0.4, 0.7));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR5)); //--- modelTransform 변수에 변
@@ -482,10 +509,11 @@ void Drawtank() {//탱크
 	glm::mat4 TR6 = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{
-		TR6 = glm::translate(TR6, glm::vec3(xmove1 - 0.2, ymove1 + 0.1, zmove1 + 0.3)); //--- x축으로 이동 행렬
-		TR6 = glm::rotate(TR6, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR6 = glm::rotate(TR6, glm::radians(yRotate1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR6 = glm::scale(TR6, glm::vec3(0.4, 0.4, 0.76));
+		TR6 = glm::translate(TR6, glm::vec3(xmove1, ymove1, zmove1)); //--- x축으로 이동 행렬
+		TR6 = glm::rotate(TR6, glm::radians(xRotate2), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR6 = glm::rotate(TR6, glm::radians(yRotate2_2), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR6 = glm::translate(TR6, glm::vec3(-xmove2, ymove2, zmove2)); //--- x축으로 이동 행렬
+		TR6 = glm::scale(TR6, glm::vec3(0.4, 0.4, 0.7));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR6)); //--- modelTransform 변수에 변
 
@@ -567,6 +595,24 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case 'M':
 		Mtimer ? Mtimer = false : Mtimer = true;
 		break;
+	case 'f':
+		ftimer ? ftimer = false : ftimer = true;
+		break;
+	case 'F':
+		Ftimer ? Ftimer = false : Ftimer = true;
+		break;
+	case 'e':
+		etimer ? etimer = false : etimer = true;
+		break;
+	case 'E':
+		Etimer ? Etimer = false : Etimer = true;
+		break;
+	case 't':
+		ttimer ? ttimer = false : ttimer = true;
+		break;
+	case 'T':
+		Ttimer ? Ttimer = false : Ttimer = true;
+		break;
 	case 'z':
 		cameraPos.z += 0.1;
 		dis = cameraPos.z;
@@ -626,6 +672,70 @@ GLvoid Timer(int value) {
 	}
 	if (Mtimer == true) {
 		yRotate1 -= 1;
+	}
+	if (ftimer == true) {
+		if (yRotate2_1 > 360 || yRotate2_2 > 360) {
+			yRotate2_1 = 0;
+			yRotate2_2 = 0;
+		}
+		yRotate2_1 += 1;
+		yRotate2_2 -= 1;
+	}
+	if (Ftimer == true) {
+		if (yRotate2_1 > 360 || yRotate2_2 > 360) {
+			yRotate2_1 = 0;
+			yRotate2_2 = 0;
+		}
+		yRotate2_1 -= 1;
+		yRotate2_2 += 1;
+	}
+	if (etimer == true) {
+		if (yRotate2_1<10 && yRotate2_1>-10) {
+			if(xmove2>0.0)
+				xmove2 -= 0.01;
+		}
+		else {
+			if (yRotate2_1 > yRotate2_2) {
+				yRotate2_1 -= 1;
+				yRotate2_2 += 1;
+			}
+			else {
+				yRotate2_1 += 1;
+				yRotate2_2 -= 1;
+			}
+		}
+	}
+	if (ttimer == true) {
+		if (mode == 1) {
+			zRotate1_1 += 1;
+			zRotate1_2 -= 1;
+			if (zRotate1_1 > 90) {
+				mode = 2;
+			}
+		}
+		else {
+			zRotate1_1 -= 1;
+			zRotate1_2 += 1;
+			if (zRotate1_1 < -90) {
+				mode = 1;
+			}
+		}
+	}
+	if (Ttimer == true) {
+		if (mode == 1) {
+			zRotate1_1 -= 1;
+			zRotate1_2 += 1;
+			if (zRotate1_1 < -90) {
+				mode = 2;
+			}
+		}
+		else {
+			zRotate1_1 += 1;
+			zRotate1_2 -= 1;
+			if (zRotate1_1 > 90) {
+				mode = 1;
+			}
+		}
 	}
 	if (atimer == true) {
 		yAngle += 0.01;
