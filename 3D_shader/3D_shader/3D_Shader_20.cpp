@@ -6,6 +6,14 @@ struct Shape {
 	GLuint vbo[2], vao, ebo;
 };
 
+GLfloat vertex[][3] = {
+	{1.0,0.,1.0},
+	{1.0,0,-1.0},
+	{-1.0,0,1.0},
+	{-1.0,0,1.0},
+	{1.0,0,-1.0},
+	{-1.0,0,-1.0}
+};
 Shape s[5];
 
 std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
@@ -24,6 +32,13 @@ float xRotate1 = 10.0f;
 float yRotate1 = 10.0f;
 float zRotate1 = 0.0f;
 
+
+
+
+//timer
+bool btimer = false;
+bool Btimer = false;
+
 int value1 = 1;
 
 GLfloat rColor = 0, gColor = 0, bColor = 0;
@@ -38,6 +53,7 @@ GLchar* vertexSource, * fragmentSource;
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid keyboard(unsigned char key, int x, int y);
+GLvoid Timer(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -47,6 +63,7 @@ void make_shaderProgram();
 /*vao, vbo 관련 함수*/
 void Initvbovao();
 void Draw();
+void Drawtank();
 
 char* filetobuf(const char* file)
 {
@@ -138,6 +155,7 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
 	glutKeyboardFunc(keyboard);
+	glutTimerFunc(10, Timer, 1);
 	glutMainLoop();
 
 	return 0;
@@ -159,7 +177,8 @@ GLvoid drawScene() {
 
 	/*그리기*/
 	Draw();
-	
+	Drawtank();
+
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
 
@@ -169,38 +188,60 @@ GLvoid Reshape(int w, int h) {
 
 void Initvbovao()
 {
-	for (int i = 0; i < 36; i++) {
-		s[0].colors[i][0] = 0.2;
-		s[0].colors[i][1] = 0.2;
-		s[0].colors[i][2] = 1.0;
-	}
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
-	Load_Object("cube.obj");
 	{
+		for (int i = 0; i < 6; i++) {
+			s[0].colors[i][0] = 1.0;
+			s[0].colors[i][1] = 1.0;
+			s[0].colors[i][2] = 1.0;
+		}
 		glGenVertexArrays(1, &s[0].vao);
 		glGenBuffers(2, s[0].vbo);
-		glGenBuffers(1, &s[0].ebo);
 
 		glBindVertexArray(s[0].vao);
 
 		glBindBuffer(GL_ARRAY_BUFFER, s[0].vbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, s[0].vbo[1]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(s[0].colors), s[0].colors, GL_STATIC_DRAW);
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s[0].ebo);
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
+	Load_Object("cube.obj");
+	{
+		for (int i = 0; i < 36; i++) {
+			s[1].colors[i][0] = 0.2;
+			s[1].colors[i][1] = 0.2;
+			s[1].colors[i][2] = 1.0;
+		}
+		glGenVertexArrays(1, &s[1].vao);
+		glGenBuffers(2, s[1].vbo);
+		glGenBuffers(1, &s[1].ebo);
+
+		glBindVertexArray(s[1].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[1].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[1].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(s[1].colors), s[1].colors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s[1].ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(unsigned int), &vertexIndices[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(ColorLocation);
 	}
 }
-void Draw() {//원점 구
+void Draw() {//바닥
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
@@ -208,18 +249,37 @@ void Draw() {//원점 구
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{
-		TR = glm::translate(TR, glm::vec3(xmove1, ymove1, zmove1)); //--- x축으로 이동 행렬
-		TR = glm::rotate(TR, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR = glm::rotate(TR, glm::radians(yRotate1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR = glm::translate(TR, glm::vec3(0, -0.5, 0)); //--- x축으로 이동 행렬
+		TR = glm::scale(TR, glm::vec3(2, 2, 2));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
 		glBindVertexArray(s[0].vao);
+		glDrawArrays(GL_TRIANGLES,0,6);
+	}
+}
+
+void Drawtank() {//탱크
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+	{
+		TR = glm::rotate(TR, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(yRotate1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR = glm::translate(TR, glm::vec3(xmove1, ymove1, zmove1)); //--- x축으로 이동 행렬
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[1].vao);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
 }
-
 void make_shaderProgram()
 {
 	make_vertexShaders(); //--- 버텍스 세이더 만들기
@@ -280,7 +340,23 @@ void make_fragmentShaders()
 
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-
-		glutPostRedisplay();
+	case 'b':
+		btimer ? btimer = false : btimer = true;
+		break;
+	case 'B':
+		Btimer ? Btimer = false : Btimer = true;
+		break;
 	}
+	glutPostRedisplay();
+}
+
+GLvoid Timer(int value) {
+	if (btimer == true) {
+		xmove1 += 0.01;
+	}
+	if (Btimer == true) {
+		xmove1 -= 0.01;
+	}
+	glutPostRedisplay();
+	glutTimerFunc(10, Timer, 1);
 }
