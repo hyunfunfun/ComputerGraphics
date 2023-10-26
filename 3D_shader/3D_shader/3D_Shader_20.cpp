@@ -38,7 +38,8 @@ float zRotate1 = 0.0f;
 //timer
 bool btimer = false;
 bool Btimer = false;
-
+bool mtimer = false;
+bool Mtimer = false;
 int value1 = 1;
 
 GLfloat rColor = 0, gColor = 0, bColor = 0;
@@ -214,6 +215,7 @@ void Initvbovao()
 		glEnableVertexAttribArray(ColorLocation);
 	}
 	Load_Object("cube.obj");
+	//아래몸체
 	{
 		for (int i = 0; i < 36; i++) {
 			s[1].colors[i][0] = 0.2;
@@ -240,6 +242,33 @@ void Initvbovao()
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(ColorLocation);
 	}
+	//중앙몸체
+	{
+		for (int i = 0; i < 36; i++) {
+			s[2].colors[i][0] = 0.3;
+			s[2].colors[i][1] = 0.3;
+			s[2].colors[i][2] = 0.8;
+		}
+		glGenVertexArrays(1, &s[2].vao);
+		glGenBuffers(2, s[2].vbo);
+		glGenBuffers(1, &s[2].ebo);
+
+		glBindVertexArray(s[2].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(s[2].colors), s[2].colors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s[2].ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(unsigned int), &vertexIndices[0], GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
 }
 void Draw() {//바닥
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
@@ -251,7 +280,7 @@ void Draw() {//바닥
 	{
 		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR = glm::translate(TR, glm::vec3(0, -0.5, 0)); //--- x축으로 이동 행렬
+		TR = glm::translate(TR, glm::vec3(0, -0.2, 0)); //--- x축으로 이동 행렬
 		TR = glm::scale(TR, glm::vec3(2, 2, 2));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
@@ -269,13 +298,28 @@ void Drawtank() {//탱크
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{
-		TR = glm::rotate(TR, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR = glm::rotate(TR, glm::radians(yRotate1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(10.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR = glm::translate(TR, glm::vec3(xmove1, ymove1, zmove1)); //--- x축으로 이동 행렬
+		TR = glm::scale(TR, glm::vec3(1.5, 1, 1.5));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
 		glBindVertexArray(s[1].vao);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	}
+	glm::mat4 TR2 = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+	{
+		TR2 = glm::translate(TR2, glm::vec3(xmove1, ymove1 + 0.4, zmove1)); //--- x축으로 이동 행렬
+		TR2 = glm::rotate(TR2, glm::radians(xRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR2 = glm::rotate(TR2, glm::radians(yRotate1), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR2 = glm::scale(TR2, glm::vec3(1, 0.5, 1));
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR2)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[2].vao);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
@@ -346,6 +390,12 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case 'B':
 		Btimer ? Btimer = false : Btimer = true;
 		break;
+	case 'm':
+		mtimer ? mtimer = false : mtimer = true;
+		break;
+	case 'M':
+		Mtimer ? Mtimer = false : Mtimer = true;
+		break;
 	}
 	glutPostRedisplay();
 }
@@ -356,6 +406,12 @@ GLvoid Timer(int value) {
 	}
 	if (Btimer == true) {
 		xmove1 -= 0.01;
+	}
+	if (mtimer == true) {
+		yRotate1 += 1;
+	}
+	if (Mtimer == true) {
+		yRotate1 -= 1;
 	}
 	glutPostRedisplay();
 	glutTimerFunc(10, Timer, 1);
