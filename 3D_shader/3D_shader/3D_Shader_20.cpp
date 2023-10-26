@@ -675,6 +675,9 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		cameraPos.z = 5;
 		cameraPos.x = 0;
 		break;
+	case 'q':
+		glutLeaveMainLoop();
+		break;
 	}
 	glutPostRedisplay();
 }
