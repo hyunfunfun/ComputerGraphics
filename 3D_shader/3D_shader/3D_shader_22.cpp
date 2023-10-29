@@ -20,6 +20,9 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
 
 //위치,회전,신축
 
+float yAngle = 0.0f;
+float dis = 2.0f;
+
 double xdoor1 = 0.0f;
 double xdoor2 = 0.0f;
 
@@ -279,8 +282,8 @@ GLvoid drawScene() {
 	view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
 	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
 
-	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
-	projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
+	projection = glm::perspective(glm::radians(60.0f), 1.0f, 0.1f, 50.0f);
+	projection = glm::translate(projection, glm::vec3(0.0, 0.0, -1.0));
 	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
 
 	Draw();
@@ -425,6 +428,34 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'o':
 		timer = true;
+		break;
+	case 'z':
+		cameraPos.z += 0.1;
+		break;
+	case 'Z':
+		cameraPos.z -= 0.1;
+		break;
+	case 'x':
+		cameraDirection.x += 0.1;
+		cameraPos.x += 0.1;
+		break;
+	case 'X':
+		cameraDirection.x -= 0.1;
+		cameraPos.x -= 0.1;
+		break;
+	case 'y':
+		cameraDirection.z = 0.0f;
+		cameraDirection.x = 0.0f;
+		yAngle += 0.1;
+		cameraPos.z = dis * cos(yAngle);
+		cameraPos.x = dis * sin(yAngle);
+		break;
+	case 'Y':
+		cameraDirection.z = 0.0f;
+		cameraDirection.x = 0.0f;
+		yAngle -= 0.1;
+		cameraPos.z = dis * cos(yAngle);
+		cameraPos.x = dis * sin(yAngle);
 		break;
 	}
 	glutPostRedisplay();
