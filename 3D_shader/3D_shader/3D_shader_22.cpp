@@ -25,6 +25,12 @@ float dis = 2.0f;
 
 float doorRotate = 0.0f;
 
+float chRotate = 0.0;
+int Rotatemode = 0;
+float chRotate1 = 0.0;
+
+double movespeed = 0.02;
+float moveangle = 45.0;
 double xch = 0.0f;
 double ych = 0.0f;
 double zch = 0.0f;
@@ -383,7 +389,58 @@ void Initvbovao()
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(ColorLocation);
 	}
-	
+	{
+		for (int i = 0; i < 36; i++) {
+			s[3].colors[i][0] = 0.0;
+			s[3].colors[i][1] = 1.0;
+			s[3].colors[i][2] = 0.0;
+		}
+		glGenVertexArrays(1, &s[3].vao);
+		glGenBuffers(2, s[3].vbo);
+		glGenBuffers(1, &s[3].ebo);
+
+		glBindVertexArray(s[3].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[3].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[3].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(s[3].colors), s[3].colors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s[3].ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(unsigned int), &vertexIndices[0], GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
+	{
+		for (int i = 0; i < 36; i++) {
+			s[4].colors[i][0] = 1.0;
+			s[4].colors[i][1] = 0.0;
+			s[4].colors[i][2] = 0.0;
+		}
+		glGenVertexArrays(1, &s[4].vao);
+		glGenBuffers(2, s[4].vbo);
+		glGenBuffers(1, &s[4].ebo);
+
+		glBindVertexArray(s[4].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[4].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[4].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(s[4].colors), s[4].colors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s[4].ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(unsigned int), &vertexIndices[0], GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
 }
 void Draw() {//무대
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
@@ -479,11 +536,15 @@ void Drawch() {//캐릭터
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 	glm::mat4 TR1 = glm::mat4(1.0f); //--- 합성 변환 행렬
 	glm::mat4 TR2 = glm::mat4(1.0f); //--- 합성 변환 행렬
+	glm::mat4 TR3 = glm::mat4(1.0f); //--- 합성 변환 행렬
+	glm::mat4 TR4 = glm::mat4(1.0f); //--- 합성 변환 행렬
+	glm::mat4 TR5 = glm::mat4(1.0f); //--- 합성 변환 행렬
+	glm::mat4 TR6 = glm::mat4(1.0f); //--- 합성 변환 행렬
 
-	{
+	{//머리
 		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR = glm::translate(TR, glm::vec3(xch, ych-0.5, zch)); //--- x축으로 이동 행렬
+		TR = glm::rotate(TR, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR = glm::scale(TR, glm::vec3(0.2, 0.2, 0.2)); //--- x축으로 이동 행렬
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
@@ -491,15 +552,86 @@ void Drawch() {//캐릭터
 		glBindVertexArray(s[2].vao);
 		glDrawElements(GL_TRIANGLES, 36,GL_UNSIGNED_INT, 0);
 	}
-	{
+	{//코
+		TR6 = glm::rotate(TR6, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR6 = glm::translate(TR6, glm::vec3(xch, ych, zch)); //--- x축으로 이동 행렬
+		TR6 = glm::rotate(TR6, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR6 = glm::translate(TR6, glm::vec3(0.0, -0.5, -0.05)); //--- x축으로 이동 행렬
+		TR6 = glm::scale(TR6, glm::vec3(0.05, 0.05, 0.05)); //--- x축으로 이동 행렬
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR6)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[3].vao);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	}
+	{//몸통
 		TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR1 = glm::translate(TR1, glm::vec3(xch, ych - 0.7, zch)); //--- x축으로 이동 행렬
+		TR1 = glm::rotate(TR1, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR1 = glm::scale(TR1, glm::vec3(0.3, 0.5, 0.3)); //--- x축으로 이동 행렬
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR1)); //--- modelTransform 변수에 변
 
 		glBindVertexArray(s[2].vao);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	}
+	{//오른팔
+		TR2 = glm::rotate(TR2, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR2 = glm::translate(TR2, glm::vec3(xch, ych, zch)); //--- x축으로 이동 행렬
+		TR2 = glm::rotate(TR2, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR2 = glm::translate(TR2, glm::vec3(0.1, - 0.7, 0)); //--- x축으로 이동 행렬
+		TR2 = glm::translate(TR2, glm::vec3(0, 0.1, 0));
+		TR2 = glm::rotate(TR2, glm::radians(-chRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR2 = glm::translate(TR2, glm::vec3(0, -0.1, 0));
+		TR2 = glm::scale(TR2, glm::vec3(0.05, 0.3, 0.05)); //--- x축으로 이동 행렬
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR2)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[3].vao);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	}
+	{//오른다리
+		TR3 = glm::rotate(TR3, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR3 = glm::translate(TR3, glm::vec3(xch, ych, zch)); //--- x축으로 이동 행렬
+		TR3 = glm::rotate(TR3, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR3 = glm::translate(TR3, glm::vec3(0.03, -0.9, 0)); //--- x축으로 이동 행렬
+		TR3 = glm::translate(TR3, glm::vec3(0, 0.1, 0));
+		TR3 = glm::rotate(TR3, glm::radians(-chRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR3 = glm::translate(TR3, glm::vec3(0, -0.1, 0));
+		TR3 = glm::scale(TR3, glm::vec3(0.05, 0.3, 0.05)); //--- x축으로 이동 행렬
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR3)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[3].vao);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	}
+	{//오른팔
+		TR4 = glm::rotate(TR4, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR4 = glm::translate(TR4, glm::vec3(xch, ych, zch)); //--- x축으로 이동 행렬
+		TR4 = glm::rotate(TR4, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR4 = glm::translate(TR4, glm::vec3(-0.1, -0.7, 0)); //--- x축으로 이동 행렬
+		TR4 = glm::translate(TR4, glm::vec3(0, 0.1, 0));
+		TR4 = glm::rotate(TR4, glm::radians(chRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR4 = glm::translate(TR4, glm::vec3(0, -0.1, 0));
+		TR4 = glm::scale(TR4, glm::vec3(0.05, 0.3, 0.05)); //--- x축으로 이동 행렬
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR4)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[4].vao);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	}
+	{//오른다리
+		TR5 = glm::translate(TR5, glm::vec3(xch, ych, zch)); //--- x축으로 이동 행렬
+		TR5 = glm::rotate(TR5, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR5 = glm::translate(TR5, glm::vec3(-0.03, -0.9, 0)); //--- x축으로 이동 행렬
+		TR5 = glm::translate(TR5, glm::vec3(0, 0.1, 0));
+		TR5 = glm::rotate(TR5, glm::radians(chRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR5 = glm::translate(TR5, glm::vec3(0, -0.1, 0));
+		TR5 = glm::scale(TR5, glm::vec3(0.05, 0.3, 0.05)); //--- x축으로 이동 행렬
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR5)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[4].vao);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
 }
@@ -596,16 +728,34 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		cameraPos.x = dis * sin(yAngle);
 		break;
 	case 'w':
-		zch -= 0.02;
+		chRotate = 0;
+		zch -= movespeed;
 		break;
 	case 's':
-		zch += 0.02;
+		chRotate = 180;
+		zch += movespeed;
 		break;
 	case 'a':
-		xch -= 0.02;
+		chRotate = 90;
+		xch -= movespeed;
 		break;
 	case 'd':
-		xch += 0.02;
+		chRotate = 270;
+		xch += movespeed;
+		break;
+	case '+':
+		movespeed += 0.001;
+		moveangle += 1;
+		break;
+	case '-':
+		movespeed -= 0.001;
+		moveangle -= 1;
+		break;
+	case 'i':
+		zch = 0;
+		xch = 0;
+		movespeed = 0.02;
+		moveangle = 45.0;
 		break;
 	}
 	glutPostRedisplay();
@@ -613,6 +763,20 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 
 GLvoid Timer(int value) {
 	if (timer == true) {
+		if (Rotatemode == 0) {
+			if (chRotate1 < moveangle) {
+				chRotate1 += 1;
+			}
+			else
+				Rotatemode = 1;
+		}
+		else if (Rotatemode == 1) {
+			if (chRotate1 > -moveangle) {
+				chRotate1 -= 1;
+			}
+			else
+				Rotatemode = 0;
+		}
 		if (doortimer == true) {
 			if (doorRotate<180) {
 				doorRotate += 1;
