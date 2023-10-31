@@ -36,6 +36,7 @@ double ych = 0.0f;
 double zch = 0.0f;
 double jump = 0.0f;
 int jumpmode = 0;
+int walkmode = 0;
 
 GLfloat vertex[][3] = {
 	{ -1.0, 1.0, -1.0 }, //0
@@ -166,6 +167,7 @@ GLchar* vertexSource, * fragmentSource;
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid keyboard(unsigned char key, int x, int y);
+GLvoid keyup(unsigned char key, int x, int y);
 GLvoid Timer(int value);
 
 /*셰이더 관련 함수*/
@@ -274,6 +276,7 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
 	glutKeyboardFunc(keyboard);
+	glutKeyboardUpFunc(keyup);
 	glutTimerFunc(10, Timer, 1);
 	glutMainLoop();
 
@@ -731,20 +734,80 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		cameraPos.x = dis * sin(yAngle);
 		break;
 	case 'w':
-		chRotate = 0;
-		zch -= movespeed;
+		if (walkmode==0) {
+			chRotate = 0;
+			zch -= movespeed;
+			if (zch < -1) {
+				walkmode = 1;
+			}
+		}
+		else if(walkmode==1){
+			chRotate = 180;
+			zch += movespeed;
+			if (zch > 1) {
+				walkmode = 0;
+			}
+		}
+		else {
+			walkmode = 0;
+		}
 		break;
 	case 's':
-		chRotate = 180;
-		zch += movespeed;
+		if (walkmode == 0) {
+			chRotate = 180;
+			zch += movespeed;
+			if (zch > 1) {
+				walkmode = 1;
+			}
+		}
+		else if (walkmode == 1) {
+			chRotate = 0;
+			zch -= movespeed;
+			if (zch < -1) {
+				walkmode = 0;
+			}
+		}
+		else {
+			walkmode = 0;
+		}
 		break;
 	case 'a':
-		chRotate = 90;
-		xch -= movespeed;
+		if (walkmode == 0) {
+			chRotate = 90;
+			xch -= movespeed;
+			if (xch < -1) {
+				walkmode = 1;
+			}
+		}
+		else if (walkmode == 1) {
+			chRotate = 270;
+			xch += movespeed;
+			if (xch > 1) {
+				walkmode = 0;
+			}
+		}
+		else {
+			walkmode = 0;
+		}
 		break;
 	case 'd':
-		chRotate = 270;
-		xch += movespeed;
+		if (walkmode == 0) {
+			chRotate = 270;
+			xch += movespeed;
+			if (xch > 1) {
+				walkmode = 1;
+			}
+		}
+		else if (walkmode == 1) {
+			chRotate = 90;
+			xch -= movespeed;
+			if (xch < -1) {
+				walkmode = 0;
+			}
+		}
+		else {
+			walkmode = 0;
+		}
 		break;
 	case '+':
 		movespeed += 0.001;
@@ -770,6 +833,23 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		break;
 	}
 	glutPostRedisplay();
+}
+
+GLvoid keyup(unsigned char key, int x, int y) {
+	switch (key) {
+	case 'w':
+		walkmode = 0;
+		break;
+	case 's':
+		walkmode = 0;
+		break;
+	case 'a':
+		walkmode = 0;
+		break;
+	case 'd':
+		walkmode = 0;
+		break;
+	}
 }
 
 GLvoid Timer(int value) {
