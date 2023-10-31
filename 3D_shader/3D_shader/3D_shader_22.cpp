@@ -34,6 +34,8 @@ float moveangle = 45.0;
 double xch = 0.0f;
 double ych = 0.0f;
 double zch = 0.0f;
+double jump = 0.0f;
+int jumpmode = 0;
 
 GLfloat vertex[][3] = {
 	{ -1.0, 1.0, -1.0 }, //0
@@ -180,6 +182,7 @@ void Drawch();
 //timer
 bool timer = true;
 bool doortimer = false;
+bool jumptimer = false;
 
 char* filetobuf(const char* file)
 {
@@ -543,7 +546,7 @@ void Drawch() {//캐릭터
 
 	{//머리
 		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR = glm::translate(TR, glm::vec3(xch, ych-0.5, zch)); //--- x축으로 이동 행렬
+		TR = glm::translate(TR, glm::vec3(xch, ych-0.5+jump, zch)); //--- x축으로 이동 행렬
 		TR = glm::rotate(TR, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR = glm::scale(TR, glm::vec3(0.2, 0.2, 0.2)); //--- x축으로 이동 행렬
 
@@ -554,7 +557,7 @@ void Drawch() {//캐릭터
 	}
 	{//코
 		TR6 = glm::rotate(TR6, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR6 = glm::translate(TR6, glm::vec3(xch, ych, zch)); //--- x축으로 이동 행렬
+		TR6 = glm::translate(TR6, glm::vec3(xch, ych + jump, zch)); //--- x축으로 이동 행렬
 		TR6 = glm::rotate(TR6, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR6 = glm::translate(TR6, glm::vec3(0.0, -0.5, -0.05)); //--- x축으로 이동 행렬
 		TR6 = glm::scale(TR6, glm::vec3(0.05, 0.05, 0.05)); //--- x축으로 이동 행렬
@@ -566,7 +569,7 @@ void Drawch() {//캐릭터
 	}
 	{//몸통
 		TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR1 = glm::translate(TR1, glm::vec3(xch, ych - 0.7, zch)); //--- x축으로 이동 행렬
+		TR1 = glm::translate(TR1, glm::vec3(xch, ych - 0.7 + jump, zch)); //--- x축으로 이동 행렬
 		TR1 = glm::rotate(TR1, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 		TR1 = glm::scale(TR1, glm::vec3(0.3, 0.5, 0.3)); //--- x축으로 이동 행렬
 
@@ -579,7 +582,7 @@ void Drawch() {//캐릭터
 		TR2 = glm::rotate(TR2, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR2 = glm::translate(TR2, glm::vec3(xch, ych, zch)); //--- x축으로 이동 행렬
 		TR2 = glm::rotate(TR2, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR2 = glm::translate(TR2, glm::vec3(0.1, - 0.7, 0)); //--- x축으로 이동 행렬
+		TR2 = glm::translate(TR2, glm::vec3(0.1, - 0.7 + jump, 0)); //--- x축으로 이동 행렬
 		TR2 = glm::translate(TR2, glm::vec3(0, 0.1, 0));
 		TR2 = glm::rotate(TR2, glm::radians(-chRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR2 = glm::translate(TR2, glm::vec3(0, -0.1, 0));
@@ -594,7 +597,7 @@ void Drawch() {//캐릭터
 		TR3 = glm::rotate(TR3, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR3 = glm::translate(TR3, glm::vec3(xch, ych, zch)); //--- x축으로 이동 행렬
 		TR3 = glm::rotate(TR3, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR3 = glm::translate(TR3, glm::vec3(0.03, -0.9, 0)); //--- x축으로 이동 행렬
+		TR3 = glm::translate(TR3, glm::vec3(0.03, -0.9 + jump, 0)); //--- x축으로 이동 행렬
 		TR3 = glm::translate(TR3, glm::vec3(0, 0.1, 0));
 		TR3 = glm::rotate(TR3, glm::radians(-chRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR3 = glm::translate(TR3, glm::vec3(0, -0.1, 0));
@@ -609,7 +612,7 @@ void Drawch() {//캐릭터
 		TR4 = glm::rotate(TR4, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR4 = glm::translate(TR4, glm::vec3(xch, ych, zch)); //--- x축으로 이동 행렬
 		TR4 = glm::rotate(TR4, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR4 = glm::translate(TR4, glm::vec3(-0.1, -0.7, 0)); //--- x축으로 이동 행렬
+		TR4 = glm::translate(TR4, glm::vec3(-0.1, -0.7 + jump, 0)); //--- x축으로 이동 행렬
 		TR4 = glm::translate(TR4, glm::vec3(0, 0.1, 0));
 		TR4 = glm::rotate(TR4, glm::radians(chRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR4 = glm::translate(TR4, glm::vec3(0, -0.1, 0));
@@ -623,7 +626,7 @@ void Drawch() {//캐릭터
 	{//오른다리
 		TR5 = glm::translate(TR5, glm::vec3(xch, ych, zch)); //--- x축으로 이동 행렬
 		TR5 = glm::rotate(TR5, glm::radians(chRotate), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR5 = glm::translate(TR5, glm::vec3(-0.03, -0.9, 0)); //--- x축으로 이동 행렬
+		TR5 = glm::translate(TR5, glm::vec3(-0.03, -0.9 + jump, 0)); //--- x축으로 이동 행렬
 		TR5 = glm::translate(TR5, glm::vec3(0, 0.1, 0));
 		TR5 = glm::rotate(TR5, glm::radians(chRotate1), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR5 = glm::translate(TR5, glm::vec3(0, -0.1, 0));
@@ -748,14 +751,22 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		moveangle += 1;
 		break;
 	case '-':
-		movespeed -= 0.001;
-		moveangle -= 1;
+		if(movespeed>0)
+		{
+			movespeed -= 0.001;
+			moveangle -= 1;
+		}
 		break;
 	case 'i':
 		zch = 0;
 		xch = 0;
 		movespeed = 0.02;
 		moveangle = 45.0;
+		break;
+	case 'j':
+		jump = 0.0;
+		jumpmode = 0;
+		jumptimer = true;
 		break;
 	}
 	glutPostRedisplay();
@@ -780,6 +791,20 @@ GLvoid Timer(int value) {
 		if (doortimer == true) {
 			if (doorRotate<180) {
 				doorRotate += 1;
+			}
+		}
+		if (jumptimer == true) {
+			if (jumpmode == 0) {
+				if (jump < 0.5) {
+					jump += 0.01;
+				}
+				else
+					jumpmode = 1;
+			}
+			else if (jumpmode == 1) {
+				if (jump > 0) {
+					jump -= 0.01;
+				}
 			}
 		}
 	}
