@@ -38,6 +38,7 @@ double xch = 0.0f;
 double ych = 0.0f;
 double zch = 0.0f;
 double jump = 0.0f;
+float jumpch = 0.0f;
 int jumpmode = 0;
 int walkmode = 0;
 
@@ -757,17 +758,19 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (zch < -1) {
 				walkmode = 1;
 			}
-			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
-			{
-				walkmode = 2;
+			if (jumpch == 0.0){
+				if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+				{
+					walkmode = 2;
+				}
 			}
 		}
 		else if (walkmode == 1) {
@@ -776,17 +779,19 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (zch > 1) {
 				walkmode = 0;
 			}
-			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
-			{
-				walkmode = 2;
+			if (jumpch == 0.0) {
+				if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+				{
+					walkmode = 2;
+				}
 			}
 		}
 		break;
@@ -797,9 +802,19 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (zch > 1) {
 				walkmode = 1;
 			}
-			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
-			{
-				walkmode = 2;
+			if (jumpch == 0.0) {
+				if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+				{
+					walkmode = 2;
+				}
 			}
 		}
 		else if (walkmode == 1) {
@@ -808,17 +823,19 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (zch < -1) {
 				walkmode = 0;
 			}
-			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
-			{
-				walkmode = 2;
+			if (jumpch == 0.0) {
+				if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+				{
+					walkmode = 2;
+				}
 			}
 		}
 		break;
@@ -829,17 +846,19 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (xch < -1) {
 				walkmode = 1;
 			}
-			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
-			{
-				walkmode = 2;
+			if (jumpch == 0.0) {
+				if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+				{
+					walkmode = 2;
+				}
 			}
 		}
 		else if (walkmode == 1) {
@@ -848,17 +867,19 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (xch > 1) {
 				walkmode = 0;
 			}
-			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
-			{
-				walkmode = 2;
+			if (jumpch == 0.0) {
+				if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+				{
+					walkmode = 2;
+				}
 			}
 		}
 		break;
@@ -869,17 +890,19 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (xch > 1) {
 				walkmode = 1;
 			}
-			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
-			{
-				walkmode = 2;
+			if (jumpch == 0.0) {
+				if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+				{
+					walkmode = 2;
+				}
 			}
 		}
 		else if (walkmode == 1) {
@@ -888,17 +911,19 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (xch < -1) {
 				walkmode = 0;
 			}
-			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
-			{
-				walkmode = 2;
-			}
-			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
-			{
-				walkmode = 2;
+			if (jumpch == 0.0) {
+				if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+				{
+					walkmode = 2;
+				}
+				if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+				{
+					walkmode = 2;
+				}
 			}
 		}
 		break;
@@ -967,6 +992,15 @@ GLvoid Timer(int value) {
 			}
 		}
 		if (jumptimer == true) {
+			if ((ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15) ||
+				(ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15) ||
+				(ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)) {
+				jumpch = 0.2;
+			}
+			else {
+				jumpch = 0.0;
+			}
+			
 			if (jumpmode == 0) {
 				if (jump < 0.5) {
 					jump += 0.01;
@@ -975,7 +1009,7 @@ GLvoid Timer(int value) {
 					jumpmode = 1;
 			}
 			else if (jumpmode == 1) {
-				if (jump > 0) {
+				if (jump > jumpch) {
 					jump -= 0.01;
 				}
 			}
