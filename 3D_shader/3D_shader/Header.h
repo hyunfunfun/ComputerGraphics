@@ -13,5 +13,6 @@
 #include <fstream>
 #include <iterator>
 #include <conio.h>
+#include <time.h>
 
 using namespace std;

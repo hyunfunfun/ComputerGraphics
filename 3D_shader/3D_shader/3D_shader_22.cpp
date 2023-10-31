@@ -18,11 +18,14 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 2.0f); //--- 카메라 위치
 glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f); //--- 카메라 바라보는 방향
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
 
+
+glm::vec3 ran1 = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 ran2= glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 ran3= glm::vec3(0.0f, 0.0f, 0.0f);
 //위치,회전,신축
 
 float yAngle = 0.0f;
 float dis = 2.0f;
-
 float doorRotate = 0.0f;
 
 float chRotate = 0.0;
@@ -258,6 +261,7 @@ bool  Load_Object(const char* path) {
 }
 
 int main(int argc, char** argv) {
+	srand(time(NULL));
 
 	glutInit(&argc, argv);
 	width = 800, height = 600;
@@ -317,6 +321,19 @@ GLvoid Reshape(int w, int h) {
 
 void Initvbovao()
 {
+	{
+		ran1.x = ((rand() % 21) * 0.1 - 1);
+		ran1.y = -0.9f;
+		ran1.z = ((rand() % 21) * 0.1 - 1);
+
+		ran2.x = ((rand() % 21) * 0.1 - 1);
+		ran2.y = -0.9f;
+		ran2.z = ((rand() % 21) * 0.1 - 1);
+
+		ran3.x = ((rand() % 21) * 0.1 - 1);
+		ran3.y = -0.9f;
+		ran3.z = ((rand() % 21) * 0.1 - 1);
+	}
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
@@ -502,7 +519,7 @@ void Drawobj() {//장애물
 	{
 		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR = glm::translate(TR, glm::vec3(0, -0.9, 0)); //--- x축으로 이동 행렬
+		TR = glm::translate(TR, ran1); //--- x축으로 이동 행렬
 		TR = glm::scale(TR, glm::vec3(0.5, 0.3, 0.5));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
@@ -513,7 +530,7 @@ void Drawobj() {//장애물
 	{
 		TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR1 = glm::translate(TR1, glm::vec3(0.5, -0.9, 0.5)); //--- x축으로 이동 행렬
+		TR1 = glm::translate(TR1, ran2); //--- x축으로 이동 행렬
 		TR1 = glm::scale(TR1, glm::vec3(0.5, 0.3, 0.5));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR1)); //--- modelTransform 변수에 변
@@ -524,7 +541,7 @@ void Drawobj() {//장애물
 	{
 		TR2 = glm::rotate(TR2, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR2 = glm::rotate(TR2, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR2 = glm::translate(TR2, glm::vec3(-0.5, -0.9, 0.3)); //--- x축으로 이동 행렬
+		TR2 = glm::translate(TR2, ran3); //--- x축으로 이동 행렬
 		TR2 = glm::scale(TR2, glm::vec3(0.5, 0.3, 0.5));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR2)); //--- modelTransform 변수에 변
@@ -734,22 +751,43 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		cameraPos.x = dis * sin(yAngle);
 		break;
 	case 'w':
-		if (walkmode==0) {
+		if (walkmode == 0) {
 			chRotate = 0;
 			zch -= movespeed;
 			if (zch < -1) {
 				walkmode = 1;
 			}
+			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+			{
+				walkmode = 2;
+			}
 		}
-		else if(walkmode==1){
+		else if (walkmode == 1) {
 			chRotate = 180;
 			zch += movespeed;
 			if (zch > 1) {
 				walkmode = 0;
 			}
-		}
-		else {
-			walkmode = 0;
+			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+			{
+				walkmode = 2;
+			}
 		}
 		break;
 	case 's':
@@ -759,6 +797,10 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (zch > 1) {
 				walkmode = 1;
 			}
+			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+			{
+				walkmode = 2;
+			}
 		}
 		else if (walkmode == 1) {
 			chRotate = 0;
@@ -766,9 +808,18 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (zch < -1) {
 				walkmode = 0;
 			}
-		}
-		else {
-			walkmode = 0;
+			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+			{
+				walkmode = 2;
+			}
 		}
 		break;
 	case 'a':
@@ -778,6 +829,18 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (xch < -1) {
 				walkmode = 1;
 			}
+			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+			{
+				walkmode = 2;
+			}
 		}
 		else if (walkmode == 1) {
 			chRotate = 270;
@@ -785,9 +848,18 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (xch > 1) {
 				walkmode = 0;
 			}
-		}
-		else {
-			walkmode = 0;
+			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+			{
+				walkmode = 2;
+			}
 		}
 		break;
 	case 'd':
@@ -797,6 +869,18 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (xch > 1) {
 				walkmode = 1;
 			}
+			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+			{
+				walkmode = 2;
+			}
 		}
 		else if (walkmode == 1) {
 			chRotate = 90;
@@ -804,9 +888,18 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 			if (xch < -1) {
 				walkmode = 0;
 			}
-		}
-		else {
-			walkmode = 0;
+			if (ran1.z - 0.15 < zch && ran1.z + 0.15 > zch && xch > ran1.x - 0.15 && xch < ran1.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran2.z - 0.15 < zch && ran2.z + 0.15 > zch && xch > ran2.x - 0.15 && xch < ran2.x + 0.15)
+			{
+				walkmode = 2;
+			}
+			if (ran3.z - 0.15 < zch && ran3.z + 0.15 > zch && xch > ran3.x - 0.15 && xch < ran3.x + 0.15)
+			{
+				walkmode = 2;
+			}
 		}
 		break;
 	case '+':
