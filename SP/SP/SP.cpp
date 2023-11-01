@@ -5,9 +5,28 @@ struct Shape {
 	GLuint vao, vbo[2];
 	GLuint ebo;
 };
-Shape shape;
-GLfloat rColor = 1, gColor = 1, bColor = 1;
 
+Shape shape;
+GLfloat rColor = 0.5, gColor = 0.5, bColor = 1.0;
+float xmove = 1.0;
+float ymove = 1.0;
+GLfloat vertex[][3] = {
+	{-0.25, -0.25, 0.0},
+	{0.25, -0.25, 0.0},
+	{-0.25,0.25,0.0},
+
+	{0.25, -0.25, 0.0},
+	{-0.25,0.25,0.0},
+	{0.25,0.25,0.0}
+};
+GLfloat colors[][3] = {
+	{0.0,1.0,0.0},
+	{0.0,1.0,0.0},
+	{0.0,1.0,0.0},
+	{0.0,1.0,0.0},
+	{0.0,1.0,0.0},
+	{0.0,1.0,0.0},
+};
 GLint width, height;
 GLuint shaderProgramID;
 GLuint vertexShader;
@@ -17,6 +36,7 @@ GLchar* vertexSource, * fragmentSource;
 /*OPGL관렴 함수*/
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
+GLvoid Timer(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -25,13 +45,12 @@ void make_shaderProgram();
 
 /*vao, vbo 관련 함수*/
 void Initvbovao();
-void UpdateBuffer();
 void Draw();
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 {
 	width = 800;
-	height = 600;
+	height = 800;
 	//--- 윈도우 생성하기
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
@@ -50,6 +69,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 	/*콜백 함수*/
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
+	glutTimerFunc(10, Timer, 1);
 	glutMainLoop();
 }
 
@@ -80,7 +100,6 @@ GLvoid drawScene() {
 
 	glUseProgram(shaderProgramID);
 	/*vao vbo 자동 업데이트*/
-	UpdateBuffer();
 	/*그리기*/
 	Draw();
 
@@ -102,11 +121,11 @@ void Initvbovao()
 	glBindVertexArray(shape.vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.vertex), shape.vertex, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
 	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.colors), shape.colors, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
 	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 
@@ -115,36 +134,30 @@ void Initvbovao()
 
 }
 
-void UpdateBuffer() {
-
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
-	glBindVertexArray(shape.vao);
-	glEnableVertexAttribArray(PosLocation);
-	glEnableVertexAttribArray(ColorLocation);
-
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.vertex), shape.vertex, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(shape.colors), shape.colors, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape.ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
-}
-
 void Draw()
 {
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
+	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+	TR = glm::translate(TR, glm::vec3(xmove, ymove, 0.0)); //--- x축으로 이동 행렬
+	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+	TR = glm::scale(TR, glm::vec3(0.3, 0.3, 0.3));
+
+	//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
 	glBindVertexArray(shape.vao);
-	glLineWidth(5);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
 
-	glDrawArrays(GL_LINES, 0, 8);
-	glDisableVertexAttribArray(PosLocation);
-	glDisableVertexAttribArray(ColorLocation);
-
+GLvoid Timer(int value) {
+	xmove -= 0.01;
+	ymove -= 0.01;
+	glutPostRedisplay();
+	glutTimerFunc(10, Timer, 1);
 }
 
 void make_shaderProgram()
@@ -162,7 +175,6 @@ void make_shaderProgram()
 	//--- Shader Program 사용하기
 	glUseProgram(shaderProgramID);
 }
-
 void make_vertexShaders()
 {
 	vertexSource = filetobuf("vertex.glsl");
@@ -183,7 +195,6 @@ void make_vertexShaders()
 		return;
 	}
 }
-
 void make_fragmentShaders()
 {
 	fragmentSource = filetobuf("fragment.glsl");
