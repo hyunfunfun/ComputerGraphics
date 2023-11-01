@@ -6,10 +6,13 @@ struct Shape {
 	GLuint ebo;
 };
 
-Shape shape;
+Shape shape[5];
 GLfloat rColor = 0.5, gColor = 0.5, bColor = 1.0;
+float basketmove = 0.0;
+bool basketmode = true;
 float xmove = 1.0;
-float ymove = 1.0;
+float ymove = rand()%10 * 0.1;
+
 GLfloat vertex[][3] = {
 	{-0.25, -0.25, 0.0},
 	{0.25, -0.25, 0.0},
@@ -20,6 +23,14 @@ GLfloat vertex[][3] = {
 	{0.25,0.25,0.0}
 };
 GLfloat colors[][3] = {
+	{0.0,0.0,1.0},
+	{0.0,0.0,1.0},
+	{0.0,0.0,1.0},
+	{0.0,0.0,1.0},
+	{0.0,0.0,1.0},
+	{0.0,0.0,1.0},
+};
+GLfloat colors1[][3] = {
 	{0.0,1.0,0.0},
 	{0.0,1.0,0.0},
 	{0.0,1.0,0.0},
@@ -27,6 +38,7 @@ GLfloat colors[][3] = {
 	{0.0,1.0,0.0},
 	{0.0,1.0,0.0},
 };
+
 GLint width, height;
 GLuint shaderProgramID;
 GLuint vertexShader;
@@ -45,10 +57,12 @@ void make_shaderProgram();
 
 /*vao, vbo 관련 함수*/
 void Initvbovao();
-void Draw();
+void Drawbasket();
+void Drawobject();
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 {
+	srand(time(NULL));
 	width = 800;
 	height = 800;
 	//--- 윈도우 생성하기
@@ -101,7 +115,8 @@ GLvoid drawScene() {
 	glUseProgram(shaderProgramID);
 	/*vao vbo 자동 업데이트*/
 	/*그리기*/
-	Draw();
+	Drawbasket();
+	Drawobject();
 
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
@@ -115,26 +130,63 @@ void Initvbovao()
 
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
-	glGenVertexArrays(1, &shape.vao);
-	glGenBuffers(2, shape.vbo);
+	{
+		glGenVertexArrays(1, &shape[0].vao);
+		glGenBuffers(2, shape[0].vbo);
 
-	glBindVertexArray(shape.vao);
+		glBindVertexArray(shape[0].vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
-	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, shape[0].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, shape.vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, shape[0].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-	glEnableVertexAttribArray(PosLocation);
-	glEnableVertexAttribArray(ColorLocation);
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
+	{
+		glGenVertexArrays(1, &shape[1].vao);
+		glGenBuffers(2, shape[1].vbo);
 
+		glBindVertexArray(shape[1].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, shape[1].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, shape[1].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
 }
 
-void Draw()
+void Drawbasket()
+{
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+	TR = glm::translate(TR, glm::vec3(basketmove, -0.5, 0.0)); //--- x축으로 이동 행렬
+	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+	TR = glm::scale(TR, glm::vec3(0.6, 0.3, 1));
+
+	//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+	glBindVertexArray(shape[0].vao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+void Drawobject()
 {
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
@@ -143,18 +195,33 @@ void Draw()
 	TR = glm::translate(TR, glm::vec3(xmove, ymove, 0.0)); //--- x축으로 이동 행렬
 	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-	TR = glm::scale(TR, glm::vec3(0.3, 0.3, 0.3));
+	TR = glm::scale(TR, glm::vec3(0.3, 0.3, 1));
 
 	//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
 	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
-	glBindVertexArray(shape.vao);
+	glBindVertexArray(shape[1].vao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 GLvoid Timer(int value) {
-	xmove -= 0.01;
+	if (basketmode == true) {
+		basketmove -= 0.01;
+		if (basketmove < -1)
+			basketmode = false;
+	}
+	else {
+		basketmove += 0.01;
+		if (basketmove > 1)
+			basketmode = true;
+	}
+
+
+	if(xmove>0)
+		xmove -= 0.01;
+	if (xmove < 0)
+		xmove += 0.01;
 	ymove -= 0.01;
 	glutPostRedisplay();
 	glutTimerFunc(10, Timer, 1);
