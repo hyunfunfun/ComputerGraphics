@@ -10,10 +10,14 @@ Shape shape[2];
 
 struct Object {
 	GLuint vao, vbo[2];
+	//도형 변수
+	bool xmode = false;
+	float xmove;
+	float ymove;
 	bool check = false;
 };
 
-Object obj;
+Object obj[5];
 GLfloat rColor = 0.5, gColor = 0.5, bColor = 1.0;
 
 //선 변수
@@ -26,11 +30,9 @@ float basketmove = 0.0;
 bool basketmode = true;
 
 
-//도형 변수
-bool xmode = false;
-float xmove = 1.0;
-float ymove;
 bool polymode = false;
+
+float speed = 0.01;
 
 GLfloat vertex[][3] = {
 	{-0.25, -0.25, 0.0},
@@ -94,15 +96,15 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 	width = 800;
 	height = 800;
 
-	ymove = (rand()%20*0.1)-1;
-	xmove = rand() % 2;
-	if (xmove == 0)
+	obj[0].ymove = rand()%10*0.1;
+	obj[0].xmove = rand() % 2;
+	if (obj[0].xmove == 0)
 	{
-		xmove = -1;
-		xmode = true;
+		obj[0].xmove = -1;
+		obj[0].xmode = true;
 	}
 	else {
-		xmode = false;
+		obj[0].xmode = false;
 	}
 	
 	//--- 윈도우 생성하기
@@ -192,23 +194,25 @@ void Initvbovao()
 		glEnableVertexAttribArray(ColorLocation);
 	}
 	{
+		for(int i=0;i<5;i++)
+		{
+			glGenVertexArrays(1, &obj[i].vao);
+			glGenBuffers(2, obj[i].vbo);
 
-		glGenVertexArrays(1, &obj.vao);
-		glGenBuffers(2, obj.vbo);
+			glBindVertexArray(obj[i].vao);
 
-		glBindVertexArray(obj.vao);
+			glBindBuffer(GL_ARRAY_BUFFER, obj[i].vbo[0]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, obj.vbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
-		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, obj.vbo[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
-		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, obj[i].vbo[1]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
+			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-		glEnableVertexAttribArray(PosLocation);
-		glEnableVertexAttribArray(ColorLocation);
+			glEnableVertexAttribArray(PosLocation);
+			glEnableVertexAttribArray(ColorLocation);
+		}
 	}
 	
 }
@@ -234,26 +238,29 @@ void Drawbasket()
 }
 void Drawobject()
 {
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+	for(int i=0;i<5;i++)
+	{
+		int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+		int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
-	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
-	TR = glm::translate(TR, glm::vec3(xmove, ymove, 0.0)); //--- x축으로 이동 행렬
-	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-	TR = glm::scale(TR, glm::vec3(0.3, 0.3, 1));
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+		TR = glm::translate(TR, glm::vec3(obj[i].xmove, obj[i].ymove, 0.0)); //--- x축으로 이동 행렬
+		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR = glm::scale(TR, glm::vec3(0.3, 0.3, 1));
 
-	//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
-	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+		//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
+		unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
-	glBindVertexArray(obj.vao);
-	if (polymode == false)
-		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-	else {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glBindVertexArray(obj[i].vao);
+		if (polymode == false)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		else {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
-	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 void Drawline()
 {
@@ -285,11 +292,26 @@ GLvoid Timer(int value) {
 			basketmode = true;
 	}
 
-	if(xmode==false)
-		xmove -= 0.01;
-	if (xmode == true)
-		xmove += 0.01;
-	ymove -= 0.01;
+	for(int i=0;i<5;i++)
+	{
+		if (obj[i].xmode == false)
+			obj[i].xmove -= speed;
+		if (obj[i].xmode == true)
+			obj[i].xmove += speed;
+		obj[i].ymove -= speed;
+		if (obj[i].ymove < -1) {
+			obj[i].ymove = rand() % 10 * 0.1;
+			obj[i].xmove = rand() % 2;
+			if (obj[i].xmove == 0)
+			{
+				obj[i].xmove = -1;
+				obj[i].xmode = true;
+			}
+			else {
+				obj[i].xmode = false;
+			}
+		}
+	}
 	glutPostRedisplay();
 	glutTimerFunc(10, Timer, 1);
 }
@@ -368,6 +390,12 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'l':
 		polymode ? polymode = false : polymode = true;
+		break;
+	case '+':
+		speed += 0.0001;
+		break;
+	case '-':
+		speed -= 0.0001;
 		break;
 	}
 	glutPostRedisplay();
