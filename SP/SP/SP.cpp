@@ -1,6 +1,13 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Header.h"
 
+enum objecType
+{
+	TRIANGLE = 3,
+	RECTANGLE = 4,
+	PENTAGON = 5
+};
+
 struct Shape {
 	GLuint vao, vbo[2];
 	bool check=false;
@@ -15,6 +22,7 @@ struct Object {
 	float xmove;
 	float ymove;
 	bool check = false;
+	int objectType = TRIANGLE;
 };
 
 Object obj[5];
@@ -34,14 +42,15 @@ bool polymode = false;
 
 float speed = 0.01;
 
+//사각형
 GLfloat vertex[][3] = {
-	{-0.25, -0.25, 0.0},
-	{0.25, -0.25, 0.0},
-	{-0.25,0.25,0.0},
+	{-0.15, -0.15, 0.0},
+	{0.15, -0.15, 0.0},
+	{0.15,0.15,0.0},
+	{-0.15,0.15,0.0}
+	//{-0.15,0.15,0.0},
 
-	{0.25, -0.25, 0.0},
-	{-0.25,0.25,0.0},
-	{0.25,0.25,0.0}
+	//{0.15, -0.15, 0.0},
 };
 GLfloat colors[][3] = {
 	{0.0,0.0,1.0},
@@ -51,6 +60,23 @@ GLfloat colors[][3] = {
 	{0.0,0.0,1.0},
 	{0.0,0.0,1.0},
 };
+
+//삼각형
+GLfloat vertex1[][3] = {
+	{-0.15, 0.0, 0.0},
+	{0.15, 0.0, 0.0},
+	{0.0,0.3,0.0},
+
+};
+GLfloat colors2[][3] = {
+	{1.0,0.0,1.0},
+	{1.0,0.0,1.0},
+	{1.0,0.0,1.0},
+	{1.0,0.0,1.0},
+	{1.0,0.0,1.0},
+	{1.0,0.0,1.0},
+};
+
 GLfloat colors1[][3] = {
 	{0.0,1.0,0.0},
 	{0.0,1.0,0.0},
@@ -59,6 +85,7 @@ GLfloat colors1[][3] = {
 	{0.0,1.0,0.0},
 	{0.0,1.0,0.0},
 };
+
 GLfloat linevertex[2][3];
 GLfloat linecolors[2][3] = {
 	{0.0,0.0,0.0},
@@ -201,13 +228,26 @@ void Initvbovao()
 
 			glBindVertexArray(obj[i].vao);
 
-			glBindBuffer(GL_ARRAY_BUFFER, obj[i].vbo[0]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
-			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			if (i < 3) {
+				glBindBuffer(GL_ARRAY_BUFFER, obj[i].vbo[0]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+				glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-			glBindBuffer(GL_ARRAY_BUFFER, obj[i].vbo[1]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
-			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				glBindBuffer(GL_ARRAY_BUFFER, obj[i].vbo[1]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
+				glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				obj[i].objectType = RECTANGLE;
+			}
+			else {
+				glBindBuffer(GL_ARRAY_BUFFER, obj[i].vbo[0]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(vertex1), vertex1, GL_STATIC_DRAW);
+				glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+				glBindBuffer(GL_ARRAY_BUFFER, obj[i].vbo[1]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(colors2), colors2, GL_STATIC_DRAW);
+				glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				obj[i].objectType = TRIANGLE;
+			}
 
 
 			glEnableVertexAttribArray(PosLocation);
@@ -226,7 +266,7 @@ void Drawbasket()
 	TR = glm::translate(TR, glm::vec3(basketmove, -0.7, 0.0)); //--- x축으로 이동 행렬
 	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-	TR = glm::scale(TR, glm::vec3(0.6, 0.3, 1));
+	TR = glm::scale(TR, glm::vec3(2.0, 0.3, 1));
 
 	//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
 	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
@@ -234,7 +274,7 @@ void Drawbasket()
 
 	glBindVertexArray(shape[0].vao);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_POLYGON, 0, 4);
 }
 void Drawobject()
 {
@@ -247,7 +287,6 @@ void Drawobject()
 		TR = glm::translate(TR, glm::vec3(obj[i].xmove, obj[i].ymove, 0.0)); //--- x축으로 이동 행렬
 		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR = glm::scale(TR, glm::vec3(0.3, 0.3, 1));
 
 		//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
 		unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
@@ -259,7 +298,7 @@ void Drawobject()
 		else {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_POLYGON, 0, obj[i].objectType);
 	}
 }
 void Drawline()
@@ -352,6 +391,7 @@ GLvoid Mouse(int button, int state, int x, int y) {
 	}
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
 		shape[1].check = false;
+		//교점의 방정식 c++
 	}
 }
 
