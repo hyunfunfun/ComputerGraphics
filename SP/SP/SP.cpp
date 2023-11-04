@@ -6,7 +6,14 @@ struct Shape {
 	bool check=false;
 };
 
-Shape shape[5];
+Shape shape[2];
+
+struct Object {
+	GLuint vao, vbo[2];
+	bool check = false;
+};
+
+Object obj;
 GLfloat rColor = 0.5, gColor = 0.5, bColor = 1.0;
 
 //선 변수
@@ -150,7 +157,7 @@ GLvoid drawScene() {
 	/*그리기*/
 	Drawbasket();
 	Drawobject();
-	if (shape[2].check == true) {
+	if (shape[1].check == true) {
 		Drawline();
 	}
 
@@ -185,16 +192,17 @@ void Initvbovao()
 		glEnableVertexAttribArray(ColorLocation);
 	}
 	{
-		glGenVertexArrays(1, &shape[1].vao);
-		glGenBuffers(2, shape[1].vbo);
 
-		glBindVertexArray(shape[1].vao);
+		glGenVertexArrays(1, &obj.vao);
+		glGenBuffers(2, obj.vbo);
 
-		glBindBuffer(GL_ARRAY_BUFFER, shape[1].vbo[0]);
+		glBindVertexArray(obj.vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, obj.vbo[0]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, shape[1].vbo[1]);
+		glBindBuffer(GL_ARRAY_BUFFER, obj.vbo[1]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -239,7 +247,7 @@ void Drawobject()
 	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
-	glBindVertexArray(shape[1].vao);
+	glBindVertexArray(obj.vao);
 	if (polymode == false)
 		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	else {
@@ -261,7 +269,7 @@ void Drawline()
 	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
-	glBindVertexArray(shape[2].vao);
+	glBindVertexArray(shape[1].vao);
 	glDrawArrays(GL_LINES, 0, 2);
 }
 
@@ -293,7 +301,7 @@ GLvoid Mouse(int button, int state, int x, int y) {
 	prevy = oy;
 	float range = 0.1;
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		shape[2].check = true;
+		shape[1].check = true;
 		linevertex[1][0] = ox;
 		linevertex[1][1] = oy;
 		linevertex[0][0] = ox;
@@ -302,16 +310,16 @@ GLvoid Mouse(int button, int state, int x, int y) {
 		{
 			int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 			int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
-			glGenVertexArrays(1, &shape[2].vao);
-			glGenBuffers(2, shape[2].vbo);
+			glGenVertexArrays(1, &shape[1].vao);
+			glGenBuffers(2, shape[1].vbo);
 
-			glBindVertexArray(shape[2].vao);
+			glBindVertexArray(shape[1].vao);
 
-			glBindBuffer(GL_ARRAY_BUFFER, shape[2].vbo[0]);
+			glBindBuffer(GL_ARRAY_BUFFER, shape[1].vbo[0]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(linevertex), linevertex, GL_STATIC_DRAW);
 			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-			glBindBuffer(GL_ARRAY_BUFFER, shape[2].vbo[1]);
+			glBindBuffer(GL_ARRAY_BUFFER, shape[1].vbo[1]);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(linecolors), linecolors, GL_STATIC_DRAW);
 			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -321,7 +329,7 @@ GLvoid Mouse(int button, int state, int x, int y) {
 		}
 	}
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-		shape[2].check = false;
+		shape[1].check = false;
 	}
 }
 
@@ -335,16 +343,16 @@ GLvoid Motion(int x, int y) {
 	{
 		int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 		int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
-		glGenVertexArrays(1, &shape[2].vao);
-		glGenBuffers(2, shape[2].vbo);
+		glGenVertexArrays(1, &shape[1].vao);
+		glGenBuffers(2, shape[1].vbo);
 
-		glBindVertexArray(shape[2].vao);
+		glBindVertexArray(shape[1].vao);
 
-		glBindBuffer(GL_ARRAY_BUFFER, shape[2].vbo[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, shape[1].vbo[0]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(linevertex), linevertex, GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, shape[2].vbo[1]);
+		glBindBuffer(GL_ARRAY_BUFFER, shape[1].vbo[1]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(linecolors), linecolors, GL_STATIC_DRAW);
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
