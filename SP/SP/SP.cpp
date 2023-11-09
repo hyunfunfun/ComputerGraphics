@@ -25,6 +25,18 @@ struct Object {
 	int objectType = TRIANGLE;
 };
 
+struct Slice {
+	GLuint vao, vbo[2];
+	//도형 변수
+	bool xmode = false;
+	float xmove;
+	float ymove;
+	bool check = false;
+	int objectType = TRIANGLE;
+};
+
+
+Slice sli[2];
 Object obj[5];
 GLfloat rColor = 0.5, gColor = 0.5, bColor = 1.0;
 
@@ -37,10 +49,20 @@ float prevy = 0;
 float basketmove = 0.0;
 bool basketmode = true;
 
+//도형 슬라이스
+glm::vec3 cross1 = glm::vec3(0.0, 0.0, 0.0);
+glm::vec3 cross2 = glm::vec3(0.0, 0.0, 0.0);
+int slicecount = 0;
+
 
 bool polymode = false;
 
 float speed = 0.01;
+
+float px, py = 0.0;
+
+bool GetIntersectPoint(const POINT& AP1, const POINT& AP2,
+	const POINT& BP1, const POINT& BP2, POINT* IP);
 
 //사각형
 GLfloat vertex[][3] = {
@@ -98,6 +120,7 @@ GLuint vertexShader;
 GLuint fragmentShader;
 GLchar* vertexSource, * fragmentSource;
 
+
 /*OPGL관렴 함수*/
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
@@ -113,8 +136,10 @@ void make_shaderProgram();
 
 /*vao, vbo 관련 함수*/
 void Initvbovao();
+void slicevao();
 void Drawbasket();
 void Drawobject();
+void Drawslice();
 void Drawline();
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
@@ -186,6 +211,7 @@ GLvoid drawScene() {
 	/*그리기*/
 	Drawbasket();
 	Drawobject();
+	//Drawslice();
 	if (shape[1].check == true) {
 		Drawline();
 	}
@@ -221,7 +247,7 @@ void Initvbovao()
 		glEnableVertexAttribArray(ColorLocation);
 	}
 	{
-		for(int i=0;i<5;i++)
+		for (int i = 0; i < 5; i++)
 		{
 			glGenVertexArrays(1, &obj[i].vao);
 			glGenBuffers(2, obj[i].vbo);
@@ -254,7 +280,31 @@ void Initvbovao()
 			glEnableVertexAttribArray(ColorLocation);
 		}
 	}
-	
+}
+
+void slicevao() {
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+	for (int i = 0; i < 2; i++)
+	{
+		glGenVertexArrays(1, &sli[i].vao);
+		glGenBuffers(2, sli[i].vbo);
+
+		glBindVertexArray(sli[i].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, sli[i].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, sli[i].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		sli[i].objectType = RECTANGLE;
+
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
 }
 
 void Drawbasket()
@@ -301,6 +351,43 @@ void Drawobject()
 		glDrawArrays(GL_POLYGON, 0, obj[i].objectType);
 	}
 }
+
+void Drawslice()
+{
+		int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+		int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+
+		glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
+		TR = glm::translate(TR, glm::vec3(sli[0].xmove-0.1, sli[0].ymove, 0.0)); //--- x축으로 이동 행렬
+		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+
+		unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(sli[0].vao);
+		if (polymode == false)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		else {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		glDrawArrays(GL_POLYGON, 0, sli[0].objectType);
+
+		glm::mat4 TR1 = glm::mat4(1.0f); //--- 합성 변환 행렬
+		TR1 = glm::translate(TR1, glm::vec3(sli[1].xmove+0.1, sli[1].ymove, 0.0)); //--- x축으로 이동 행렬
+		TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR1)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(sli[1].vao);
+		if (polymode == false)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		else {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		glDrawArrays(GL_POLYGON, 0, sli[1].objectType);
+}
 void Drawline()
 {
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
@@ -310,6 +397,7 @@ void Drawline()
 	TR = glm::translate(TR, glm::vec3(0.0, 0.0, 0.0)); //--- x축으로 이동 행렬
 	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 	TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+
 
 	//vertex.glsl에 modelTransform에 좌표를 넣기 때문에 전처럼 updatebuffer()함수(vao,vbo업데이트)함수를 쓰지 않아도 된다.
 	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
@@ -391,7 +479,12 @@ GLvoid Mouse(int button, int state, int x, int y) {
 	}
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
 		shape[1].check = false;
-		//교점의 방정식 c++
+		sli[0].objectType = RECTANGLE;
+		sli[1].objectType = TRIANGLE;
+		GetIntersectPoint();
+
+		//vao에 넣을 slice좌표 조정
+		slicevao();
 	}
 }
 
@@ -439,6 +532,29 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		break;
 	}
 	glutPostRedisplay();
+}
+
+bool GetIntersectPoint(const POINT& AP1, const POINT& AP2,
+	const POINT& BP1, const POINT& BP2, POINT* IP)
+{
+	double t;
+	double s;
+	double under = (BP2.y - BP1.y) * (AP2.x - AP1.x) - (BP2.x - BP1.x) * (AP2.y - AP1.y);
+	if (under == 0) return false;
+
+	double _t = (BP2.x - BP1.x) * (AP1.y - BP1.y) - (BP2.y - BP1.y) * (AP1.x - BP1.x);
+	double _s = (AP2.x - AP1.x) * (AP1.y - BP1.y) - (AP2.y - AP1.y) * (AP1.x - BP1.x);
+
+	t = _t / under;
+	s = _s / under;
+
+	if (t < 0.0 || t>1.0 || s < 0.0 || s>1.0) return false;
+	if (_t == 0 && _s == 0) return false;
+
+	IP->x = AP1.x + t * (double)(AP2.x - AP1.x);
+	IP->y = AP1.y + t * (double)(AP2.y - AP1.y);
+
+	return true;
 }
 
 void make_shaderProgram()
