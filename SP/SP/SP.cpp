@@ -26,6 +26,9 @@ struct Object {
 };
 
 struct Slice {
+	float vertex[5][3];
+	float color[5][3];
+
 	GLuint vao, vbo[2];
 	//도형 변수
 	bool xmode = false;
@@ -53,7 +56,8 @@ bool basketmode = true;
 glm::vec3 cross1 = glm::vec3(0.0, 0.0, 0.0);
 glm::vec3 cross2 = glm::vec3(0.0, 0.0, 0.0);
 int slicecount = 0;
-
+int firstcross = 0;
+int lastcross = 0;
 
 bool polymode = false;
 
@@ -61,20 +65,19 @@ float speed = 0.01;
 
 float px, py = 0.0;
 
-bool GetIntersectPoint(const POINT& AP1, const POINT& AP2,
-	const POINT& BP1, const POINT& BP2, POINT* IP);
+bool GetIntersectPoint(float x1, float x2, float y1, float y2);
 
 //사각형
-GLfloat vertex[][3] = {
+float vertex[][3] = {
+	{-0.15,0.15,0.0},
 	{-0.15, -0.15, 0.0},
 	{0.15, -0.15, 0.0},
-	{0.15,0.15,0.0},
-	{-0.15,0.15,0.0}
+	{0.15,0.15,0.0}
 	//{-0.15,0.15,0.0},
 
 	//{0.15, -0.15, 0.0},
 };
-GLfloat colors[][3] = {
+float colors[][3] = {
 	{0.0,0.0,1.0},
 	{0.0,0.0,1.0},
 	{0.0,0.0,1.0},
@@ -84,13 +87,13 @@ GLfloat colors[][3] = {
 };
 
 //삼각형
-GLfloat vertex1[][3] = {
+float vertex1[][3] = {
 	{-0.15, 0.0, 0.0},
 	{0.15, 0.0, 0.0},
 	{0.0,0.3,0.0},
 
 };
-GLfloat colors2[][3] = {
+float colors2[][3] = {
 	{1.0,0.0,1.0},
 	{1.0,0.0,1.0},
 	{1.0,0.0,1.0},
@@ -99,7 +102,7 @@ GLfloat colors2[][3] = {
 	{1.0,0.0,1.0},
 };
 
-GLfloat colors1[][3] = {
+float colors1[][3] = {
 	{0.0,1.0,0.0},
 	{0.0,1.0,0.0},
 	{0.0,1.0,0.0},
@@ -108,8 +111,8 @@ GLfloat colors1[][3] = {
 	{0.0,1.0,0.0},
 };
 
-GLfloat linevertex[2][3];
-GLfloat linecolors[2][3] = {
+float linevertex[2][3];
+float linecolors[2][3] = {
 	{0.0,0.0,0.0},
 	{0.0,0.0,0.0}
 };
@@ -211,7 +214,7 @@ GLvoid drawScene() {
 	/*그리기*/
 	Drawbasket();
 	Drawobject();
-	//Drawslice();
+	Drawslice();
 	if (shape[1].check == true) {
 		Drawline();
 	}
@@ -294,13 +297,12 @@ void slicevao() {
 		glBindVertexArray(sli[i].vao);
 
 		glBindBuffer(GL_ARRAY_BUFFER, sli[i].vbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(sli[i].vertex), sli[i].vertex, GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, sli[i].vbo[1]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		sli[i].objectType = RECTANGLE;
 
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(ColorLocation);
@@ -439,6 +441,13 @@ GLvoid Timer(int value) {
 			}
 		}
 	}
+	if (sli[0].xmode == true) {
+		sli[0].ymove -= 0.01;
+		sli[1].ymove -= 0.01;
+		if (sli[0].ymove < -1) {
+			sli[0].xmode == false;
+		}
+	}
 	glutPostRedisplay();
 	glutTimerFunc(10, Timer, 1);
 }
@@ -479,9 +488,202 @@ GLvoid Mouse(int button, int state, int x, int y) {
 	}
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
 		shape[1].check = false;
-		sli[0].objectType = RECTANGLE;
-		sli[1].objectType = TRIANGLE;
-		GetIntersectPoint();
+		for (int i = 0; i < 5; i++) {
+			if (i < 3) {
+				if(slicecount==0)//왼쪽 슬라이스 도형에 넣기
+				{
+					if (GetIntersectPoint(vertex[0][0] + obj[i].xmove, vertex[1][0] + obj[i].xmove, vertex[0][1] + obj[i].ymove, vertex[1][1] + obj[i].ymove) == true) {
+						sli[0].vertex[0][0] = vertex[0][0] + obj[i].xmove;
+						sli[0].vertex[0][1] = vertex[0][1] + obj[i].ymove;
+						sli[0].vertex[1][0] = cross1.x;
+						sli[0].vertex[1][1] = cross1.y;
+
+						sli[1].vertex[0][0] = cross1.x;
+						sli[1].vertex[0][1] = cross1.y;
+						sli[1].vertex[1][0] = vertex[1][0] + obj[i].xmove;
+						sli[1].vertex[1][1] = vertex[1][1] + obj[i].ymove;
+						slicecount++;
+						firstcross = 1;
+					}
+					else {
+						sli[0].vertex[0][0] = vertex[0][0] + obj[i].xmove;
+						sli[0].vertex[0][1] = vertex[0][1] + obj[i].ymove;
+						sli[0].vertex[1][0] = vertex[1][0] + obj[i].xmove;
+						sli[0].vertex[1][1] = vertex[1][1] + obj[i].ymove;
+					}
+					if (GetIntersectPoint(vertex[1][0] + obj[i].xmove, vertex[2][0] + obj[i].xmove, vertex[1][1] + obj[i].ymove, vertex[2][1] + obj[i].ymove) == true) {
+						sli[0].vertex[1][0] = vertex[1][0] + obj[i].xmove;
+						sli[0].vertex[1][1] = vertex[1][1] + obj[i].ymove;
+						sli[0].vertex[2][0] = cross1.x;
+						sli[0].vertex[2][1] = cross1.y;
+
+						sli[1].vertex[0][0] = cross1.x;
+						sli[1].vertex[0][1] = cross1.y;
+						sli[1].vertex[1][0] = vertex[2][0] + obj[i].xmove;
+						sli[1].vertex[1][1] = vertex[2][1] + obj[i].ymove;
+						slicecount++;
+						firstcross = 2;
+					}
+					else {
+						sli[0].vertex[1][0] = vertex[1][0] + obj[i].xmove;
+						sli[0].vertex[1][1] = vertex[1][1] + obj[i].ymove;
+						sli[0].vertex[2][0] = vertex[2][0] + obj[i].xmove;
+						sli[0].vertex[2][1] = vertex[2][1] + obj[i].ymove;
+					}
+					if (GetIntersectPoint(vertex[2][0] + obj[i].xmove, vertex[3][0] + obj[i].xmove, vertex[2][1] + obj[i].ymove, vertex[3][1] + obj[i].ymove) == true) {
+						sli[0].vertex[2][0] = vertex[2][0] + obj[i].xmove;
+						sli[0].vertex[2][1] = vertex[2][1] + obj[i].ymove;
+						sli[0].vertex[3][0] = cross1.x;
+						sli[0].vertex[3][1] = cross1.y;
+
+						sli[1].vertex[0][0] = cross1.x;
+						sli[1].vertex[0][1] = cross1.y;
+						sli[1].vertex[1][0] = vertex[3][0] + obj[i].xmove;
+						sli[1].vertex[1][1] = vertex[3][1] + obj[i].ymove;
+						slicecount++;
+						firstcross = 3;
+					}
+				}
+				else if (slicecount == 1) {//오른쪽 슬라이스 도형에 넣기
+					if (firstcross == 3) {
+						if (GetIntersectPoint(vertex[3][0] + obj[i].xmove, vertex[0][0] + obj[i].xmove, vertex[3][1] + obj[i].ymove, vertex[0][1] + obj[i].ymove) == true) {
+							sli[1].vertex[1][0] = vertex[3][0] + obj[i].xmove;
+							sli[1].vertex[1][1] = vertex[3][1] + obj[i].ymove;
+							sli[1].vertex[2][0] = cross2.x;
+							sli[1].vertex[2][1] = cross2.y;
+
+							sli[0].vertex[4][0] = cross2.x;
+							sli[0].vertex[4][1] = cross2.y;
+							sli[0].vertex[0][0] = vertex[0][0] + obj[i].xmove;
+							sli[0].vertex[0][1] = vertex[0][1] + obj[i].ymove;
+							slicecount++;
+							lastcross = 4;
+						}
+					}
+					if (firstcross == 2) {
+						if (GetIntersectPoint(vertex[2][0] + obj[i].xmove, vertex[3][0] + obj[i].xmove, vertex[2][1] + obj[i].ymove, vertex[3][1] + obj[i].ymove) == true) {
+							sli[1].vertex[1][0] = vertex[2][0] + obj[i].xmove;
+							sli[1].vertex[1][1] = vertex[2][1] + obj[i].ymove;
+							sli[1].vertex[2][0] = cross2.x;
+							sli[1].vertex[2][1] = cross2.y;
+
+							sli[0].vertex[3][0] = cross2.x;
+							sli[0].vertex[3][1] = cross2.y;
+							sli[0].vertex[4][0] = vertex[3][0] + obj[i].xmove;
+							sli[0].vertex[4][1] = vertex[3][1] + obj[i].ymove;
+							slicecount++;
+							lastcross = 3;
+						}
+						else {
+							sli[1].vertex[1][0] = vertex[2][0] + obj[i].xmove;
+							sli[1].vertex[1][1] = vertex[2][1] + obj[i].ymove;
+							sli[1].vertex[2][0] = vertex[3][0] + obj[i].xmove;
+							sli[1].vertex[2][1] = vertex[3][1] + obj[i].ymove;
+						}
+						if (GetIntersectPoint(vertex[3][0] + obj[i].xmove, vertex[0][0] + obj[i].xmove, vertex[3][1] + obj[i].ymove, vertex[0][1] + obj[i].ymove) == true) {
+							sli[1].vertex[2][0] = vertex[3][0] + obj[i].xmove;
+							sli[1].vertex[2][1] = vertex[3][1] + obj[i].ymove;
+							sli[1].vertex[3][0] = cross2.x;
+							sli[1].vertex[3][1] = cross2.y;
+
+							sli[0].vertex[3][0] = cross2.x;
+							sli[0].vertex[3][1] = cross2.y;
+							sli[0].vertex[4][0] = vertex[0][0] + obj[i].xmove;
+							sli[0].vertex[4][1] = vertex[0][1] + obj[i].ymove;
+							slicecount++;
+							lastcross = 4;
+						}
+					}
+					if (firstcross == 1) {
+						if (GetIntersectPoint(vertex[1][0] + obj[i].xmove, vertex[2][0] + obj[i].xmove, vertex[1][1] + obj[i].ymove, vertex[2][1] + obj[i].ymove) == true) {
+							sli[1].vertex[1][0] = vertex[1][0] + obj[i].xmove;
+							sli[1].vertex[1][1] = vertex[1][1] + obj[i].ymove;
+							sli[1].vertex[2][0] = cross2.x;
+							sli[1].vertex[2][1] = cross2.y;
+
+							sli[0].vertex[2][0] = cross2.x;
+							sli[0].vertex[2][1] = cross2.y;
+							sli[0].vertex[3][0] = vertex[2][0] + obj[i].xmove;
+							sli[0].vertex[3][1] = vertex[2][1] + obj[i].ymove;
+							slicecount++;
+							lastcross = 2;
+						}
+						else {
+							sli[1].vertex[1][0] = vertex[1][0] + obj[i].xmove;
+							sli[1].vertex[1][1] = vertex[1][1] + obj[i].ymove;
+							sli[1].vertex[2][0] = vertex[2][0] + obj[i].xmove;
+							sli[1].vertex[2][1] = vertex[2][1] + obj[i].ymove;
+						}
+						if (GetIntersectPoint(vertex[2][0] + obj[i].xmove, vertex[3][0] + obj[i].xmove, vertex[2][1] + obj[i].ymove, vertex[3][1] + obj[i].ymove) == true) {
+							sli[1].vertex[2][0] = vertex[2][0] + obj[i].xmove;
+							sli[1].vertex[2][1] = vertex[2][1] + obj[i].ymove;
+							sli[1].vertex[3][0] = cross2.x;
+							sli[1].vertex[3][1] = cross2.y;
+
+							sli[0].vertex[2][0] = cross2.x;
+							sli[0].vertex[2][1] = cross2.y;
+							sli[0].vertex[3][0] = vertex[3][0] + obj[i].xmove;
+							sli[0].vertex[3][1] = vertex[3][1] + obj[i].ymove;
+							slicecount++;
+							lastcross = 3;
+						}
+						else {
+							sli[1].vertex[2][0] = vertex[2][0] + obj[i].xmove;
+							sli[1].vertex[2][1] = vertex[2][1] + obj[i].ymove;
+							sli[1].vertex[3][0] = vertex[3][0] + obj[i].xmove;
+							sli[1].vertex[3][1] = vertex[3][1] + obj[i].ymove;
+						}
+						if (GetIntersectPoint(vertex[3][0] + obj[i].xmove, vertex[0][0] + obj[i].xmove, vertex[3][1] + obj[i].ymove, vertex[0][1] + obj[i].ymove) == true) {
+							sli[1].vertex[3][0] = vertex[3][0] + obj[i].xmove;
+							sli[1].vertex[3][1] = vertex[3][1] + obj[i].ymove;
+							sli[1].vertex[4][0] = cross2.x;
+							sli[1].vertex[4][1] = cross2.y;
+
+							sli[0].vertex[2][0] = cross2.x;
+							sli[0].vertex[2][1] = cross2.y;
+							sli[0].vertex[3][0] = vertex[0][0] + obj[i].xmove;
+							sli[0].vertex[3][1] = vertex[0][1] + obj[i].ymove;
+							slicecount++;
+							lastcross = 4;
+						}
+					}
+				}
+				else {//교점을 이어준다.
+					switch (firstcross) {
+					case 1:
+						if (lastcross == 2) {
+							sli[0].objectType = PENTAGON;
+							sli[1].objectType = TRIANGLE;
+						}
+						if (lastcross == 3) {
+							sli[0].objectType = RECTANGLE;
+							sli[1].objectType = RECTANGLE;
+						}
+						if (lastcross == 4) {
+							sli[1].objectType = PENTAGON;
+							sli[0].objectType = TRIANGLE;
+						}
+						break;
+					case 2:
+						if (lastcross == 3) {
+							sli[0].objectType = PENTAGON;
+							sli[1].objectType = TRIANGLE;
+						}
+						if (lastcross == 4) {
+							sli[0].objectType = RECTANGLE;
+							sli[1].objectType = RECTANGLE;
+						}
+						break;
+					case 3:
+						if (lastcross == 4) {
+							sli[0].objectType = PENTAGON;
+							sli[1].objectType = TRIANGLE;
+						}
+					}
+					sli[0].xmode = true;
+				}
+			}
+		}
 
 		//vao에 넣을 slice좌표 조정
 		slicevao();
@@ -534,16 +736,26 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	glutPostRedisplay();
 }
 
-bool GetIntersectPoint(const POINT& AP1, const POINT& AP2,
-	const POINT& BP1, const POINT& BP2, POINT* IP)
+bool GetIntersectPoint(float x1, float x2, float y1, float y2)
 {
+	float temp;
+	if (linevertex[0][0] > linevertex[1][0]) {
+		temp = linevertex[0][0];
+		linevertex[0][0] = linevertex[1][0];
+		linevertex[1][0] = temp;
+	}
+	if (linevertex[0][1] > linevertex[1][1]) {
+		temp = linevertex[0][1];
+		linevertex[0][1] = linevertex[1][1];
+		linevertex[1][1] = temp;
+	}
 	double t;
 	double s;
-	double under = (BP2.y - BP1.y) * (AP2.x - AP1.x) - (BP2.x - BP1.x) * (AP2.y - AP1.y);
+	double under = (y2 - y1) * (linevertex[1][0] - linevertex[0][0]) - (x2 - x1) * (linevertex[1][1] - linevertex[0][1]);
 	if (under == 0) return false;
 
-	double _t = (BP2.x - BP1.x) * (AP1.y - BP1.y) - (BP2.y - BP1.y) * (AP1.x - BP1.x);
-	double _s = (AP2.x - AP1.x) * (AP1.y - BP1.y) - (AP2.y - AP1.y) * (AP1.x - BP1.x);
+	double _t = (x2 - x1) * (linevertex[0][1] - y1) - (y2 - y1) * (linevertex[0][0] - x1);
+	double _s = (linevertex[1][0] - linevertex[0][0]) * (linevertex[0][1] - y1) - (linevertex[1][1] - linevertex[0][1]) * (linevertex[0][0] - x1);
 
 	t = _t / under;
 	s = _s / under;
@@ -551,8 +763,14 @@ bool GetIntersectPoint(const POINT& AP1, const POINT& AP2,
 	if (t < 0.0 || t>1.0 || s < 0.0 || s>1.0) return false;
 	if (_t == 0 && _s == 0) return false;
 
-	IP->x = AP1.x + t * (double)(AP2.x - AP1.x);
-	IP->y = AP1.y + t * (double)(AP2.y - AP1.y);
+	if (slicecount == 0) {
+		cross1.x = linevertex[0][0] + t * (double)(linevertex[1][0] - linevertex[0][0]);
+		cross1.y = linevertex[0][1] + t * (double)(linevertex[1][1] - linevertex[0][1]);
+	}
+	else if (slicecount == 1) {
+		cross2.x = linevertex[0][0] + t * (double)(linevertex[1][0] - linevertex[0][0]);
+		cross2.y = linevertex[0][1] + t * (double)(linevertex[1][1] - linevertex[0][1]);
+	}
 
 	return true;
 }
