@@ -19,9 +19,9 @@ struct Object {
 	GLuint vao, vbo[2];
 	//도형 변수
 	bool xmode = false;
+	bool check = true;
 	float xmove;
 	float ymove;
-	bool check = false;
 	int objectType = TRIANGLE;
 };
 
@@ -30,15 +30,13 @@ struct Slice {
 	float color[5][3];
 
 	GLuint vao, vbo[2];
-	//도형 변수
 	bool xmode = false;
-	float xmove;
-	float ymove;
-	bool check = false;
+	bool check = true;
+	float xmove=0.0;
+	float ymove=0.0;
 	int objectType = TRIANGLE;
 };
 
-int sliceobj = 0;
 Slice sli[10];
 Object obj[5];
 GLfloat rColor = 0.5, gColor = 0.5, bColor = 1.0;
@@ -52,16 +50,11 @@ float prevy = 0;
 float basketmove = 0.0;
 bool basketmode = true;
 
-//도형 슬라이스
-glm::vec3 cross1 = glm::vec3(0.0, 0.0, 0.0);
-glm::vec3 cross2 = glm::vec3(0.0, 0.0, 0.0);
-int slicecount = 0;
 
 bool polymode = false;
-
+int slicecount = 0;
+int sliceobj = 0;
 float speed = 0.01;
-
-float px, py = 0.0;
 
 bool GetIntersectPoint(float x1, float x2, float y1, float y2);
 
@@ -157,9 +150,10 @@ void make_shaderProgram();
 
 /*vao, vbo 관련 함수*/
 void Initvbovao();
-void slicevao(int sliceobj);
+void slicevao();
 void Drawbasket();
 void Drawobject();
+void Drawslice();
 void Drawline();
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
@@ -230,7 +224,10 @@ GLvoid drawScene() {
 	/*vao vbo 자동 업데이트*/
 	/*그리기*/
 	Drawbasket();
-	Drawobject();
+	if (obj[1].check == true) {
+		Drawobject();
+	}
+	Drawslice();
 	if (shape[1].check == true) {
 		Drawline();
 	}
@@ -301,46 +298,37 @@ void Initvbovao()
 	}
 }
 
-void slicevao(int sliceobj) {
+void slicevao() {
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
 	
-	for (int i = 0; i < 10; i++) {
-		if(i%2==0)
-		{
-			glGenVertexArrays(1, &sli[i].vao);
-			glGenBuffers(2, sli[i].vbo);
+	glGenVertexArrays(1, &sli[sliceobj-1].vao);
+	glGenBuffers(2, sli[sliceobj - 1].vbo);
 
-			glBindVertexArray(sli[i].vao);
+	glBindVertexArray(sli[sliceobj - 1].vao);
 
-			glBindBuffer(GL_ARRAY_BUFFER, sli[i].vbo[0]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(slicevertex1), slicevertex1, GL_STATIC_DRAW);
-			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, sli[sliceobj - 1].vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(sli[sliceobj - 1].vertex), sli[sliceobj - 1].vertex, GL_STATIC_DRAW);
+	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-			glBindBuffer(GL_ARRAY_BUFFER, sli[i].vbo[1]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
-			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			sli[sliceobj].objectType == TRIANGLE;
-		}
-		else {
-			glGenVertexArrays(1, &sli[i].vao);
-			glGenBuffers(2, sli[i].vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, sli[sliceobj - 1].vbo[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(sli[sliceobj - 1].color), sli[sliceobj - 1].color, GL_STATIC_DRAW);
+	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	sli[sliceobj-1].objectType == TRIANGLE;
 
-			glBindVertexArray(sli[i].vao);
-			glBindBuffer(GL_ARRAY_BUFFER, sli[i].vbo[0]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(slicevertex2), slicevertex2, GL_STATIC_DRAW);
-			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindVertexArray(sli[sliceobj].vao);
+	glBindBuffer(GL_ARRAY_BUFFER, sli[sliceobj].vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(sli[sliceobj].vertex), sli[sliceobj].vertex, GL_STATIC_DRAW);
+	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-			glBindBuffer(GL_ARRAY_BUFFER, sli[i].vbo[1]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(colors1), colors1, GL_STATIC_DRAW);
-			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, sli[sliceobj].vbo[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(sli[sliceobj].color), sli[sliceobj].color, GL_STATIC_DRAW);
+	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-			sli[i].objectType == TRIANGLE;
-		}
-	}
-		glEnableVertexAttribArray(PosLocation);
-		glEnableVertexAttribArray(ColorLocation);
+	sli[sliceobj].objectType == TRIANGLE;
+	glEnableVertexAttribArray(PosLocation);
+	glEnableVertexAttribArray(ColorLocation);
 }
 
 void Drawbasket()
@@ -526,45 +514,6 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		break;
 	}
 	glutPostRedisplay();
-}
-
-bool GetIntersectPoint(float x1, float x2, float y1, float y2)
-{
-	float temp;
-	if (linevertex[0][0] > linevertex[1][0]) {
-		temp = linevertex[0][0];
-		linevertex[0][0] = linevertex[1][0];
-		linevertex[1][0] = temp;
-	}
-	if (linevertex[0][1] > linevertex[1][1]) {
-		temp = linevertex[0][1];
-		linevertex[0][1] = linevertex[1][1];
-		linevertex[1][1] = temp;
-	}
-	double t;
-	double s;
-	double under = (y2 - y1) * (linevertex[1][0] - linevertex[0][0]) - (x2 - x1) * (linevertex[1][1] - linevertex[0][1]);
-	if (under == 0) return false;
-
-	double _t = (x2 - x1) * (linevertex[0][1] - y1) - (y2 - y1) * (linevertex[0][0] - x1);
-	double _s = (linevertex[1][0] - linevertex[0][0]) * (linevertex[0][1] - y1) - (linevertex[1][1] - linevertex[0][1]) * (linevertex[0][0] - x1);
-
-	t = _t / under;
-	s = _s / under;
-
-	if (t < 0.0 || t>1.0 || s < 0.0 || s>1.0) return false;
-	if (_t == 0 && _s == 0) return false;
-
-	if (slicecount == 0) {
-		cross1.x = linevertex[0][0] + t * (double)(linevertex[1][0] - linevertex[0][0]);
-		cross1.y = linevertex[0][1] + t * (double)(linevertex[1][1] - linevertex[0][1]);
-	}
-	else if (slicecount == 1) {
-		cross2.x = linevertex[0][0] + t * (double)(linevertex[1][0] - linevertex[0][0]);
-		cross2.y = linevertex[0][1] + t * (double)(linevertex[1][1] - linevertex[0][1]);
-	}
-
-	return true;
 }
 
 void make_shaderProgram()
