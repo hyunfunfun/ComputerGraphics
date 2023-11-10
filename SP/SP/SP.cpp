@@ -512,6 +512,9 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case '-':
 		speed -= 0.0001;
 		break;
+	case 'q':
+		glutLeaveMainLoop();
+		break;
 	}
 	glutPostRedisplay();
 }
