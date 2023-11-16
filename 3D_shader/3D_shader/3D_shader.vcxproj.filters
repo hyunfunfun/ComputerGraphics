@@ -45,12 +45,18 @@
     <ClCompile Include="3D_shader_22.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="3D_Shader_25.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.glsl">
       <Filter>소스 파일</Filter>
     </None>
     <None Include="vertex.glsl">
+      <Filter>소스 파일</Filter>
+    </None>
+    <None Include="fragment1.glsl">
       <Filter>소스 파일</Filter>
     </None>
   </ItemGroup>
