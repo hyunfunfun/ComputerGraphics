@@ -167,21 +167,6 @@ GLfloat colors1[][3] = {
 	 { 0.0, 1.0, 0.0 },	//4
 };
 
-float vertices[] = { //--- 버텍스 속성: 좌표값(FragPos), 노말값 (Normal)
--0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
--0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
--0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
--0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
--0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
--0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
-};
-
 bool mode = true;
 
 bool timer = false;
@@ -189,6 +174,12 @@ int Key = 0;
 float xRotateAni = 0.0f;
 float yRotateAni = 0.0f;
 double xMove = 0.0, yMove = 0.0, zMove = 0.0;
+
+std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
+
+std::vector< glm::vec3 > vertices;
+std::vector< glm::vec2 > uvs;
+std::vector< glm::vec3 > normals;
 
 
 GLfloat rColor = 0, gColor = 0, bColor = 0;
@@ -199,14 +190,12 @@ GLuint vertexShader;
 GLuint fragmentShader;
 GLchar* vertexSource, * fragmentSource;
 
-GLuint shaderProgram;
-GLuint vertex1Shader;
-GLuint fragment1Shader;
-GLchar* vertex1Source, * fragment1Source;
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f); //--- 카메라 위치
 glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f); //--- 카메라 바라보는 방향
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
+
+glm::vec3 lightPosition(0.0f, 3.0f, 0.0f);
 
 /*OPGL관렴 함수*/
 GLvoid drawScene();
@@ -218,10 +207,6 @@ GLvoid Timer(int value);
 void make_vertexShaders();
 void make_fragmentShaders();
 void make_shaderProgram();
-
-void make_vertex1Shaders();
-void make_fragment1Shaders();
-void make_shader1Program();
 
 /*vao, vbo 관련 함수*/
 void Initvbovao();
@@ -262,7 +247,6 @@ int main(int argc, char** argv) {
 
 	/*초기화 함수*/
 	make_shaderProgram();
-	make_shader1Program();
 	Initvbovao();
 	Initbuffer();
 	glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -353,8 +337,8 @@ void Initvbovao()
 
 void Initbuffer() {
 
-	int PosLocation = glGetAttribLocation(shaderProgram, "vPos");
-	int NormalLocation = glGetAttribLocation(shaderProgram, "vNormal");
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
+	int NormalLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 	//조명
 	{
 		glGenVertexArrays(1, &s[2].vao);
@@ -363,7 +347,7 @@ void Initbuffer() {
 		glBindVertexArray(s[2].vao);
 
 		glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
 
 		//glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[1]);
@@ -373,12 +357,10 @@ void Initbuffer() {
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(NormalLocation);
 
-		glUseProgram(shaderProgram);
-		unsigned int lightPosLocation = glGetUniformLocation(shaderProgram, "lightPos");
-		glUniform3f(lightPosLocation, 0.0, 0.0, 5.0);
-		unsigned int lightColorLocation = glGetUniformLocation(shaderProgram, "lightColor");
+		glUseProgram(shaderProgramID);
+		unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
 		glUniform3f(lightColorLocation, 1.0, 1.0, 1.0);
-		unsigned int objColorLocation = glGetUniformLocation(shaderProgram, "objectColor");
+		unsigned int objColorLocation = glGetUniformLocation(shaderProgramID, "objectColor");
 		glUniform3f(lightColorLocation, 1.0, 0.5, 0.3);
 
 	}
@@ -428,7 +410,7 @@ void make_shaderProgram()
 }
 void make_vertexShaders()
 {
-	vertexSource = filetobuf("vertex.glsl");
+	vertexSource = filetobuf("vertex1.glsl");
 	//--- 버텍스 세이더 객체 만들기
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	//--- 세이더 코드를 세이더 객체에 넣기
@@ -448,7 +430,7 @@ void make_vertexShaders()
 }
 void make_fragmentShaders()
 {
-	fragmentSource = filetobuf("fragment.glsl");
+	fragmentSource = filetobuf("fragment1.glsl");
 	//--- 프래그먼트 세이더 객체 만들기
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	//--- 세이더 코드를 세이더 객체에 넣기
@@ -466,63 +448,6 @@ void make_fragmentShaders()
 		return;
 	}
 }
-
-void make_shader1Program()
-{
-	make_vertex1Shaders(); //--- 버텍스 세이더 만들기
-	make_fragment1Shaders(); //--- 프래그먼트 세이더 만들기
-	//-- shader Program
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertex1Shader);
-	glAttachShader(shaderProgram, fragment1Shader);
-	glLinkProgram(shaderProgram);
-	//--- 세이더 삭제하기
-	glDeleteShader(vertex1Shader);
-	glDeleteShader(fragment1Shader);
-	//--- Shader Program 사용하기
-	glUseProgram(shaderProgram);
-}
-void make_vertex1Shaders()
-{
-	vertex1Source = filetobuf("vertex1.glsl");
-	//--- 버텍스 세이더 객체 만들기
-	vertex1Shader = glCreateShader(GL_VERTEX_SHADER);
-	//--- 세이더 코드를 세이더 객체에 넣기
-	glShaderSource(vertex1Shader, 1, (const GLchar**)&vertex1Source, 0);
-	//--- 버텍스 세이더 컴파일하기
-	glCompileShader(vertex1Shader);
-	//--- 컴파일이 제대로 되지 않은 경우: 에러 체크
-	GLint result;
-	GLchar errorLog[512];
-	glGetShaderiv(vertex1Shader, GL_COMPILE_STATUS, &result);
-	if (!result)
-	{
-		glGetShaderInfoLog(vertex1Shader, 512, NULL, errorLog);
-		std::cerr << "ERROR: vertex shader 컴파일 실패\n" << errorLog << std::endl;
-		return;
-	}
-}
-void make_fragment1Shaders()
-{
-	fragment1Source = filetobuf("fragment1.glsl");
-	//--- 프래그먼트 세이더 객체 만들기
-	fragment1Shader = glCreateShader(GL_FRAGMENT_SHADER);
-	//--- 세이더 코드를 세이더 객체에 넣기
-	glShaderSource(fragment1Shader, 1, (const GLchar**)&fragment1Source, 0);
-	//--- 프래그먼트 세이더 컴파일
-	glCompileShader(fragment1Shader);
-	//--- 컴파일이 제대로 되지 않은 경우: 컴파일 에러 체크
-	GLint result;
-	GLchar errorLog[512];
-	glGetShaderiv(fragment1Shader, GL_COMPILE_STATUS, &result);
-	if (!result)
-	{
-		glGetShaderInfoLog(fragment1Shader, 512, NULL, errorLog);
-		std::cerr << "ERROR: fragment shader 컴파일 실패\n" << errorLog << std::endl;
-		return;
-	}
-}
-
 GLvoid Timer(int value) {
 	if (timer == true)
 	{
