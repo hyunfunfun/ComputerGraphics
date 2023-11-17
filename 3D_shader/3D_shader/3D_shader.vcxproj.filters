@@ -59,6 +59,9 @@
     <None Include="fragment1.glsl">
       <Filter>소스 파일</Filter>
     </None>
+    <None Include="vertex1.glsl">
+      <Filter>소스 파일</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header.h">

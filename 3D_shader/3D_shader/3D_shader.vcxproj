@@ -155,7 +155,9 @@
     <ClCompile Include="3D_shader_22.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="3D_Shader_25.cpp" />
+    <ClCompile Include="3D_Shader_25.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="3D_Shader_test2.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -164,6 +166,7 @@
     <None Include="fragment.glsl" />
     <None Include="fragment1.glsl" />
     <None Include="vertex.glsl" />
+    <None Include="vertex1.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header.h" />

@@ -2,11 +2,12 @@
 #include "Header.h"
 
 struct Shape {
-	GLfloat colors[1000][3];
+	float colors[1000][3] = {
+	};
 	GLuint vbo[2], vao, ebo;
 };
 
-Shape s;
+Shape s[4];
 
 std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
 
@@ -14,18 +15,8 @@ std::vector< glm::vec3 > vertices;
 std::vector< glm::vec2 > uvs;
 std::vector< glm::vec3 > normals;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 2.0f); //--- 카메라 위치
-glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f); //--- 카메라 바라보는 방향
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
-
-
-glm::vec3 ran1 = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 ran2= glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 ran3= glm::vec3(0.0f, 0.0f, 0.0f);
-//위치,회전,신축
-
-
-GLfloat rColor = 0, gColor = 0, bColor = 0;
+GLfloat radius = 0.1f;
+GLfloat rColor = 1, gColor = 1, bColor = 1;
 
 GLint width, height;
 GLuint shaderProgramID;
@@ -45,7 +36,6 @@ void make_shaderProgram();
 /*vao, vbo 관련 함수*/
 void Initvbovao();
 void Draw();
-
 
 char* filetobuf(const char* file)
 {
@@ -119,6 +109,7 @@ bool  Load_Object(const char* path) {
 }
 
 int main(int argc, char** argv) {
+
 	srand(time(NULL));
 
 	glutInit(&argc, argv);
@@ -147,24 +138,11 @@ GLvoid drawScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	glUseProgram(shaderProgramID);
 
-	glm::mat4 view = glm::mat4(1.0f);
-	glm::mat4 projection = glm::mat4(1.0f);
-
-	unsigned int viewLocation = glGetUniformLocation(shaderProgramID, "viewTransform"); //--- 뷰잉 변환 설정
-	unsigned int projectionLocation = glGetUniformLocation(shaderProgramID, "projectionTransform"); //--- 투영 변환 값 설정
-
-	view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
-	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
-
-	projection = glm::perspective(glm::radians(60.0f), 1.0f, 0.1f, 50.0f);
-	projection = glm::translate(projection, glm::vec3(0.0, 0.0, -1.0));
-	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
-
+	/*그리기*/
 	Draw();
-
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
 
@@ -177,50 +155,102 @@ void Initvbovao()
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
-	Load_Object("cube.obj");
+	//머리
+	Load_Object("head.obj");
 	{
-		glGenVertexArrays(1, &s.vao);
-		glGenBuffers(2, s.vbo);
-		glGenBuffers(1, &s.ebo);
+		for (int i = 0; i < 1000; i++) {
+			s[0].colors[i][0] = 0.1;
+			s[0].colors[i][1] = 0.5;
+			s[0].colors[i][2] = 1.0;
+		}
 
-		glBindVertexArray(s.vao);
+		glGenVertexArrays(1, &s[0].vao);
+		glGenBuffers(2, s[0].vbo);
+		glGenBuffers(1, &s[0].ebo);
 
-		glBindBuffer(GL_ARRAY_BUFFER, s.vbo[0]);
+		glBindVertexArray(s[0].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[0].vbo[0]);
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, s.vbo[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(s.colors), s.colors, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, s[0].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(s[0].colors), s[0].colors, GL_STATIC_DRAW);
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s.ebo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s[0].ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(unsigned int), &vertexIndices[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(PosLocation);
 		glEnableVertexAttribArray(ColorLocation);
 	}
-	
+
+	Load_Object("body.obj");
+	{
+		for (int i = 0; i < 1000; i++) {
+			s[1].colors[i][0] = 0.1;
+			s[1].colors[i][1] = 0.5;
+			s[1].colors[i][2] = 1.0;
+		}
+
+		glGenVertexArrays(1, &s[1].vao);
+		glGenBuffers(2, s[1].vbo);
+		glGenBuffers(1, &s[1].ebo);
+
+		glBindVertexArray(s[1].vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[1].vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, s[1].vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(s[1].colors), s[1].colors, GL_STATIC_DRAW);
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s[1].ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(unsigned int), &vertexIndices[0], GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(PosLocation);
+		glEnableVertexAttribArray(ColorLocation);
+	}
 }
-void Draw() {//무대
+void Draw() {
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
 
 	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "modelTransform"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
+
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
-	glm::mat4 TR1 = glm::mat4(1.0f); //--- 합성 변환 행렬
-	glm::mat4 TR2 = glm::mat4(1.0f); //--- 합성 변환 행렬
 
 	{
+		TR = glm::translate(TR, glm::vec3(0, 0, 0)); //--- x축으로 이동 행렬
 		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 		TR = glm::rotate(TR, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-		TR = glm::translate(TR, glm::vec3(0, 0, 0)); //--- x축으로 이동 행렬
+		TR = glm::scale(TR, glm::vec3(0.01, 0.01, 0.01));
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR)); //--- modelTransform 변수에 변
 
-		glBindVertexArray(s.vao);
-		glDrawArrays(GL_TRIANGLES, 0, 30);
+		glBindVertexArray(s[0].vao);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, 1000, GL_UNSIGNED_INT, 0);
+	}
+
+	glm::mat4 TR1 = glm::mat4(1.0f); //--- 합성 변환 행렬
+
+	{
+		TR1 = glm::translate(TR1, glm::vec3(0, -0.3, 0)); //--- x축으로 이동 행렬
+		TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+		TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		TR1 = glm::scale(TR1, glm::vec3(0.01, 0.01, 0.01));
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR1)); //--- modelTransform 변수에 변
+
+		glBindVertexArray(s[1].vao);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, 1000, GL_UNSIGNED_INT, 0);
 	}
 }
+
 
 void make_shaderProgram()
 {
@@ -279,4 +309,3 @@ void make_fragmentShaders()
 		return;
 	}
 }
-
