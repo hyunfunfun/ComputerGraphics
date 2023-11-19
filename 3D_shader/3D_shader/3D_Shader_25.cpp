@@ -59,7 +59,6 @@ GLfloat vertex[][3] = {
 
 
 };
-
 GLfloat colors[][3] = {
 
 	{ 0.0, 1.0, 0.0 }, //0
@@ -140,7 +139,6 @@ GLfloat vertex1[][3] = {
 	{0.2,-0.2,-0.2},  //3
 	{0.0,0.4,0.0},  //4
 };
-
 GLfloat colors1[][3] = {
 	 { 0.0, 1.0, 0.0 }, //0
 	 { 0.0, 1.0, 0.0 },	//2
@@ -167,6 +165,21 @@ GLfloat colors1[][3] = {
 	 { 0.0, 1.0, 0.0 },	//4
 };
 
+float vertices[] = { //--- 버텍스 속성: 좌표값(FragPos), 노말값 (Normal)
+-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
+};
+
 bool mode = true;
 
 bool timer = false;
@@ -176,10 +189,6 @@ float yRotateAni = 0.0f;
 double xMove = 0.0, yMove = 0.0, zMove = 0.0;
 
 std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
-
-std::vector< glm::vec3 > vertices;
-std::vector< glm::vec2 > uvs;
-std::vector< glm::vec3 > normals;
 
 
 GLfloat rColor = 0, gColor = 0, bColor = 0;
@@ -209,8 +218,8 @@ void make_fragmentShaders();
 void make_shaderProgram();
 
 /*vao, vbo 관련 함수*/
-void Initvbovao();
 void Initbuffer();
+void Initvbovao();
 void Draw();
 
 char* filetobuf(const char* file)
@@ -292,8 +301,8 @@ GLvoid Reshape(int w, int h) {
 
 void Initvbovao()
 {
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+	int PosLocation = glGetAttribLocation(shaderProgramID, "vPos");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "vNormal");
 	{
 		glGenVertexArrays(1, &s[0].vao);
 		glGenBuffers(2, s[0].vbo);
@@ -337,8 +346,8 @@ void Initvbovao()
 
 void Initbuffer() {
 
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
-	int NormalLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+	int PosLocation = glGetAttribLocation(shaderProgramID, "vPos");
+	int NormalLocation = glGetAttribLocation(shaderProgramID, "vNormal");
 	//조명
 	{
 		glGenVertexArrays(1, &s[2].vao);
@@ -347,7 +356,7 @@ void Initbuffer() {
 		glBindVertexArray(s[2].vao);
 
 		glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[0]);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
 
 		//glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[1]);
@@ -358,18 +367,22 @@ void Initbuffer() {
 		glEnableVertexAttribArray(NormalLocation);
 
 		glUseProgram(shaderProgramID);
+		unsigned int lightPosLocation = glGetUniformLocation(shaderProgramID, "lightPos");
+		glUniform3f(lightPosLocation, 0.0, 0.0, 5.0);
 		unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
 		glUniform3f(lightColorLocation, 1.0, 1.0, 1.0);
 		unsigned int objColorLocation = glGetUniformLocation(shaderProgramID, "objectColor");
-		glUniform3f(lightColorLocation, 1.0, 0.5, 0.3);
+		glUniform3f(objColorLocation, 1.0, 0.5, 0.3);
+		unsigned int viewPosLocation = glGetUniformLocation(shaderProgramID, "viewPos");
+		glUniform3f(viewPosLocation, cameraPos.x, cameraPos.y, cameraPos.z);
 
 	}
 }
 
 void Draw()
 {
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position");
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color");
+	int PosLocation = glGetAttribLocation(shaderProgramID, "vPos");
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "vNormal");
 
 	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "model"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
 
