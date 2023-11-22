@@ -78,7 +78,7 @@ GLvoid TimerFunction(int value)
 			lightRadians = 0.0f;
 		}
 	}
-	
+
 	/*Update와 Draw호출*/
 	glutPostRedisplay();
 	/*타이머 무한 반복*/
@@ -140,7 +140,7 @@ void CameraTransform()
 void LightTransform()
 {
 	/*조명 좌표*/
-	lightX = (1.0f + lightRadiusZ) * cos(lightRadians);
+	lightX = 1.0f * cos(lightRadians);
 	lightZ = (1.0f + lightRadiusZ) * sin(lightRadians);
 	/*셰이더: 조명 좌표 넣기*/
 	unsigned int lightPosLocation = glGetUniformLocation(shaderID, "lightPos");
@@ -182,6 +182,9 @@ void Cube::Draw()
 		int objColorLocation = glGetUniformLocation(shaderID, "objectColor");
 		glUniform3f(objColorLocation, 0.0f, 1.0f, 0.0f);
 
+		GLint pAttribute = glGetAttribLocation(shaderID, "in_Position");
+		GLint cAttribute = glGetAttribLocation(shaderID, "in_Color");
+
 		/*초기화 후 변환 행렬 채우기*/
 		Transform();
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -202,7 +205,7 @@ void Cube::Transform()
 	_mixMat = glm::mat4{ 1.0f };
 	_mixMat = glm::rotate(_mixMat, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	_mixMat = glm::rotate(_mixMat, glm::radians(30.0f + _rotateY), glm::vec3(0.0f, 1.0f, 0.0f));
-	_mixMat = glm::scale(_mixMat, glm::vec3(0.5f,0.5f,0.5f));
+	_mixMat = glm::scale(_mixMat, glm::vec3(0.5f, 0.5f, 0.5f));
 	glUniformMatrix4fv(transformLocate, 1, GL_FALSE, glm::value_ptr(_mixMat));
 }
 void Cube::Rotating()
@@ -244,6 +247,9 @@ void LightCube::Draw()
 		/*도형의 색*/
 		int objColorLocation = glGetUniformLocation(shaderID, "objectColor");
 		glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
+
+		GLint pAttribute = glGetAttribLocation(shaderID, "in_Position");
+		GLint cAttribute = glGetAttribLocation(shaderID, "in_Color");
 
 		/*초기화 후 변환 행렬 채우기*/
 		Transform();
@@ -304,13 +310,15 @@ void Pyramid::InitBuffer()
 void Pyramid::Draw()
 {
 	/*도형의 색*/
-	
+
 	if (_Alive == true)
 	{
 		glBindVertexArray(_vao);
 		int objColorLocation = glGetUniformLocation(shaderID, "objectColor");
 		glUniform3f(objColorLocation, 0.0f, 0.0f, 1.0f);
 
+		GLint pAttribute = glGetAttribLocation(shaderID, "in_Position");
+		GLint cAttribute = glGetAttribLocation(shaderID, "in_Color");
 
 		/*초기화 후 변환 행렬 채우기*/
 		Transform();

@@ -1,7 +1,7 @@
 ﻿#include "function.h"
 #include <iostream>
 
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
 	/***********************************
 	[순서]
@@ -11,14 +11,14 @@ int main(int argc, char** argv)
 	***********************************/
 
 	/*********윈도우 생성하기*********/
-	glutInit(&argc, argv); 
+	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowPosition(550, 100);
 	glutInitWindowSize(800, 800);
 	glutCreateWindow("Drill25");
 
 	/*********GLEW 초기화하기*********/
-	glewExperimental = GL_TRUE; 
+	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)
 	{
 		std::cerr << "Unable to initialize GLEW" << std::endl;
@@ -43,8 +43,8 @@ int main(int argc, char** argv)
 	printf("[z/Z]:조명 큐브를 센터 큐브에 가깝게/멀게 이동하기(조명의 위치가 멀어지면 공전 궤도도 함꼐 멀어짐\n");
 	printf("[q]:프로그램 종료\n");
 	/*********콜백 함수(운영체제 호출 함수) 호출하기*********/
-	
-	glutDisplayFunc(drawScene); 
+
+	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
 	glutKeyboardFunc(Keyboard);
 	glutTimerFunc(50, TimerFunction, 1);

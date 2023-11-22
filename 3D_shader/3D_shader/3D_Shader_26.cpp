@@ -1,4 +1,4 @@
-ï»¿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include "Header.h"
 
 struct Shape {
@@ -6,165 +6,6 @@ struct Shape {
 };
 
 Shape s[4];
-
-//ì •ìœ¡ë©´ì²´
-GLfloat vertex[][3] = {
-	{ -0.2, 0.2, -0.2 }, //0
-	{ -0.2, 0.2, 0.2 }, //1
-	{ 0.2, 0.2, 0.2 }, //2
-
-	{ -0.2, 0.2, -0.2 }, //0
-	{ 0.2, 0.2, 0.2 }, //2
-	{ 0.2, 0.2, -0.2 },//3
-
-	{ -0.2, -0.2, -0.2 },//4
-	{ 0.2, -0.2, 0.2 },//6
-	{ -0.2, -0.2, 0.2 },//5
-
-	{ -0.2, -0.2, -0.2 },//4
-	{ 0.2, -0.2, -0.2 },//7
-	{ 0.2, -0.2, 0.2 },//6
-
-	{ -0.2, 0.2, -0.2 }, //0
-	{ 0.2, 0.2, -0.2 },//3
-	{ -0.2, -0.2, -0.2 },//4
-
-	{ 0.2, 0.2, -0.2 },//3
-	{ 0.2, -0.2, -0.2 },//7
-	{ -0.2, -0.2, -0.2 },//4
-
-	{ -0.2, 0.2, 0.2 }, //1
-	{ -0.2, -0.2, 0.2 },//5
-	{ 0.2, 0.2, 0.2 }, //2
-
-	{ 0.2, -0.2, 0.2 },//6
-	{ 0.2, 0.2, 0.2 }, //2
-	{ -0.2, -0.2, 0.2 },//5
-
-	{ -0.2, 0.2, 0.2 }, //1
-	{ -0.2, 0.2, -0.2 }, //0
-	{ -0.2, -0.2, -0.2 },//4
-
-	{ -0.2, 0.2, 0.2 }, //1
-	{ -0.2, -0.2, -0.2 },//4
-	{ -0.2, -0.2, 0.2 },//5
-
-	{ 0.2, 0.2, 0.2 }, //2
-	{ 0.2, -0.2, -0.2 },//7
-	{ 0.2, 0.2, -0.2 },//3
-
-	{ 0.2, 0.2, 0.2 }, //2
-	{ 0.2, -0.2, 0.2 },//6
-	{ 0.2, -0.2, -0.2 },//7
-
-
-};
-GLfloat colors[][3] = {
-
-	{ 0.0, 1.0, 0.0 }, //0
-	{ 0.0, 1.0, 0.0 }, //1
-	{ 0.0, 1.0, 0.0 }, //2
-
-	{ 0.0, 1.0, 0.0 }, //0
-	{ 0.0, 1.0, 0.0 }, //2
-	{ 0.0, 1.0, 0.0 }, //3
-
-	{ 0.0, 1.0, 0.0 }, //4
-	{ 0.0, 1.0, 0.0 }, //6
-	{ 0.0, 1.0, 0.0 }, //5
-
-	{ 0.0, 1.0, 0.0 }, //4
-	{ 0.0, 1.0, 0.0 }, //7
-	{ 0.0, 1.0, 0.0 }, //6
-
-	{ 0.0, 1.0, 0.0 }, //0
-	{ 0.0, 1.0, 0.0 }, //3
-	{ 0.0, 1.0, 0.0 }, //4
-
-	{ 0.0, 1.0, 0.0 }, //3
-	{ 0.0, 1.0, 0.0 }, //7
-	{ 0.0, 1.0, 0.0 }, //4
-
-	{ 0.0, 1.0, 0.0 }, //1
-	{ 0.0, 1.0, 0.0 }, //5
-	{ 0.0, 1.0, 0.0 }, //2
-
-	{ 0.0, 1.0, 0.0 }, //6
-	{ 0.0, 1.0, 0.0 }, //2
-	{ 0.0, 1.0, 0.0 }, //5
-
-	{ 0.0, 1.0, 0.0 }, //1
-	{ 0.0, 1.0, 0.0 }, //0
-	{ 0.0, 1.0, 0.0 }, //4
-
-	{ 0.0, 1.0, 0.0 }, //1
-	{ 0.0, 1.0, 0.0 }, //4
-	{ 0.0, 1.0, 0.0 }, //5
-
-	{ 0.0, 1.0, 0.0 }, //2
-	{ 0.0, 1.0, 0.0 }, //7
-	{ 0.0, 1.0, 0.0 }, //3
-
-	{ 0.0, 1.0, 0.0 }, //2
-	{ 0.0, 1.0, 0.0 }, //6
-	{ 0.0, 1.0, 0.0 }, //7
-
-
-};
-
-//ì‚¬ë©´ì²´
-GLfloat vertex1[][3] = {
-	{-0.2,-0.2,-0.2}, //0
-	{0.2,-0.2,0.2},  //2
-	{-0.2,-0.2,0.2}, //1
-
-	{-0.2,-0.2,-0.2}, //0
-	{0.2,-0.2,-0.2},  //3
-	{0.2,-0.2,0.2},  //2
-
-	{-0.2,-0.2,0.2}, //1
-	{0.2,-0.2,0.2},  //2
-	{0.0,0.4,0.0},  //4
-
-	{-0.2,-0.2,-0.2}, //0
-	{0.0,0.4,0.0},  //4
-	{0.2,-0.2,-0.2},  //3
-
-	{-0.2,-0.2,-0.2}, //0
-	{-0.2,-0.2,0.2}, //1
-	{0.0,0.4,0.0},  //4
-
-
-	{0.2,-0.2,0.2},  //2
-	{0.2,-0.2,-0.2},  //3
-	{0.0,0.4,0.0},  //4
-};
-GLfloat colors1[][3] = {
-	 { 0.0, 1.0, 0.0 }, //0
-	 { 0.0, 1.0, 0.0 },	//2
-	 { 0.0, 1.0, 0.0 },	//1
-
-	 { 0.0, 1.0, 0.0 },	//0
-	 { 0.0, 1.0, 0.0 },	//3
-	 { 0.0, 1.0, 0.0 },	//2
-
-	 { 0.0, 1.0, 0.0 },	//1
-	 { 0.0, 1.0, 0.0 },	//2
-	 { 0.0, 1.0, 0.0 },	//4
-
-	 { 0.0, 1.0, 0.0 },	//0
-	 { 0.0, 1.0, 0.0 },	//4
-	 { 0.0, 1.0, 0.0 },	//3
-
-	 { 0.0, 1.0, 0.0 },	//0
-	 { 0.0, 1.0, 0.0 },	//1
-	 { 0.0, 1.0, 0.0 },	//4
-
-	 { 0.0, 1.0, 0.0 },	//2
-	 { 0.0, 1.0, 0.0 },	//3
-	 { 0.0, 1.0, 0.0 },	//4
-};
-
 
 std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
 
@@ -175,13 +16,6 @@ std::vector< glm::vec3 > temp_vertices;
 std::vector< glm::vec2 > temp_uvs;
 std::vector< glm::vec3 > temp_normals;
 
-
-bool mode = false;
-
-bool timer = false;
-int Key = 0;
-float xRotateAni = 0.0f;
-float yRotateAni = 0.0f;
 double xMove = 0.0, yMove = 0.0, zMove = 0.0;
 
 
@@ -193,26 +27,29 @@ GLuint vertexShader;
 GLuint fragmentShader;
 GLchar* vertexSource, * fragmentSource;
 
+int lightmode = 0;
+float yAngle = 0.0f;
+float dis = 2.0f;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f); //--- ì¹´ë©”ë¼ ìœ„ì¹˜
-glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f); //--- ì¹´ë©”ë¼ ë°”ë¼ë³´ëŠ” ë°©í–¥
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- ì¹´ë©”ë¼ ìœ„ìª½ ë°©í–¥
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f); //--- Ä«¸Ş¶ó À§Ä¡
+glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f); //--- Ä«¸Ş¶ó ¹Ù¶óº¸´Â ¹æÇâ
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- Ä«¸Ş¶ó À§ÂÊ ¹æÇâ
 
 glm::vec3 lightPosition(0.0f, 3.0f, 0.0f);
 
-/*OPGLê´€ë ´ í•¨ìˆ˜*/
+/*OPGL°ü·Å ÇÔ¼ö*/
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
-GLvoid keyboard(unsigned char key, int x, int y);
-GLvoid Timer(int value);
+GLvoid Keyboard(unsigned char key, int w, int h);
 
-/*ì…°ì´ë” ê´€ë ¨ í•¨ìˆ˜*/
+/*¼ÎÀÌ´õ °ü·Ã ÇÔ¼ö*/
 void make_vertexShaders();
 void make_fragmentShaders();
 void make_shaderProgram();
 
-/*vao, vbo ê´€ë ¨ í•¨ìˆ˜*/
+/*vao, vbo °ü·Ã ÇÔ¼ö*/
 void Initbuffer();
+void light();
 void Draw();
 
 char* filetobuf(const char* file)
@@ -244,7 +81,7 @@ bool ReadObj(const char* path) {
 	uvIndices.clear();
 	FILE* file = fopen(path, "r");
 	if (file == NULL) {
-		printf("íŒŒì¼ ê²½ë¡œ í™•ì¸\n");
+		printf("ÆÄÀÏ °æ·Î È®ÀÎ\n");
 		getchar();
 		return false;
 	}
@@ -273,7 +110,7 @@ bool ReadObj(const char* path) {
 			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
 			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
 			if (matches != 9) {
-				printf("ëª»ì½");
+				printf("¸øÀĞ");
 				return false;
 			}
 			vertexIndices.push_back(vertexIndex[0]);
@@ -323,14 +160,15 @@ int main(int argc, char** argv) {
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	/*ì´ˆê¸°í™” í•¨ìˆ˜*/
+	/*ÃÊ±âÈ­ ÇÔ¼ö*/
 	make_shaderProgram();
 	Initbuffer();
+	light();
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(keyboard);
+	glutKeyboardFunc(Keyboard);
 	glutMainLoop();
 
 	return 0;
@@ -347,19 +185,19 @@ GLvoid drawScene() {
 	glm::mat4 projection = glm::mat4(1.0f);
 	projection = glm::perspective(glm::radians(30.0f), 1.0f, 0.1f, 50.0f);
 	projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
-	unsigned int projectionLocation = glGetUniformLocation(shaderProgramID, "projection"); //--- íˆ¬ì˜ ë³€í™˜ ê°’ ì„¤ì •
+	unsigned int projectionLocation = glGetUniformLocation(shaderProgramID, "projection"); //--- Åõ¿µ º¯È¯ °ª ¼³Á¤
 	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
 
 	glm::mat4 view = glm::mat4(1.0f);
 	cameraPos.y = 3.0;
 	view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
-	unsigned int viewLocation = glGetUniformLocation(shaderProgramID, "view"); //--- ë·°ì‰ ë³€í™˜ ì„¤ì •
+	unsigned int viewLocation = glGetUniformLocation(shaderProgramID, "view"); //--- ºäÀ× º¯È¯ ¼³Á¤
 	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
 
-	/*ê·¸ë¦¬ê¸°*/
+	/*±×¸®±â*/
 	Draw();
 
-	glutSwapBuffers(); //--- í™”ë©´ì— ì¶œë ¥í•˜ê¸°
+	glutSwapBuffers(); //--- È­¸é¿¡ Ãâ·ÂÇÏ±â
 }
 
 GLvoid Reshape(int w, int h) {
@@ -371,7 +209,7 @@ void Initbuffer() {
 	int PosLocation = glGetAttribLocation(shaderProgramID, "vPos");
 	int NormalLocation = glGetAttribLocation(shaderProgramID, "vNormal");
 	{
-		ReadObj("cube.obj");
+		ReadObj("sphere.obj");
 		{
 			glGenVertexArrays(1, &s[0].vao);
 			glGenBuffers(2, s[0].vbo);
@@ -380,128 +218,201 @@ void Initbuffer() {
 
 			glBindBuffer(GL_ARRAY_BUFFER, s[0].vbo[0]);
 			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0* sizeof(float), (void*)0);
+			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, s[0].vbo[1]);
 			glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
-			glVertexAttribPointer(NormalLocation, 3, GL_FLOAT, GL_FALSE, 0* sizeof(float), (void*)0);
+			glVertexAttribPointer(NormalLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
+
+			glEnableVertexAttribArray(PosLocation);
+			glEnableVertexAttribArray(NormalLocation);
+		}
+		ReadObj("sphere.obj");
+		{
+			glGenVertexArrays(1, &s[1].vao);
+			glGenBuffers(2, s[1].vbo);
+
+			glBindVertexArray(s[1].vao);
+
+			glBindBuffer(GL_ARRAY_BUFFER, s[1].vbo[0]);
+			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
+
+			glBindBuffer(GL_ARRAY_BUFFER, s[1].vbo[1]);
+			glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+			glVertexAttribPointer(NormalLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
 
 			glEnableVertexAttribArray(PosLocation);
 			glEnableVertexAttribArray(NormalLocation);
 		}
 
-		glUseProgram(shaderProgramID);
-		unsigned int lightPosLocation = glGetUniformLocation(shaderProgramID, "lightPos");
-		glUniform3f(lightPosLocation, 0.0, 0.0, 5.0);
-		unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
-		glUniform3f(lightColorLocation, 1.0, 1.0, 1.0);
-		unsigned int objColorLocation = glGetUniformLocation(shaderProgramID, "objectColor");
-		glUniform3f(objColorLocation, 1.0, 0.5, 0.3);
-		unsigned int viewPosLocation = glGetUniformLocation(shaderProgramID, "viewPos");
-		glUniform3f(viewPosLocation, cameraPos.x, cameraPos.y, cameraPos.z);
+		ReadObj("sphere.obj");
+		{
+			glGenVertexArrays(1, &s[2].vao);
+			glGenBuffers(2, s[2].vbo);
 
+			glBindVertexArray(s[2].vao);
+
+			glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[0]);
+			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
+
+			glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[1]);
+			glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+			glVertexAttribPointer(NormalLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
+
+			glEnableVertexAttribArray(PosLocation);
+			glEnableVertexAttribArray(NormalLocation);
+		}
 	}
 }
-
+void light() {
+	glUseProgram(shaderProgramID);
+	unsigned int lightPosLocation = glGetUniformLocation(shaderProgramID, "lightPos");
+	glUniform3f(lightPosLocation, 0.0, 0.0, 5.0);
+	unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
+	glUniform3f(lightColorLocation, 1.0, 1.0, 1.0);
+	unsigned int viewPosLocation = glGetUniformLocation(shaderProgramID, "viewPos");
+	glUniform3f(viewPosLocation, cameraPos.x, cameraPos.y, cameraPos.z);
+}
 void Draw()
 {
 	int PosLocation = glGetAttribLocation(shaderProgramID, "vPos");
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "vNormal");
 
-	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "model"); //--- ë²„í…ìŠ¤ ì„¸ì´ë”ì—ì„œ ëª¨ë¸ë§ ë³€í™˜ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "model"); //--- ¹öÅØ½º ¼¼ÀÌ´õ¿¡¼­ ¸ğµ¨¸µ º¯È¯ À§Ä¡ °¡Á®¿À±â
 
-	glm::mat4 TR1 = glm::mat4(1.0f); //--- í•©ì„± ë³€í™˜ í–‰ë ¬
-	TR1 = glm::translate(TR1, glm::vec3(xMove, yMove, zMove)); //--- xì¶•ìœ¼ë¡œ ì´ë™ í–‰ë ¬
-	TR1 = glm::rotate(TR1, glm::radians(180.0f), glm::vec3(1.0, 0.0, 0.0)); //--- xì¶•ì— ëŒ€í•˜ì—¬ íšŒì „ í–‰ë ¬
-	TR1 = glm::rotate(TR1, glm::radians(30.0f + yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- yì¶•ì— ëŒ€í•˜ì—¬ íšŒì „ í–‰ë ¬
+	glm::mat4 TR1 = glm::mat4(1.0f); //--- ÇÕ¼º º¯È¯ Çà·Ä
+	TR1 = glm::translate(TR1, glm::vec3(xMove, yMove, zMove)); //--- xÃàÀ¸·Î ÀÌµ¿ Çà·Ä
+	TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- xÃà¿¡ ´ëÇÏ¿© È¸Àü Çà·Ä
+	TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- yÃà¿¡ ´ëÇÏ¿© È¸Àü Çà·Ä
 
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR1)); //--- modelTransform ë³€ìˆ˜ì— ë³€
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR1)); //--- modelTransform º¯¼ö¿¡ º¯
 
-	if (mode == false) {
-		glBindVertexArray(s[0].vao);
+	unsigned int objColorLocation = glGetUniformLocation(shaderProgramID, "objectColor");
+	glUniform3f(objColorLocation, 1.0, 0.0, 0.0);
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-	}
-	if (mode == true) {
-		glBindVertexArray(s[1].vao);
+	glBindVertexArray(s[0].vao);
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-	}
+	glDrawArrays(GL_TRIANGLES, 0, 10000);
+
+	glm::mat4 TR2 = glm::mat4(1.0f); //--- ÇÕ¼º º¯È¯ Çà·Ä
+	TR2 = glm::translate(TR2, glm::vec3(xMove-1.0, yMove, zMove)); //--- xÃàÀ¸·Î ÀÌµ¿ Çà·Ä
+	TR2 = glm::rotate(TR2, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- xÃà¿¡ ´ëÇÏ¿© È¸Àü Çà·Ä
+	TR2 = glm::rotate(TR2, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- yÃà¿¡ ´ëÇÏ¿© È¸Àü Çà·Ä
+	TR2 = glm::scale(TR2, glm::vec3(0.7, 0.7, 0.7)); //--- xÃàÀ¸·Î ÀÌµ¿ Çà·Ä
+
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR2)); //--- modelTransform º¯¼ö¿¡ º¯
+
+	glUniform3f(objColorLocation, 0.0, 1.0, 0.0);
+
+	glBindVertexArray(s[1].vao);
+
+	glDrawArrays(GL_TRIANGLES, 0, 10000);
+
+
+	glm::mat4 TR3 = glm::mat4(1.0f); //--- ÇÕ¼º º¯È¯ Çà·Ä
+	TR3 = glm::translate(TR3, glm::vec3(xMove - 1.5, yMove, zMove)); //--- xÃàÀ¸·Î ÀÌµ¿ Çà·Ä
+	TR3 = glm::rotate(TR3, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- xÃà¿¡ ´ëÇÏ¿© È¸Àü Çà·Ä
+	TR3 = glm::rotate(TR3, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- yÃà¿¡ ´ëÇÏ¿© È¸Àü Çà·Ä
+	TR3 = glm::scale(TR3, glm::vec3(0.4, 0.4, 0.4)); //--- xÃàÀ¸·Î ÀÌµ¿ Çà·Ä
+
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR3)); //--- modelTransform º¯¼ö¿¡ º¯
+
+	glUniform3f(objColorLocation, 0.0, 0.0, 1.0);
+
+	glBindVertexArray(s[2].vao);
+
+	glDrawArrays(GL_TRIANGLES, 0, 10000);
 
 }
 
 void make_shaderProgram()
 {
-	make_vertexShaders(); //--- ë²„í…ìŠ¤ ì„¸ì´ë” ë§Œë“¤ê¸°
-	make_fragmentShaders(); //--- í”„ë˜ê·¸ë¨¼íŠ¸ ì„¸ì´ë” ë§Œë“¤ê¸°
+	make_vertexShaders(); //--- ¹öÅØ½º ¼¼ÀÌ´õ ¸¸µé±â
+	make_fragmentShaders(); //--- ÇÁ·¡±×¸ÕÆ® ¼¼ÀÌ´õ ¸¸µé±â
 	//-- shader Program
 	shaderProgramID = glCreateProgram();
 	glAttachShader(shaderProgramID, vertexShader);
 	glAttachShader(shaderProgramID, fragmentShader);
 	glLinkProgram(shaderProgramID);
-	//--- ì„¸ì´ë” ì‚­ì œí•˜ê¸°
+	//--- ¼¼ÀÌ´õ »èÁ¦ÇÏ±â
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-	//--- Shader Program ì‚¬ìš©í•˜ê¸°
+	//--- Shader Program »ç¿ëÇÏ±â
 	glUseProgram(shaderProgramID);
 }
 void make_vertexShaders()
 {
 	vertexSource = filetobuf("vertex1.glsl");
-	//--- ë²„í…ìŠ¤ ì„¸ì´ë” ê°ì²´ ë§Œë“¤ê¸°
+	//--- ¹öÅØ½º ¼¼ÀÌ´õ °´Ã¼ ¸¸µé±â
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	//--- ì„¸ì´ë” ì½”ë“œë¥¼ ì„¸ì´ë” ê°ì²´ì— ë„£ê¸°
+	//--- ¼¼ÀÌ´õ ÄÚµå¸¦ ¼¼ÀÌ´õ °´Ã¼¿¡ ³Ö±â
 	glShaderSource(vertexShader, 1, (const GLchar**)&vertexSource, 0);
-	//--- ë²„í…ìŠ¤ ì„¸ì´ë” ì»´íŒŒì¼í•˜ê¸°
+	//--- ¹öÅØ½º ¼¼ÀÌ´õ ÄÄÆÄÀÏÇÏ±â
 	glCompileShader(vertexShader);
-	//--- ì»´íŒŒì¼ì´ ì œëŒ€ë¡œ ë˜ì§€ ì•Šì€ ê²½ìš°: ì—ëŸ¬ ì²´í¬
+	//--- ÄÄÆÄÀÏÀÌ Á¦´ë·Î µÇÁö ¾ÊÀº °æ¿ì: ¿¡·¯ Ã¼Å©
 	GLint result;
 	GLchar errorLog[512];
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
 		glGetShaderInfoLog(vertexShader, 512, NULL, errorLog);
-		std::cerr << "ERROR: vertex shader ì»´íŒŒì¼ ì‹¤íŒ¨\n" << errorLog << std::endl;
+		std::cerr << "ERROR: vertex shader ÄÄÆÄÀÏ ½ÇÆĞ\n" << errorLog << std::endl;
 		return;
 	}
 }
 void make_fragmentShaders()
 {
 	fragmentSource = filetobuf("fragment1.glsl");
-	//--- í”„ë˜ê·¸ë¨¼íŠ¸ ì„¸ì´ë” ê°ì²´ ë§Œë“¤ê¸°
+	//--- ÇÁ·¡±×¸ÕÆ® ¼¼ÀÌ´õ °´Ã¼ ¸¸µé±â
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	//--- ì„¸ì´ë” ì½”ë“œë¥¼ ì„¸ì´ë” ê°ì²´ì— ë„£ê¸°
+	//--- ¼¼ÀÌ´õ ÄÚµå¸¦ ¼¼ÀÌ´õ °´Ã¼¿¡ ³Ö±â
 	glShaderSource(fragmentShader, 1, (const GLchar**)&fragmentSource, 0);
-	//--- í”„ë˜ê·¸ë¨¼íŠ¸ ì„¸ì´ë” ì»´íŒŒì¼
+	//--- ÇÁ·¡±×¸ÕÆ® ¼¼ÀÌ´õ ÄÄÆÄÀÏ
 	glCompileShader(fragmentShader);
-	//--- ì»´íŒŒì¼ì´ ì œëŒ€ë¡œ ë˜ì§€ ì•Šì€ ê²½ìš°: ì»´íŒŒì¼ ì—ëŸ¬ ì²´í¬
+	//--- ÄÄÆÄÀÏÀÌ Á¦´ë·Î µÇÁö ¾ÊÀº °æ¿ì: ÄÄÆÄÀÏ ¿¡·¯ Ã¼Å©
 	GLint result;
 	GLchar errorLog[512];
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
 		glGetShaderInfoLog(fragmentShader, 512, NULL, errorLog);
-		std::cerr << "ERROR: fragment shader ì»´íŒŒì¼ ì‹¤íŒ¨\n" << errorLog << std::endl;
+		std::cerr << "ERROR: fragment shader ÄÄÆÄÀÏ ½ÇÆĞ\n" << errorLog << std::endl;
 		return;
 	}
 }
-GLvoid Timer(int value) {
-	if (timer == true)
-	{
-		glutPostRedisplay(); // í™”ë©´ ì¬ ì¶œë ¥
-		yRotateAni += 0.5f;
-		glutTimerFunc(10, Timer, 1);
-	}
-}
 
-GLvoid keyboard(unsigned char key, int x, int y) {
+GLvoid Keyboard(unsigned char key, int w, int h) {
+	unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
+	unsigned int lightPosLocation = glGetUniformLocation(shaderProgramID, "lightPos");
 	switch (key) {
-	case 'm':
-		mode ? mode = false : mode = true;
+	case 'c':
+		lightmode++;
+		switch (lightmode) {
+		case 1:
+			glUniform3f(lightColorLocation, 0.1, 0.5, 1.0);
+			break;
+		case 2:
+			glUniform3f(lightColorLocation, 0.5, 0.8, 0.6);
+			break;
+		case 3:
+			glUniform3f(lightColorLocation, 0.8, 0.3, 0.4);
+			break;
+		default:
+			lightmode = 0;
+		}
 		break;
-	case 'y':
-		timer ? timer = false : timer = true;
-		glutTimerFunc(10, Timer, 1);
+	case 'r':
+		yAngle += 0.1;
+		glUniform3f(lightPosLocation, dis * sin(yAngle), 0.0, dis * cos(yAngle));
+		break;
+	case 'R':
+		yAngle -= 0.1;
+		glUniform3f(lightPosLocation, dis * sin(yAngle), 0.0, dis * cos(yAngle));
+		break;
+	case 'q':
+		glutLeaveMainLoop();
 		break;
 	}
 	glutPostRedisplay();

@@ -31,10 +31,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment.glsl">
+    <None Include="vertex.glsl">
       <Filter>소스 파일</Filter>
     </None>
-    <None Include="vertex.glsl">
+    <None Include="fragment.glsl">
       <Filter>소스 파일</Filter>
     </None>
   </ItemGroup>
