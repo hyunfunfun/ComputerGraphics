@@ -411,9 +411,6 @@ GLvoid Keyboard(unsigned char key, int w, int h) {
 		yAngle -= 0.1;
 		glUniform3f(lightPosLocation, dis * sin(yAngle), 0.0, dis * cos(yAngle));
 		break;
-	case 'q':
-		glutLeaveMainLoop();
-		break;
 	}
 	glutPostRedisplay();
 }
