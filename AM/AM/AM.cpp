@@ -16,6 +16,8 @@ std::vector< glm::vec3 > temp_vertices;
 std::vector< glm::vec2 > temp_uvs;
 std::vector< glm::vec3 > temp_normals;
 
+float xRotateAni = 0.0f;
+float yRotateAni = 0.0f;
 double xMove = 0.0, yMove = 0.0, zMove = 0.0;
 
 
@@ -27,9 +29,6 @@ GLuint vertexShader;
 GLuint fragmentShader;
 GLchar* vertexSource, * fragmentSource;
 
-int lightmode = 0;
-float yAngle = 0.0f;
-float dis = 2.0f;
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f); //--- 카메라 위치
 glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f); //--- 카메라 바라보는 방향
@@ -40,7 +39,8 @@ glm::vec3 lightPosition(0.0f, 3.0f, 0.0f);
 /*OPGL관렴 함수*/
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
-GLvoid Keyboard(unsigned char key, int w, int h);
+GLvoid keyboard(unsigned char key, int x, int y);
+GLvoid Timer(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -49,7 +49,6 @@ void make_shaderProgram();
 
 /*vao, vbo 관련 함수*/
 void Initbuffer();
-void light();
 void Draw();
 
 char* filetobuf(const char* file)
@@ -163,12 +162,11 @@ int main(int argc, char** argv) {
 	/*초기화 함수*/
 	make_shaderProgram();
 	Initbuffer();
-	light();
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Keyboard);
+	glutKeyboardFunc(keyboard);
 	glutMainLoop();
 
 	return 0;
@@ -227,54 +225,20 @@ void Initbuffer() {
 			glEnableVertexAttribArray(PosLocation);
 			glEnableVertexAttribArray(NormalLocation);
 		}
-		ReadObj("cube.obj");
-		{
-			glGenVertexArrays(1, &s[1].vao);
-			glGenBuffers(2, s[1].vbo);
 
-			glBindVertexArray(s[1].vao);
+		glUseProgram(shaderProgramID);
+		unsigned int lightPosLocation = glGetUniformLocation(shaderProgramID, "lightPos");
+		glUniform3f(lightPosLocation, 0.0, 0.0, 5.0);
+		unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
+		glUniform3f(lightColorLocation, 1.0, 1.0, 1.0);
+		unsigned int objColorLocation = glGetUniformLocation(shaderProgramID, "objectColor");
+		glUniform3f(objColorLocation, 1.0, 0.5, 0.3);
+		unsigned int viewPosLocation = glGetUniformLocation(shaderProgramID, "viewPos");
+		glUniform3f(viewPosLocation, cameraPos.x, cameraPos.y, cameraPos.z);
 
-			glBindBuffer(GL_ARRAY_BUFFER, s[1].vbo[0]);
-			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
-
-			glBindBuffer(GL_ARRAY_BUFFER, s[1].vbo[1]);
-			glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
-			glVertexAttribPointer(NormalLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
-
-			glEnableVertexAttribArray(PosLocation);
-			glEnableVertexAttribArray(NormalLocation);
-		}
-
-		ReadObj("cube.obj");
-		{
-			glGenVertexArrays(1, &s[2].vao);
-			glGenBuffers(2, s[2].vbo);
-
-			glBindVertexArray(s[2].vao);
-
-			glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[0]);
-			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
-
-			glBindBuffer(GL_ARRAY_BUFFER, s[2].vbo[1]);
-			glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
-			glVertexAttribPointer(NormalLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
-
-			glEnableVertexAttribArray(PosLocation);
-			glEnableVertexAttribArray(NormalLocation);
-		}
 	}
 }
-void light() {
-	glUseProgram(shaderProgramID);
-	unsigned int lightPosLocation = glGetUniformLocation(shaderProgramID, "lightPos");
-	glUniform3f(lightPosLocation, 0.0, 0.0, 5.0);
-	unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
-	glUniform3f(lightColorLocation, 1.0, 1.0, 1.0);
-	unsigned int viewPosLocation = glGetUniformLocation(shaderProgramID, "viewPos");
-	glUniform3f(viewPosLocation, cameraPos.x, cameraPos.y, cameraPos.z);
-}
+
 void Draw()
 {
 	int PosLocation = glGetAttribLocation(shaderProgramID, "vPos");
@@ -284,46 +248,14 @@ void Draw()
 
 	glm::mat4 TR1 = glm::mat4(1.0f); //--- 합성 변환 행렬
 	TR1 = glm::translate(TR1, glm::vec3(xMove, yMove, zMove)); //--- x축으로 이동 행렬
-	TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-	TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+	TR1 = glm::rotate(TR1, glm::radians(180.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+	TR1 = glm::rotate(TR1, glm::radians(30.0f + yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
 
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR1)); //--- modelTransform 변수에 변
 
-	unsigned int objColorLocation = glGetUniformLocation(shaderProgramID, "objectColor");
-	glUniform3f(objColorLocation, 1.0, 0.0, 0.0);
-
 	glBindVertexArray(s[0].vao);
-
-	glDrawArrays(GL_TRIANGLES, 0, 10000);
-
-	glm::mat4 TR2 = glm::mat4(1.0f); //--- 합성 변환 행렬
-	TR2 = glm::translate(TR2, glm::vec3(xMove-1.0, yMove, zMove)); //--- x축으로 이동 행렬
-	TR2 = glm::rotate(TR2, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-	TR2 = glm::rotate(TR2, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-	TR2 = glm::scale(TR2, glm::vec3(0.7, 0.7, 0.7)); //--- x축으로 이동 행렬
-
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR2)); //--- modelTransform 변수에 변
-
-	glUniform3f(objColorLocation, 0.0, 1.0, 0.0);
-
-	glBindVertexArray(s[1].vao);
-
-	glDrawArrays(GL_TRIANGLES, 0, 10000);
-
-
-	glm::mat4 TR3 = glm::mat4(1.0f); //--- 합성 변환 행렬
-	TR3 = glm::translate(TR3, glm::vec3(xMove - 1.5, yMove, zMove)); //--- x축으로 이동 행렬
-	TR3 = glm::rotate(TR3, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-	TR3 = glm::rotate(TR3, glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
-	TR3 = glm::scale(TR3, glm::vec3(0.4, 0.4, 0.4)); //--- x축으로 이동 행렬
-
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR3)); //--- modelTransform 변수에 변
-
-	glUniform3f(objColorLocation, 0.0, 0.0, 1.0);
-
-	glBindVertexArray(s[2].vao);
-
-	glDrawArrays(GL_TRIANGLES, 0, 10000);
+	
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 }
 
@@ -383,34 +315,8 @@ void make_fragmentShaders()
 	}
 }
 
-GLvoid Keyboard(unsigned char key, int w, int h) {
-	unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
-	unsigned int lightPosLocation = glGetUniformLocation(shaderProgramID, "lightPos");
+GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-	case 'c':
-		lightmode++;
-		switch (lightmode) {
-		case 1:
-			glUniform3f(lightColorLocation, 0.1, 0.5, 1.0);
-			break;
-		case 2:
-			glUniform3f(lightColorLocation, 0.5, 0.8, 0.6);
-			break;
-		case 3:
-			glUniform3f(lightColorLocation, 0.8, 0.3, 0.4);
-			break;
-		default:
-			lightmode = 0;
-		}
-		break;
-	case 'r':
-		yAngle += 0.1;
-		glUniform3f(lightPosLocation, dis * sin(yAngle), 0.0, dis * cos(yAngle));
-		break;
-	case 'R':
-		yAngle -= 0.1;
-		glUniform3f(lightPosLocation, dis * sin(yAngle), 0.0, dis * cos(yAngle));
-		break;
 	}
 	glutPostRedisplay();
 }
