@@ -3,8 +3,10 @@
 
 struct Shape {
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
-	GLuint vbo[2], vao, ebo;
-	int name;
+	glm::vec3 Scale = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 Move = glm::vec3(0.0f, 0.0f, 0.0f);
+	GLuint vbo[2], vao;
+	float upscale = 0.0f;
 };
 
 Shape s[25][25];
@@ -20,9 +22,7 @@ std::vector< glm::vec3 > temp_normals;
 
 float xRotateAni = 0.0f;
 float yRotateAni = 0.0f;
-double xMove = 0.0, yMove = 0.0, zMove = 0.0;
 int cubesize = 0;
-
 
 GLfloat rColor = 0, gColor = 0, bColor = 0;
 
@@ -39,10 +39,14 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
 
 glm::vec3 lightPosition(0.0f, 3.0f, 0.0f);
 
+bool timer = true;
+bool timer1 = false;
+
 /*OPGL관렴 함수*/
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid keyboard(unsigned char key, int x, int y);
+GLvoid Timer(int value);
 
 /*셰이더 관련 함수*/
 void make_vertexShaders();
@@ -162,6 +166,8 @@ int main(int argc, char** argv) {
 	glewExperimental = GL_TRUE;
 	glewInit();
 
+
+
 	/*초기화 함수*/
 	make_shaderProgram();
 	Initbuffer();
@@ -170,6 +176,7 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(Reshape);
 	glutKeyboardFunc(keyboard);
+	glutTimerFunc(10, Timer, 1);
 	glutMainLoop();
 
 	return 0;
@@ -209,6 +216,8 @@ void Initbuffer() {
 
 	int PosLocation = glGetAttribLocation(shaderProgramID, "vPos");
 	int NormalLocation = glGetAttribLocation(shaderProgramID, "vNormal");
+
+	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "model");
 	{
 		ReadObj("cube.obj");
 		{
@@ -216,6 +225,7 @@ void Initbuffer() {
 			{
 				for(int j=0;j<cubesize;j++)
 				{
+					s[j][i].upscale = rand() % 10 * 0.0001;
 					glGenVertexArrays(1, &s[j][i].vao);
 					glGenBuffers(2, s[j][i].vbo);
 
@@ -231,6 +241,16 @@ void Initbuffer() {
 
 					glEnableVertexAttribArray(PosLocation);
 					glEnableVertexAttribArray(NormalLocation);
+
+
+					s[j][i].Move.x = j * 0.5;
+					s[j][i].Move.z = i * 0.5;
+					s[j][i].TR = glm::translate(s[j][i].TR, glm::vec3(s[j][i].Move.x, s[j][i].Move.y, s[j][i].Move.z)); //--- x축으로 이동 행렬
+					glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(s[j][i].TR)); //--- modelTransform 변수에 변
+
+					glBindVertexArray(s[j][i].vao);
+
+					glDrawArrays(GL_TRIANGLES, 0, 36);
 				}
 			}
 		}
@@ -257,12 +277,11 @@ void Draw()
 
 	for(int i=0;i<cubesize;i++)
 	{
-		xMove = 0;
 		for(int j=0;j<cubesize;j++)
 		{
-			xMove += 0.5;
-			s[j][i].TR= glm::translate(s[j][i].TR, glm::vec3(xMove, yMove, zMove)); //--- x축으로 이동 행렬
+			//s[j][i].TR= glm::translate(s[j][i].TR, glm::vec3(s[j][i].Move.x, s[j][i].Move.y, s[j][i].Move.z)); //--- x축으로 이동 행렬
 			s[j][i].TR= glm::rotate(s[j][i].TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
+			s[j][i].TR = glm::scale(s[j][i].TR, glm::vec3(s[j][i].Scale.x, s[j][i].Scale.y, s[j][i].Scale.z)); //--- x축으로 이동 행렬
 
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(s[j][i].TR)); //--- modelTransform 변수에 변
 
@@ -270,7 +289,6 @@ void Draw()
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		zMove += 0.5;
 	}
 
 }
@@ -333,6 +351,24 @@ void make_fragmentShaders()
 
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
+	case '1':
+		timer1 ? timer1 = false : timer1 = true;
+		break;
 	}
 	glutPostRedisplay();
+}
+GLvoid Timer(int value) {
+
+	if (timer==true){
+		if (timer1 == true) {
+			for (int i = 0; i < cubesize; i++) {
+				for (int j = 0; j < cubesize; j++) {
+					s[j][i].Scale.y = s[j][i].upscale;
+					//s[j][i].Scale.y += 0.001;
+				}
+			}
+		}
+	}
+	glutPostRedisplay();
+	glutTimerFunc(10, Timer, 1);
 }
