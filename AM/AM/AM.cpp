@@ -2,11 +2,12 @@
 #include "Header.h"
 
 struct Shape {
+	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 	GLuint vbo[2], vao, ebo;
 	int name;
 };
 
-Shape* s[4];
+Shape s[25][25];
 
 std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
 
@@ -149,9 +150,6 @@ bool ReadObj(const char* path) {
 int main(int argc, char** argv) {
 	cout << "숫자입력" << endl;
 	cin >> cubesize;
-	for (int i = 0; i < cubesize; i++) {
-		s[i] = new Shape;
-	}
 	srand(time(NULL));
 
 	glutInit(&argc, argv);
@@ -216,21 +214,24 @@ void Initbuffer() {
 		{
 			for(int i=0;i<cubesize;i++)
 			{
-				glGenVertexArrays(1, &s[i]->vao);
-				glGenBuffers(2, s[i]->vbo);
+				for(int j=0;j<cubesize;j++)
+				{
+					glGenVertexArrays(1, &s[j][i].vao);
+					glGenBuffers(2, s[j][i].vbo);
 
-				glBindVertexArray(s[i]->vao);
+					glBindVertexArray(s[j][i].vao);
 
-				glBindBuffer(GL_ARRAY_BUFFER, s[i]->vbo[0]);
-				glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-				glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
+					glBindBuffer(GL_ARRAY_BUFFER, s[j][i].vbo[0]);
+					glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+					glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
 
-				glBindBuffer(GL_ARRAY_BUFFER, s[i]->vbo[1]);
-				glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
-				glVertexAttribPointer(NormalLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
+					glBindBuffer(GL_ARRAY_BUFFER, s[j][i].vbo[1]);
+					glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+					glVertexAttribPointer(NormalLocation, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float), (void*)0);
 
-				glEnableVertexAttribArray(PosLocation);
-				glEnableVertexAttribArray(NormalLocation);
+					glEnableVertexAttribArray(PosLocation);
+					glEnableVertexAttribArray(NormalLocation);
+				}
 			}
 		}
 
@@ -254,18 +255,22 @@ void Draw()
 
 	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "model"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
 
-	glm::mat4 TR1 = glm::mat4(1.0f); //--- 합성 변환 행렬
 	for(int i=0;i<cubesize;i++)
 	{
-		TR1 = glm::translate(TR1, glm::vec3(xMove+0.5, yMove, zMove)); //--- x축으로 이동 행렬
-		TR1 = glm::rotate(TR1, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-		TR1 = glm::rotate(TR1, glm::radians(0.0f + yRotateAni), glm::vec3(0.0, 1.0, 0.0)); //--- y축에 대하여 회전 행렬
+		xMove = 0;
+		for(int j=0;j<cubesize;j++)
+		{
+			xMove += 0.5;
+			s[j][i].TR= glm::translate(s[j][i].TR, glm::vec3(xMove, yMove, zMove)); //--- x축으로 이동 행렬
+			s[j][i].TR= glm::rotate(s[j][i].TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
 
-		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(TR1)); //--- modelTransform 변수에 변
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(s[j][i].TR)); //--- modelTransform 변수에 변
 
-		glBindVertexArray(s[i]->vao);
+			glBindVertexArray(s[j][i].vao);
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		zMove += 0.5;
 	}
 
 }
