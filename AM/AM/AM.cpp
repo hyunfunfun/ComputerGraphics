@@ -3,14 +3,13 @@
 
 struct Shape {
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
-	glm::vec3 Scale = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 Scale = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 Move = glm::vec3(0.0f, 0.0f, 0.0f);
 	GLuint vbo[2], vao;
 	float upscale = 0.0f;
 };
 
 Shape s[25][25];
-
 std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
 
 std::vector< glm::vec3 > vertices;
@@ -23,6 +22,7 @@ std::vector< glm::vec3 > temp_normals;
 float xRotateAni = 0.0f;
 float yRotateAni = 0.0f;
 int cubesize = 0;
+
 
 GLfloat rColor = 0, gColor = 0, bColor = 0;
 
@@ -39,7 +39,6 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
 
 glm::vec3 lightPosition(0.0f, 3.0f, 0.0f);
 
-bool timer = true;
 bool timer1 = false;
 
 /*OPGL관렴 함수*/
@@ -225,7 +224,7 @@ void Initbuffer() {
 			{
 				for(int j=0;j<cubesize;j++)
 				{
-					s[j][i].upscale = rand() % 10 * 0.0001;
+					s[j][i].upscale = rand() % 10 * 0.01;
 					glGenVertexArrays(1, &s[j][i].vao);
 					glGenBuffers(2, s[j][i].vbo);
 
@@ -243,9 +242,6 @@ void Initbuffer() {
 					glEnableVertexAttribArray(NormalLocation);
 
 
-					s[j][i].Move.x = j * 0.5;
-					s[j][i].Move.z = i * 0.5;
-					s[j][i].TR = glm::translate(s[j][i].TR, glm::vec3(s[j][i].Move.x, s[j][i].Move.y, s[j][i].Move.z)); //--- x축으로 이동 행렬
 					glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(s[j][i].TR)); //--- modelTransform 변수에 변
 
 					glBindVertexArray(s[j][i].vao);
@@ -279,9 +275,16 @@ void Draw()
 	{
 		for(int j=0;j<cubesize;j++)
 		{
-			//s[j][i].TR= glm::translate(s[j][i].TR, glm::vec3(s[j][i].Move.x, s[j][i].Move.y, s[j][i].Move.z)); //--- x축으로 이동 행렬
+			s[j][i].Move.x = j * 0.5;
+			s[j][i].Move.z = i * 0.5;
+			s[j][i].Move.y = 0.25;
+
+			s[j][i].TR = glm::mat4{ 1.0f };
+
 			s[j][i].TR= glm::rotate(s[j][i].TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
-			s[j][i].TR = glm::scale(s[j][i].TR, glm::vec3(s[j][i].Scale.x, s[j][i].Scale.y, s[j][i].Scale.z)); //--- x축으로 이동 행렬
+			//s[j][i].TR = glm::translate(s[j][i].TR, glm::vec3(s[j][i].Move.x, s[j][i].Move.y, s[j][i].Move.z)); //--- x축으로 이동 행렬
+			s[j][i].TR = glm::scale(s[j][i].TR, glm::vec3(1 + s[j][i].Scale.x, 1 + s[j][i].Scale.y, 1 + s[j][i].Scale.z)); //--- x축으로 이동 행렬
+			s[j][i].TR = glm::translate(s[j][i].TR, glm::vec3(s[j][i].Move.x, s[j][i].Move.y, s[j][i].Move.z)); //--- x축으로 이동 행렬
 
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(s[j][i].TR)); //--- modelTransform 변수에 변
 
@@ -351,20 +354,24 @@ void make_fragmentShaders()
 
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-	case '1':
+	case 'a':
 		timer1 ? timer1 = false : timer1 = true;
+		break;
+	case 'b':
+		timer1 = false;
 		break;
 	}
 	glutPostRedisplay();
 }
+
 GLvoid Timer(int value) {
 
-	if (timer==true){
-		if (timer1 == true) {
-			for (int i = 0; i < cubesize; i++) {
-				for (int j = 0; j < cubesize; j++) {
-					s[j][i].Scale.y = s[j][i].upscale;
-					//s[j][i].Scale.y += 0.001;
+	if (timer1 == true) {
+		for (int i = 0; i < cubesize; i++) {
+			for (int j = 0; j < cubesize; j++) {
+
+				if (s[j][i].Scale.y <= 2.0f) {
+					s[j][i].Scale.y += s[j][i].upscale;
 				}
 			}
 		}
