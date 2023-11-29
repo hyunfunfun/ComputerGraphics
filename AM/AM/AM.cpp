@@ -5,6 +5,7 @@ struct Shape {
 	glm::mat4 TR = glm::mat4(1.0f); //--- 합성 변환 행렬
 	glm::vec3 Scale = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 Move = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 color = glm::vec3(rand() % 11 * 0.1, rand() % 11 * 0.1, rand() % 11 * 0.1);
 	GLuint vbo[2], vao;
 	float upscale = 0.0f;
 	bool upmode = true;
@@ -22,7 +23,8 @@ std::vector< glm::vec3 > temp_normals;
 
 float xRotateAni = 0.0f;
 float yRotateAni = 0.0f;
-int cubesize = 0;
+int cubesize_width = 0;
+int cubesize_length = 0;
 bool turnlight = false;
 
 
@@ -44,6 +46,7 @@ glm::vec3 cameraPos1 = glm::vec3(0.0f, 30.0f, 5.0f); //--- 카메라 위치
 glm::vec3 lightPosition(3.0f, 11.0f, 3.0f);
 
 bool timer1 = false;
+bool timer2 = false;
 
 bool yRotate = false;
 float yAngle = 1.0f;
@@ -160,8 +163,10 @@ bool ReadObj(const char* path) {
 }
 
 int main(int argc, char** argv) {
-	cout << "숫자입력" << endl;
-	cin >> cubesize;
+	cout << "가로입력" << endl;
+	cin >> cubesize_width;
+	cout << "세로입력" << endl;
+	cin >> cubesize_length;
 	srand(time(NULL));
 
 	glutInit(&argc, argv);
@@ -242,9 +247,9 @@ void Initbuffer() {
 	{
 		ReadObj("cube.obj");
 		{
-			for(int i=0;i<cubesize;i++)
+			for(int i=0;i<cubesize_length;i++)
 			{
-				for(int j=0;j<cubesize;j++)
+				for(int j=0;j<cubesize_width;j++)
 				{
 					s[j][i].Move.x = j * 0.5 - 2.0;
 					s[j][i].Move.z = i * 0.5 - 2.0;
@@ -278,13 +283,9 @@ void Initbuffer() {
 
 		glUseProgram(shaderProgramID);
 		unsigned int lightPosLocation = glGetUniformLocation(shaderProgramID, "lightPos");
-		glUniform3f(lightPosLocation, 3.0, 10.0, 3.0);
+		glUniform3f(lightPosLocation, 3.0, 5.0, 3.0);
 		unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
 		glUniform3f(lightColorLocation, 1.0, 1.0, 1.0);
-		unsigned int objColorLocation = glGetUniformLocation(shaderProgramID, "objectColor");
-		glUniform3f(objColorLocation, 1.0, 0.5, 0.3);
-		
-
 	}
 }
 
@@ -294,11 +295,12 @@ void Draw()
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "vNormal");
 
 	unsigned int modelLocation = glGetUniformLocation(shaderProgramID, "model"); //--- 버텍스 세이더에서 모델링 변환 위치 가져오기
-
-	for(int i=0;i<cubesize;i++)
+	unsigned int objColorLocation = glGetUniformLocation(shaderProgramID, "objectColor");
+	for(int i=0;i< cubesize_length;i++)
 	{
-		for(int j=0;j<cubesize;j++)
+		for(int j=0;j<cubesize_width;j++)
 		{
+			glUniform3f(objColorLocation, s[j][i].color.x, s[j][i].color.y, s[j][i].color.z);
 			s[j][i].TR = glm::mat4{ 1.0f };
 
 			s[j][i].TR= glm::rotate(s[j][i].TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
@@ -395,16 +397,30 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		yRotate ? yRotate = false : yRotate = true;
 		break;
 	case '+':
-		for (int i = 0; i < cubesize; i++) {
-			for (int j = 0; j < cubesize; j++) {
+		for (int i = 0; i < cubesize_length; i++) {
+			for (int j = 0; j < cubesize_width; j++) {
 				s[j][i].upscale *= 1.1;
 			}
 		}
 		break;
 	case '-':
-		for (int i = 0; i < cubesize; i++) {
-			for (int j = 0; j < cubesize; j++) {
+		for (int i = 0; i < cubesize_length; i++) {
+			for (int j = 0; j < cubesize_width; j++) {
 				s[j][i].upscale *= 0.9;
+			}
+		}
+		break;
+	case 'r':
+		cout << "가로입력" << endl;
+		cin >> cubesize_width;
+		cout << "세로입력" << endl;
+		cin >> cubesize_length;
+		timer1 = false;
+		yRotate = false;
+		Initbuffer();
+		for (int i = 0; i < cubesize_length; i++) {
+			for (int j = 0; j < cubesize_width; j++) {
+				s[j][i].Scale = glm::vec3( 0,0,0 );
 			}
 		}
 		break;
@@ -415,8 +431,8 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 GLvoid Timer(int value) {
 
 	if (timer1 == true) {
-		for (int i = 0; i < cubesize; i++) {
-			for (int j = 0; j < cubesize; j++) {
+		for (int i = 0; i < cubesize_length; i++) {
+			for (int j = 0; j < cubesize_width; j++) {
 				if ( s[j][i].upmode==true) {
 					s[j][i].Scale.y += s[j][i].upscale;
 					if (s[j][i].Scale.y >= 10.0f) {
