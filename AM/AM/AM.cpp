@@ -394,7 +394,20 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	case 'y':
 		yRotate ? yRotate = false : yRotate = true;
 		break;
-
+	case '+':
+		for (int i = 0; i < cubesize; i++) {
+			for (int j = 0; j < cubesize; j++) {
+				s[j][i].upscale *= 1.1;
+			}
+		}
+		break;
+	case '-':
+		for (int i = 0; i < cubesize; i++) {
+			for (int j = 0; j < cubesize; j++) {
+				s[j][i].upscale *= 0.9;
+			}
+		}
+		break;
 	}
 	glutPostRedisplay();
 }
