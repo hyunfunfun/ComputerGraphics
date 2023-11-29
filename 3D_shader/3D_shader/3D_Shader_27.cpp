@@ -647,7 +647,7 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		cameraDirection.z = 0.0f;
 		cameraDirection.x = 0.0f;
 		yAngle -= 0.1;
-		cameraPos.z = dis * cos(yAngle);
+		//cameraPos.z = dis * cos(yAngle);
 		cameraPos.x = dis * sin(yAngle);
 		break;
 	case 'c':

@@ -7,6 +7,7 @@ struct Shape {
 	glm::vec3 Move = glm::vec3(0.0f, 0.0f, 0.0f);
 	GLuint vbo[2], vao;
 	float upscale = 0.0f;
+	bool upmode = true;
 };
 
 Shape s[25][25];
@@ -22,9 +23,10 @@ std::vector< glm::vec3 > temp_normals;
 float xRotateAni = 0.0f;
 float yRotateAni = 0.0f;
 int cubesize = 0;
+bool turnlight = false;
 
 
-GLfloat rColor = 0, gColor = 0, bColor = 0;
+GLfloat rColor = 0.3, gColor = 0.3, bColor = 0.3;
 
 GLint width, height;
 GLuint shaderProgramID;
@@ -33,13 +35,20 @@ GLuint fragmentShader;
 GLchar* vertexSource, * fragmentSource;
 
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f); //--- 카메라 위치
+glm::vec3 cameraPos = glm::vec3(20.0f, 20.0f, 20.0f); //--- 카메라 위치
 glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f); //--- 카메라 바라보는 방향
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); //--- 카메라 위쪽 방향
 
-glm::vec3 lightPosition(0.0f, 3.0f, 0.0f);
+glm::vec3 cameraPos1 = glm::vec3(0.0f, 30.0f, 5.0f); //--- 카메라 위치
+
+glm::vec3 lightPosition(3.0f, 11.0f, 3.0f);
 
 bool timer1 = false;
+
+bool yRotate = false;
+float yAngle = 1.0f;
+float dis_z = cameraPos.z;
+float dis_x = cameraPos.x;
 
 /*OPGL관렴 함수*/
 GLvoid drawScene();
@@ -156,7 +165,7 @@ int main(int argc, char** argv) {
 	srand(time(NULL));
 
 	glutInit(&argc, argv);
-	width = 800, height = 600;
+	width = 1000, height = 800;
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(width, height);
 	glutInitWindowPosition(0, 0);
@@ -164,8 +173,6 @@ int main(int argc, char** argv) {
 	glutCreateWindow("Cube");
 	glewExperimental = GL_TRUE;
 	glewInit();
-
-
 
 	/*초기화 함수*/
 	make_shaderProgram();
@@ -190,18 +197,33 @@ GLvoid drawScene() {
 	glUseProgram(shaderProgramID);
 
 	glm::mat4 projection = glm::mat4(1.0f);
+	glm::mat4 projection1 = glm::mat4(1.0f);
+
 	projection = glm::perspective(glm::radians(30.0f), 1.0f, 0.1f, 50.0f);
 	projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
+
 	unsigned int projectionLocation = glGetUniformLocation(shaderProgramID, "projection"); //--- 투영 변환 값 설정
 	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
 
 	glm::mat4 view = glm::mat4(1.0f);
-	cameraPos.y = 3.0;
 	view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
 	unsigned int viewLocation = glGetUniformLocation(shaderProgramID, "view"); //--- 뷰잉 변환 설정
 	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
 
+	glViewport(0, 0, 1000, 800);
 	/*그리기*/
+	Draw();
+
+	unsigned int projectionLocation1 = glGetUniformLocation(shaderProgramID, "projection");
+
+	view = glm::lookAt(cameraPos1, cameraDirection, cameraUp);
+	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
+
+	projection = glm::perspective(glm::radians(30.0f), 1.0f, 0.1f, 50.0f);
+	projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
+	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
+	glViewport(750, 550, 200, 200);
+
 	Draw();
 
 	glutSwapBuffers(); //--- 화면에 출력하기
@@ -224,7 +246,10 @@ void Initbuffer() {
 			{
 				for(int j=0;j<cubesize;j++)
 				{
-					s[j][i].upscale = rand() % 10 * 0.01;
+					s[j][i].Move.x = j * 0.5 - 2.0;
+					s[j][i].Move.z = i * 0.5 - 2.0;
+					s[j][i].Move.y = 0.25;
+					s[j][i].upscale = (rand() % 10+1) * 0.01;
 					glGenVertexArrays(1, &s[j][i].vao);
 					glGenBuffers(2, s[j][i].vbo);
 
@@ -253,13 +278,12 @@ void Initbuffer() {
 
 		glUseProgram(shaderProgramID);
 		unsigned int lightPosLocation = glGetUniformLocation(shaderProgramID, "lightPos");
-		glUniform3f(lightPosLocation, 0.0, 5.0, 0.0);
+		glUniform3f(lightPosLocation, 3.0, 10.0, 3.0);
 		unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
 		glUniform3f(lightColorLocation, 1.0, 1.0, 1.0);
 		unsigned int objColorLocation = glGetUniformLocation(shaderProgramID, "objectColor");
 		glUniform3f(objColorLocation, 1.0, 0.5, 0.3);
-		unsigned int viewPosLocation = glGetUniformLocation(shaderProgramID, "viewPos");
-		glUniform3f(viewPosLocation, cameraPos.x, cameraPos.y, cameraPos.z);
+		
 
 	}
 }
@@ -275,10 +299,6 @@ void Draw()
 	{
 		for(int j=0;j<cubesize;j++)
 		{
-			s[j][i].Move.x = j * 0.5;
-			s[j][i].Move.z = i * 0.5;
-			s[j][i].Move.y = 0.25;
-
 			s[j][i].TR = glm::mat4{ 1.0f };
 
 			s[j][i].TR= glm::rotate(s[j][i].TR, glm::radians(0.0f), glm::vec3(1.0, 0.0, 0.0)); //--- x축에 대하여 회전 행렬
@@ -353,13 +373,28 @@ void make_fragmentShaders()
 }
 
 GLvoid keyboard(unsigned char key, int x, int y) {
+	unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
 	switch (key) {
-	case 'a':
-		timer1 ? timer1 = false : timer1 = true;
+	case '1':
+		timer1 = true;
 		break;
-	case 'b':
+	case '2':
 		timer1 = false;
 		break;
+	case 'c':
+		glUniform3f(lightColorLocation, rand()%11*0.1, rand() % 11 * 0.1, rand() % 11 * 0.1);
+		break;
+	case 't':
+		turnlight ? turnlight = false : turnlight = true;
+		if (turnlight == true)
+			glUniform3f(lightColorLocation, 0, 0, 0);
+		else if (turnlight == false)
+			glUniform3f(lightColorLocation, 1.0, 1.0, 1.0);
+		break;
+	case 'y':
+		yRotate ? yRotate = false : yRotate = true;
+		break;
+
 	}
 	glutPostRedisplay();
 }
@@ -369,12 +404,25 @@ GLvoid Timer(int value) {
 	if (timer1 == true) {
 		for (int i = 0; i < cubesize; i++) {
 			for (int j = 0; j < cubesize; j++) {
-
-				if (s[j][i].Scale.y <= 2.0f) {
+				if ( s[j][i].upmode==true) {
 					s[j][i].Scale.y += s[j][i].upscale;
+					if (s[j][i].Scale.y >= 10.0f) {
+						s[j][i].upmode = false;
+					}
+				}
+				else if (s[j][i].upmode == false) {
+					s[j][i].Scale.y -= s[j][i].upscale;
+					if (s[j][i].Scale.y <= 0.0f) {
+						s[j][i].upmode = true;
+					}
 				}
 			}
 		}
+	}
+	if (yRotate == true) {
+		yAngle += 0.01;
+		cameraPos.z = dis_z * cos(yAngle);
+		cameraPos.x = dis_x * sin(yAngle);
 	}
 	glutPostRedisplay();
 	glutTimerFunc(10, Timer, 1);
