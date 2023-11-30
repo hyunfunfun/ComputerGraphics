@@ -9,6 +9,7 @@ struct Shape {
 	GLuint vbo[2], vao;
 	float upscale = 0.0f;
 	bool upmode = true;
+	bool wave = false;
 };
 
 Shape s[25][25];
@@ -254,7 +255,6 @@ void Initbuffer() {
 					s[j][i].Move.x = j * 0.5 - 2.0;
 					s[j][i].Move.z = i * 0.5 - 2.0;
 					s[j][i].Move.y = 0.25;
-					s[j][i].upscale = (rand() % 10+1) * 0.01;
 					glGenVertexArrays(1, &s[j][i].vao);
 					glGenBuffers(2, s[j][i].vbo);
 
@@ -378,10 +378,24 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 	unsigned int lightColorLocation = glGetUniformLocation(shaderProgramID, "lightColor");
 	switch (key) {
 	case '1':
+		for (int i = 0; i < cubesize_length; i++) {
+			for (int j = 0; j < cubesize_width; j++) {
+				s[j][i].Scale.y = 0;
+				s[j][i].upscale = (rand() % 10 + 1) * 0.01;
+			}
+		}
 		timer1 = true;
+		timer2 = false;
 		break;
 	case '2':
+		for (int i = 0; i < cubesize_length; i++) {
+			for (int j = 0; j < cubesize_width; j++) {
+				s[j][i].Scale.y = 0;
+				s[j][i].upscale = 0.03;
+			}
+		}
 		timer1 = false;
+		timer2 = true;
 		break;
 	case 'c':
 		glUniform3f(lightColorLocation, rand()%11*0.1, rand() % 11 * 0.1, rand() % 11 * 0.1);
@@ -443,6 +457,41 @@ GLvoid Timer(int value) {
 					s[j][i].Scale.y -= s[j][i].upscale;
 					if (s[j][i].Scale.y <= 0.0f) {
 						s[j][i].upmode = true;
+					}
+				}
+			}
+		}
+	}
+	if (timer2 == true) {
+		for (int i = 0; i < cubesize_length; i++) {
+			for (int j = 0; j < cubesize_width; j++) {
+				if (i==0)
+				{
+					if (s[j][i].upmode == true) {
+						s[j][i].Scale.y += s[j][i].upscale;
+						if (s[j][i].Scale.y >= 10.0f) {
+							s[j][i].upmode = false;
+						}
+					}
+					else if (s[j][i].upmode == false) {
+						s[j][i].Scale.y -= s[j][i].upscale;
+						if (s[j][i].Scale.y <= 0.0f) { 
+							s[j][i].upmode = true;
+						}
+					}
+				}
+				else {
+					if (s[j][i].upmode == true && s[j][i - 1].Scale.y > 1.0) {
+						s[j][i].Scale.y += s[j][i].upscale;
+						if (s[j][i].Scale.y >= 10.0f) {
+							s[j][i].upmode = false;
+						}
+					}
+					else if (s[j][i].upmode == false && s[j][i - 1].Scale.y < 9.0) {
+						s[j][i].Scale.y -= s[j][i].upscale;
+						if (s[j][i].Scale.y <= 0.0f) {
+							s[j][i].upmode = true;
+						}
 					}
 				}
 			}
